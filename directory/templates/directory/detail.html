@@ -1,0 +1,62 @@
+{% extends 'directory/base.html' %}
+
+{% block title %}{{ website.title }} - Website Directory{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                {% if website.category %}
+                <li class="breadcrumb-item"><a
+                        href="?category={{ website.category.slug }}">{{ website.category.name }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active">{{ website.title }}</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-body">
+                <h2>{{ website.title }}</h2>
+                <p class="text-muted">
+                    <i class="bi bi-link-45deg"></i>
+                    <a href="{{ website.url }}" target="_blank">{{ website.url }}</a>
+                </p>
+                {% if website.category %}
+                <span class="badge bg-primary">{{ website.category.name }}</span>
+                {% endif %}
+                <hr>
+                <h5>Description</h5>
+                <p>{{ website.description }}</p>
+                <hr>
+                <h5>Contact Information</h5>
+                <p><i class="bi bi-person"></i> {{ website.owner_name }}</p>
+                <p><i class="bi bi-envelope"></i> {{ website.owner_email }}</p>
+                <a href="{{ website.url }}" target="_blank" class="btn btn-primary btn-lg">
+                    <i class="bi bi-box-arrow-up-right"></i> Visit Website
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Related Websites</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for related in related_websites %}
+                <a href="{% url 'website_detail' related.slug %}" class="list-group-item list-group-item-action">
+                    <strong>{{ related.title }}</strong>
+                    <br>
+                    <small class="text-muted">{{ related.description|truncatewords:10 }}</small>
+                </a>
+                {% empty %}
+                <div class="list-group-item">No related websites</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'directory/base.html' %}
+
+{% block title %}Website Directory - Home{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>Website Directory</h1>
+        <p class="text-muted">Discover the best websites curated for you</p>
+    </div>
+    <div class="col-md-4">
+        <form method="get" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search websites..."
+                value="{{ request.GET.search|default:'' }}">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Categories Sidebar -->
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-folder"></i> Categories</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'index' %}"
+                    class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                    All Categories
+                </a>
+                {% for category in categories %}
+                <a href="?category={{ category.slug }}"
+                    class="list-group-item list-group-item-action {% if selected_category == category.slug %}active{% endif %}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Websites Grid -->
+    <div class="col-md-9">
+        <div class="row">
+            {% for website in page_obj %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card website-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'website_detail' website.slug %}" class="text-decoration-none">
+                                {{ website.title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small">{{ website.description|truncatewords:15 }}</p>
+                        {% if website.category %}
+                        <span class="badge bg-secondary category-badge">{{ website.category.name }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ website.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-box-arrow-up-right"></i> Visit
+                        </a>
+                        <a href="{% url 'website_detail' website.slug %}" class="btn btn-sm btn-outline-secondary">
+                            Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">No websites found. Be the first to submit!</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

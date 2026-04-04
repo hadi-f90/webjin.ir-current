@@ -1,0 +1,107 @@
+{% extends 'directory/base.html' %}
+
+{% block title %}Admin Dashboard - Website Directory{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="bi bi-speedometer2"></i> Admin Dashboard</h1>
+
+<div class="row">
+    <!-- Pending Websites -->
+    <div class="col-md-12 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Pending Review ({{ pending.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% if pending %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>URL</th>
+                                <th>Category</th>
+                                <th>Submitted By</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for website in pending %}
+                            <tr>
+                                <td>{{ website.title }}</td>
+                                <td><a href="{{ website.url }}" target="_blank">{{ website.url|truncatechars:30 }}</a>
+                                </td>
+                                <td>{{ website.category.name|default:"-" }}</td>
+                                <td>{{ website.owner_name }}</td>
+                                <td>{{ website.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'approve_website' website.pk %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-circle"></i> Approve
+                                    </a>
+                                    <a href="{% url 'reject_website' website.pk %}" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-x-circle"></i> Reject
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No pending submissions.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Approved Websites -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> Approved ({{ approved.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% if approved %}
+                <ul class="list-group list-group-flush">
+                    {% for website in approved|slice:":10" %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a>
+                        <span class="badge bg-success rounded-pill">Active</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if approved.count > 10 %}
+                <small class="text-muted">And {{ approved.count|add:"-10" }} more...</small>
+                {% endif %}
+                {% else %}
+                <p class="text-muted mb-0">No approved websites.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejected Websites -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-x-circle"></i> Rejected ({{ rejected.count }})</h5>
+            </div>
+            <div class="card-body">
+                {% if rejected %}
+                <ul class="list-group list-group-flush">
+                    {% for website in rejected|slice:":10" %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ website.title }}
+                        <span class="badge bg-danger rounded-pill">Rejected</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No rejected websites.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
