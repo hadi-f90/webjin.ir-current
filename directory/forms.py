@@ -1,5 +1,7 @@
 from django import forms
 from .models import Website, Category
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 class WebsiteSubmitForm(forms.ModelForm):
     """Form for users to submit new websites"""
@@ -30,6 +32,25 @@ class WebsiteSubmitForm(forms.ModelForm):
                 'placeholder': 'your@email.com'
             }),
         }
+
+    def clean_url(self):
+        url = self.cleaned_data.get('url', '').strip()
+
+        if not url:
+            raise ValidationError("آدرس وب‌سایت الزامی است.")
+
+        # Add https:// if no protocol exists
+        if not url.startswith(('http://', 'https://', 'www')):
+            url = 'https://' + url
+
+        # Validate the URL
+        try:
+            validator = URLValidator(schemes=['http', 'https'])
+            validator(url)
+        except ValidationError:
+            raise ValidationError("آدرس وب‌سایت معتبر نیست.")
+
+        return url
 
 
 class WebsiteAdminForm(forms.ModelForm):

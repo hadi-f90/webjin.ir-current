@@ -23,7 +23,8 @@
 
                     <div class="mb-3">
                         <label class="form-label">آدرس وب‌سایت *</label>
-                        {{ form.url }}
+                        <input type="text" name="url" class="form-control" placeholder="example.com" required id="id_url">
+                        <small class="text-muted">می‌توانید بدون http:// یا https:// وارد کنید</small>
                         {% if form.url.errors %}
                         <div class="text-danger">{{ form.url.errors }}</div>
                         {% endif %}

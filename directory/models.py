@@ -21,7 +21,7 @@ class Website(models.Model):
     slug = models.SlugField(unique=True)
     url = models.URLField()
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True,)
     owner_name = models.CharField(max_length=100)
     owner_email = models.EmailField()
     screenshot = models.ImageField(upload_to='screenshots/', blank=True, null=True)
