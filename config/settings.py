@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+from django.utils.translation import gettext_lazy as _
 
 import os
 from pathlib import Path
@@ -100,13 +101,16 @@ AUTH_PASSWORD_VALIDATORS = [{
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+# Update these settings
+LANGUAGE_CODE = 'fa-ir'
+TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
-
 USE_TZ = True
+
+LANGUAGES = [
+    ('fa', _('Persian')),
+    ('en', _('English')),
+]
 
 
 # Static files (CSS, JavaScript, Images)

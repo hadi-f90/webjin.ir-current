@@ -4,7 +4,13 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from .forms import WebsiteSubmitForm
 from .models import Category, Website
+import logging
 
+logger = logging.getLogger(__name__)
+
+def submit_website(request):
+    logger.error('Form import: {}', WebsiteSubmitForm)
+    logger.error('Form fields: {}', WebsiteSubmitForm._meta.model)
 
 def is_admin(user):
     return user.is_staff
@@ -55,13 +61,11 @@ def submit_website(request):
         form = WebsiteSubmitForm(request.POST)
         if form.is_valid():
             website = form.save(commit=False)
-            website.status = 'pending'  # Default status is pending
+            website.status = 'pending'
             if request.user.is_authenticated:
                 website.created_by = request.user
             website.save()
-            messages.success(
-                request, 'Website submitted successfully! It will be reviewed shortly.'
-            )
+            messages.success(request, "وب‌سایت شما با موفقیت ثبت شد!")
             return redirect('success')
     else:
         form = WebsiteSubmitForm()

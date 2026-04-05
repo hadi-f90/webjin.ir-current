@@ -1,13 +1,13 @@
 {% extends 'directory/base.html' %}
 
-{% block title %}{{ website.title }} - Website Directory{% endblock %}
+{% block title %}{{ website.title }} - دایرکتوری وب‌سایت{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-8">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
                 {% if website.category %}
                 <li class="breadcrumb-item"><a
                         href="?category={{ website.category.slug }}">{{ website.category.name }}</a></li>
@@ -27,14 +27,14 @@
                 <span class="badge bg-primary">{{ website.category.name }}</span>
                 {% endif %}
                 <hr>
-                <h5>Description</h5>
+                <h5>توضیحات</h5>
                 <p>{{ website.description }}</p>
                 <hr>
-                <h5>Contact Information</h5>
+                <h5>اطلاعات تماس</h5>
                 <p><i class="bi bi-person"></i> {{ website.owner_name }}</p>
                 <p><i class="bi bi-envelope"></i> {{ website.owner_email }}</p>
                 <a href="{{ website.url }}" target="_blank" class="btn btn-primary btn-lg">
-                    <i class="bi bi-box-arrow-up-right"></i> Visit Website
+                    <i class="bi bi-box-arrow-up-right"></i> بازدید از وب‌سایت
                 </a>
             </div>
         </div>
@@ -43,7 +43,7 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Related Websites</h5>
+                <h5 class="mb-0">وب‌سایت‌های مرتبط</h5>
             </div>
             <div class="list-group list-group-flush">
                 {% for related in related_websites %}
@@ -53,7 +53,7 @@
                     <small class="text-muted">{{ related.description|truncatewords:10 }}</small>
                 </a>
                 {% empty %}
-                <div class="list-group-item">No related websites</div>
+                <div class="list-group-item">وب‌سایت مرتبطی یافت نشد</div>
                 {% endfor %}
             </div>
         </div>

@@ -1,16 +1,16 @@
 {% extends 'directory/base.html' %}
 
-{% block title %}Website Directory - Home{% endblock %}
+{% block title %}دایرکتوری وب‌سایت{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-md-8">
-        <h1>Website Directory</h1>
-        <p class="text-muted">Discover the best websites curated for you</p>
+        <h1>دایرکتوری وب‌سایت‌ها</h1>
+        <p class="text-muted">بهترین وب‌سایت‌های فارسی و خارجی</p>
     </div>
     <div class="col-md-4">
         <form method="get" class="d-flex">
-            <input type="text" name="search" class="form-control me-2" placeholder="Search websites..."
+            <input type="text" name="search" class="form-control me-2" placeholder="جستجو..."
                 value="{{ request.GET.search|default:'' }}">
             <button type="submit" class="btn btn-outline-primary">
                 <i class="bi bi-search"></i>
@@ -24,12 +24,12 @@
     <div class="col-md-3">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-folder"></i> Categories</h5>
+                <h5 class="mb-0"><i class="bi bi-folder"></i> دسته‌بندی‌ها</h5>
             </div>
             <div class="list-group list-group-flush">
                 <a href="{% url 'index' %}"
                     class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
-                    All Categories
+                    همه دسته‌ها
                 </a>
                 {% for category in categories %}
                 <a href="?category={{ category.slug }}"
@@ -60,17 +60,17 @@
                     </div>
                     <div class="card-footer bg-transparent">
                         <a href="{{ website.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-box-arrow-up-right"></i> Visit
+                            <i class="bi bi-box-arrow-up-right"></i> بازدید
                         </a>
                         <a href="{% url 'website_detail' website.slug %}" class="btn btn-sm btn-outline-secondary">
-                            Details
+                            جزئیات
                         </a>
                     </div>
                 </div>
             </div>
             {% empty %}
             <div class="col-12">
-                <div class="alert alert-info">No websites found. Be the first to submit!</div>
+                <div class="alert alert-info">هیچ وب‌سایتی یافت نشد. اولین نفری باشید که وب‌سایت ثبت می‌کنید!</div>
             </div>
             {% endfor %}
         </div>
@@ -81,23 +81,23 @@
             <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1">First</a>
+                    <a class="page-link" href="?page=1">اولین</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
                 </li>
                 {% endif %}
 
                 <li class="page-item active">
-                    <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    <span class="page-link">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
                 </li>
 
                 {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">آخرین</a>
                 </li>
                 {% endif %}
             </ul>

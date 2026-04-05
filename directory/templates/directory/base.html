@@ -1,23 +1,29 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Website Directory{% endblock %}</title>
+    <title>{% block title %}دایرکتوری وب‌سایت{% endblock %}</title>
 
-    <!-- Bootstrap CSS (Local) -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- Bootstrap RTL CSS (Local) -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.rtl.min.css' %}">
 
     <!-- Bootstrap Icons -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <<link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
-    {% block extra_css %}{% endblock %}
+        <style>
+            body {
+                font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+            }
+        </style>
+
+        {% block extra_css %}{% endblock %}
 </head>
 
 <body>
@@ -25,22 +31,22 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">
-                <i class="bi bi-globe"></i> Web Directory
+                <i class="bi bi-globe"></i> دایرکتوری وب‌سایت
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">Home</a>
+                        <a class="nav-link" href="{% url 'index' %}">خانه</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'submit_website' %}">Submit Website</a>
+                        <a class="nav-link" href="{% url 'submit_website' %}">ثبت وب‌سایت</a>
                     </li>
                     {% if user.is_staff %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'admin_dashboard' %}">Admin</a>
+                        <a class="nav-link" href="{% url 'admin_dashboard' %}">مدیریت</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -63,16 +69,14 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="bg-light py-4 mt-5">
         <div class="container text-center">
-            <p class="text-muted mb-0">© 2024 Website Directory. All rights reserved.</p>
+            <p class="text-muted mb-0">© ۱۴۰۴ - تمامی حقوق محفوظ است</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS (Local) -->
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-    <!-- Custom JS -->
+    <!-- Bootstrap JS -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
