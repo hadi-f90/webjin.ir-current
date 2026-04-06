@@ -23,10 +23,19 @@
 
                     <div class="mb-3">
                         <label class="form-label">آدرس وب‌سایت *</label>
-                        <input type="text" name="url" class="form-control" placeholder="example.com" required id="id_url">
+                        {{ form.url }}
                         <small class="text-muted">می‌توانید بدون http:// یا https:// وارد کنید</small>
                         {% if form.url.errors %}
                         <div class="text-danger">{{ form.url.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">اسلاگ سفارشی (اختیاری)</label>
+                        {{ form.custom_slug }}
+                        <small class="text-muted">آدرس: example.com/website/اسلاگ-شما</small>
+                        {% if form.custom_slug.errors %}
+                        <div class="text-danger">{{ form.custom_slug.errors }}</div>
                         {% endif %}
                     </div>
 

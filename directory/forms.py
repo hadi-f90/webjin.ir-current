@@ -5,9 +5,20 @@ from django.core.exceptions import ValidationError
 
 class WebsiteSubmitForm(forms.ModelForm):
     """Form for users to submit new websites"""
+    # Optional custom slug field
+    custom_slug = forms.SlugField(
+        required=False,
+        label='اسلاگ سفارشی (اختیاری)',
+        help_text='آدرس اختصاصی برای وب‌سایت شما (اختیاری)',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'my-website'
+        })
+    )
+
     class Meta:
         model = Website
-        fields = ['title', 'url', 'description', 'category', 'owner_name', 'owner_email']
+        fields = ['title', 'custom_slug','url', 'description', 'category', 'owner_name', 'owner_email']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -51,6 +62,34 @@ class WebsiteSubmitForm(forms.ModelForm):
             raise ValidationError("آدرس وب‌سایت معتبر نیست.")
 
         return url
+
+    def clean_custom_slug(self):
+        slug = self.cleaned_data.get('custom_slug', '').strip()
+
+        if slug:
+            # Check if slug already exists
+            from django.utils.text import slugify
+
+            slug = slugify(slug)
+
+            if Website.objects.filter(slug=slug).exists():
+                raise ValidationError("این اسلاگ قبلاً استفاده شده است.")
+
+        return slug
+
+    def save(self, commit=True):
+        website = super().save(commit=False)
+
+        # Use custom slug if provided, otherwise will be auto-generated in model save()
+        if self.cleaned_data.get('custom_slug'):
+            from django.utils.text import slugify
+
+            website.slug = slugify(self.cleaned_data['custom_slug'])
+
+        if commit:
+            website.save()
+
+        return website
 
 
 class WebsiteAdminForm(forms.ModelForm):
