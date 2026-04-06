@@ -1,13 +1,13 @@
 {% extends 'directory/base.html' %}
 
-{% block title %}ثبت وب‌سایت - لینک‌یاب{% endblock %}
+{% block title %}ویرایش وب‌سایت - لینک‌یاب{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> ثبت وب‌سایت جدید</h4>
+                <h4 class="mb-0"><i class="bi bi-pencil"></i> ویرایش وب‌سایت</h4>
             </div>
             <div class="card-body">
                 <form method="post" id="websiteForm">
@@ -41,8 +41,15 @@
                                 autocomplete="off">
                             <div id="tagSuggestions" class="tag-suggestions"></div>
                         </div>
-                        <div id="tagChips" class="tag-chips"></div>
-                        <input type="hidden" name="tags_input" id="tagsInput">
+                        <div id="tagChips" class="tag-chips">
+                            {% for tag in website.tags.all %}
+                            <span class="tag-chip" data-tag="{{ tag.name }}">
+                                {{ tag.name }}
+                                <span class="remove-tag" onclick="removeTag('{{ tag.name }}')">×</span>
+                            </span>
+                            {% endfor %}
+                        </div>
+                        <input type="hidden" name="tags_input" id="tagsInput" value="{{ current_tags }}">
                     </div>
 
                     <div class="mb-3">
@@ -64,19 +71,16 @@
                     <div class="mb-3 form-check">
                         {{ form.hide_owner_info }}
                         <label class="form-check-label" for="{{ form.hide_owner_info.id_for_label }}">
-                            مخفی کردن اطلاعات تماس از کاربران
+                            مخفی کردن اطلاعات تماس
                         </label>
                     </div>
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-send"></i> ثبت وب‌سایت
+                            <i class="bi bi-check-circle"></i> ذخیره تغییرات
                         </button>
                     </div>
                 </form>
-            </div>
-            <div class="card-footer text-muted">
-                <small>وب‌سایت شما پس از بررسی منتشر خواهد شد.</small>
             </div>
         </div>
     </div>
@@ -86,6 +90,15 @@
 {% block extra_js %}
 <script>
     let selectedTags = [];
+
+    {% for tag in website.tags.all %}
+    selectedTags.push('{{ tag.name }}');
+    {% endfor %}
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function () {
+        updateTagsInput();
+    });
 
     const tagInput = document.getElementById('tagInput');
     const tagSuggestions = document.getElementById('tagSuggestions');
@@ -113,6 +126,7 @@
                     tagSuggestions.innerHTML = html;
                     tagSuggestions.classList.add('show');
                 } else {
+                    // Allow adding new tag
                     if (!selectedTags.includes(query)) {
                         html = `<div class="tag-suggestion-item" onclick="addTag('${query}')">+ افزودن "${query}"</div>`;
                         tagSuggestions.innerHTML = html;
@@ -155,6 +169,7 @@
         tagsInput.value = selectedTags.join(',');
     }
 
+    // Hide suggestions when clicking outside
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.position-relative')) {
             tagSuggestions.classList.remove('show');

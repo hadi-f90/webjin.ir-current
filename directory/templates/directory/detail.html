@@ -2,6 +2,12 @@
 
 {% block title %}{{ website.title }} - دایرکتوری وب‌سایت{% endblock %}
 
+{% if is_owner %}
+<a href="{% url 'edit_website' website.slug %}" class="btn btn-sm btn-outline-primary me-2">
+    <i class="bi bi-pencil"></i> ویرایش
+</a>
+{% endif %}
+
 {% block content %}
 <div class="row">
     <div class="col-md-8">
@@ -18,7 +24,7 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h2>{{ website.title }}</h2>
-                
+
                 <!-- Rating Display -->
                 <div class="mb-2">
                     {% if website.total_ratings > 0 %}
@@ -36,24 +42,24 @@
                         <span class="text-muted">بدون امتیاز</span>
                     {% endif %}
                 </div>
-                
+
                 <p class="text-muted">
-                    <i class="bi bi-link-45deg"></i> 
+                    <i class="bi bi-link-45deg"></i>
                     <a href="{{ website.url }}" target="_blank">{{ website.url }}</a>
                 </p>
-                
+
                 {% if website.category %}
                 <span class="badge bg-primary">{{ website.category.name }}</span>
                 {% endif %}
-                
+
                 {% for tag in website.tags.all %}
                 <a href="?tag={{ tag.slug }}" class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
                 {% endfor %}
-                
+
                 <hr>
                 <h5>توضیحات</h5>
                 <p>{{ website.description }}</p>
-                
+
                 <hr>
                 <!-- Owner Info (Hidden if requested) -->
                 {% if not website.hide_owner_info %}
@@ -63,7 +69,7 @@
                 {% else %}
                 <p class="text-muted"><i class="bi bi-eye-slash"></i> اطلاعات صاحب وب‌سایت مخفی شده است.</p>
                 {% endif %}
-                
+
                 <a href="{{ website.url }}" target="_blank" class="btn btn-primary btn-lg">
                     <i class="bi bi-box-arrow-up-right"></i> بازدید از وب‌سایت
                 </a>
@@ -84,7 +90,7 @@
                             {% csrf_token %}
                             <div class="btn-group" role="group">
                                 {% for i in "12345" %}
-                                <button type="submit" name="rating" value="{{ forloop.counter }}" 
+                                <button type="submit" name="rating" value="{{ forloop.counter }}"
                                         class="btn btn-outline-warning {% if user_rating.rating == forloop.counter %}active{% endif %}">
                                     {{ forloop.counter }} ⭐
                                 </button>
@@ -121,7 +127,7 @@
                 {% else %}
                     <p class="text-muted">برای نوشتن نظر باید <a href="/admin/login/">وارد شوید</a></p>
                 {% endif %}
-                
+
                 <hr>
                 {% for review in reviews %}
                 <div class="border-bottom pb-3 mb-3">
