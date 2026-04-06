@@ -9,33 +9,151 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'index' %}">خانه</a></li>
                 {% if website.category %}
-                <li class="breadcrumb-item"><a
-                        href="?category={{ website.category.slug }}">{{ website.category.name }}</a></li>
+                <li class="breadcrumb-item"><a href="?category={{ website.category.slug }}">{{ website.category.name }}</a></li>
                 {% endif %}
                 <li class="breadcrumb-item active">{{ website.title }}</li>
             </ol>
         </nav>
 
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-body">
                 <h2>{{ website.title }}</h2>
+                
+                <!-- Rating Display -->
+                <div class="mb-2">
+                    {% if website.total_ratings > 0 %}
+                        <span class="text-warning">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= website.average_rating|floatformat:0 %}
+                                    ⭐
+                                {% else %}
+                                    ☆
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <span class="text-muted">({{ website.average_rating|floatformat:1 }} / ۵ - {{ website.total_ratings }} رأی)</span>
+                    {% else %}
+                        <span class="text-muted">بدون امتیاز</span>
+                    {% endif %}
+                </div>
+                
                 <p class="text-muted">
-                    <i class="bi bi-link-45deg"></i>
+                    <i class="bi bi-link-45deg"></i> 
                     <a href="{{ website.url }}" target="_blank">{{ website.url }}</a>
                 </p>
+                
                 {% if website.category %}
                 <span class="badge bg-primary">{{ website.category.name }}</span>
                 {% endif %}
+                
+                {% for tag in website.tags.all %}
+                <a href="?tag={{ tag.slug }}" class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
+                {% endfor %}
+                
                 <hr>
                 <h5>توضیحات</h5>
                 <p>{{ website.description }}</p>
+                
                 <hr>
+                <!-- Owner Info (Hidden if requested) -->
+                {% if not website.hide_owner_info %}
                 <h5>اطلاعات تماس</h5>
                 <p><i class="bi bi-person"></i> {{ website.owner_name }}</p>
                 <p><i class="bi bi-envelope"></i> {{ website.owner_email }}</p>
+                {% else %}
+                <p class="text-muted"><i class="bi bi-eye-slash"></i> اطلاعات صاحب وب‌سایت مخفی شده است.</p>
+                {% endif %}
+                
                 <a href="{{ website.url }}" target="_blank" class="btn btn-primary btn-lg">
                     <i class="bi bi-box-arrow-up-right"></i> بازدید از وب‌سایت
                 </a>
+            </div>
+        </div>
+
+        <!-- Rating Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">امتیازدهی</h5>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                    {% if user_rating %}
+                        <p class="text-success">امتیاز شما: {{ user_rating.rating }} ⭐</p>
+                    {% else %}
+                        <form method="post" action="{% url 'rate_website' website.slug %}">
+                            {% csrf_token %}
+                            <div class="btn-group" role="group">
+                                {% for i in "12345" %}
+                                <button type="submit" name="rating" value="{{ forloop.counter }}" 
+                                        class="btn btn-outline-warning {% if user_rating.rating == forloop.counter %}active{% endif %}">
+                                    {{ forloop.counter }} ⭐
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">برای امتیازدهی باید <a href="/admin/login/">وارد شوید</a></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Review Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">نظرات کاربران</h5>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                    {% if user_review %}
+                        <div class="alert alert-info">
+                            <strong>نظر شما:</strong>
+                            <p>{{ user_review.content }}</p>
+                            <small class="text-muted">{{ user_review.created_at|date:"Y/m/d" }}</small>
+                        </div>
+                    {% else %}
+                        <form method="post" action="{% url 'review_website' website.slug %}">
+                            {% csrf_token %}
+                            {{ review_form.as_p }}
+                            <button type="submit" class="btn btn-primary">ثبت نظر</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">برای نوشتن نظر باید <a href="/admin/login/">وارد شوید</a></p>
+                {% endif %}
+                
+                <hr>
+                {% for review in reviews %}
+                <div class="border-bottom pb-3 mb-3">
+                    <strong>{{ review.user.username }}</strong>
+                    <small class="text-muted">{{ review.created_at|date:"Y/m/d" }}</small>
+                    <p class="mb-0">{{ review.content }}</p>
+                </div>
+                {% empty %}
+                <p class="text-muted">هنوز نظری ثبت نشده است.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Report Section -->
+        <div class="card mb-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-flag"></i> گزارش مشکل</h5>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                    {% if user_report %}
+                        <p class="text-warning">شما قبلاً این وب‌سایت را گزارش کرده‌اید.</p>
+                    {% else %}
+                        <form method="post" action="{% url 'report_website' website.slug %}">
+                            {% csrf_token %}
+                            {{ report_form.as_p }}
+                            <button type="submit" class="btn btn-danger">ارسال گزارش</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">برای گزارش باید <a href="/admin/login/">وارد شوید</a></p>
+                {% endif %}
             </div>
         </div>
     </div>
