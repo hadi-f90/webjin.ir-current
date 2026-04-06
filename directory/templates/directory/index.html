@@ -3,46 +3,94 @@
 {% block title %}دایرکتوری وب‌سایت{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h1>دایرکتوری وب‌سایت‌ها</h1>
-        <p class="text-muted">بهترین وب‌سایت‌های فارسی و خارجی</p>
-    </div>
-    <div class="col-md-4">
-        <form method="get" class="d-flex">
-            <input type="text" name="search" class="form-control me-2" placeholder="جستجو..."
-                value="{{ request.GET.search|default:'' }}">
-            <button type="submit" class="btn btn-outline-primary">
+<!-- Big Search Bar -->
+<div class="search-box mb-5">
+    <form method="get" action="{% url 'index' %}" class="position-relative">
+        <div class="input-group input-group-lg">
+            <input type="text" name="search" class="form-control" placeholder="جستجو در وب‌سایت‌ها..."
+                value="{{ request.GET.search|default:'' }}" id="searchInput" autocomplete="off">
+            <button class="btn btn-primary" type="submit">
                 <i class="bi bi-search"></i>
             </button>
-        </form>
-    </div>
+        </div>
+        <!-- Search Suggestions -->
+        <div id="searchResults" class="search-results d-none"></div>
+    </form>
 </div>
 
 <div class="row">
-    <!-- Categories Sidebar -->
+    <!-- Sidebar -->
     <div class="col-md-3">
-        <div class="card">
+        <!-- Categories -->
+        <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-folder"></i> دسته‌بندی‌ها</h5>
+                <h6 class="mb-0"><i class="bi bi-folder"></i> دسته‌بندی‌ها</h6>
             </div>
             <div class="list-group list-group-flush">
                 <a href="{% url 'index' %}"
                     class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
-                    همه دسته‌ها
+                    همه ({{ categories|length }})
                 </a>
                 {% for category in categories %}
                 <a href="?category={{ category.slug }}"
                     class="list-group-item list-group-item-action {% if selected_category == category.slug %}active{% endif %}">
-                    {{ category.name }}
+                    <i class="{{ category.icon }}"></i> {{ category.name }}
+                    <span class="badge bg-secondary float-end">{{ category.website_count }}</span>
                 </a>
                 {% endfor %}
             </div>
         </div>
+
+        <!-- Popular Tags Accordion -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0" data-bs-toggle="collapse" data-bs-target="#tagsCollapse" style="cursor: pointer;">
+                    <i class="bi bi-tags"></i> برچسب‌های محبوب <i class="bi bi-chevron-down float-end"></i>
+                </h6>
+            </div>
+            <div id="tagsCollapse" class="collapse show">
+                <div class="card-body">
+                    {% for tag in all_tags %}
+                    <a href="?tag={{ tag.slug }}" class="badge bg-light text-dark text-decoration-none mb-1">
+                        {{ tag.name }} ({{ tag.website_count }})
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Websites Grid -->
+    <!-- Main Content -->
     <div class="col-md-9">
+        <!-- Featured/Random Websites -->
+        {% if not request.GET.search and not selected_category and not tag_slug %}
+        <div class="card mb-4 border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-stars"></i> وب‌سایت‌های پیشنهادی</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for website in featured_websites %}
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6><a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a></h6>
+                                <p class="small text-muted mb-0">{{ website.description|truncatewords:10 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Website List -->
+        <h4 class="mb-3">
+            {% if selected_category %}{{ selected_category }}{% elif tag_slug %}برچسب:
+            {{ tag_slug }}{% elif request.GET.search %}نتایج جستجو{% else %}همه وب‌سایت‌ها{% endif %}
+        </h4>
+
         <div class="row">
             {% for website in page_obj %}
             <div class="col-md-6 col-lg-4 mb-4">
@@ -55,7 +103,12 @@
                         </h5>
                         <p class="card-text text-muted small">{{ website.description|truncatewords:15 }}</p>
                         {% if website.category %}
-                        <span class="badge bg-secondary category-badge">{{ website.category.name }}</span>
+                        <span class="badge bg-primary">{{ website.category.name }}</span>
+                        {% endif %}
+                        {% if website.total_ratings > 0 %}
+                        <span class="badge bg-warning text-dark">
+                            ⭐ {{ website.average_rating|floatformat:1 }}
+                        </span>
                         {% endif %}
                     </div>
                     <div class="card-footer bg-transparent">
@@ -70,7 +123,7 @@
             </div>
             {% empty %}
             <div class="col-12">
-                <div class="alert alert-info">هیچ وب‌سایتی یافت نشد. اولین نفری باشید که وب‌سایت ثبت می‌کنید!</div>
+                <div class="alert alert-info">هیچ وب‌سایتی یافت نشد.</div>
             </div>
             {% endfor %}
         </div>
@@ -105,4 +158,44 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const query = this.value;
+        const resultsDiv = document.getElementById('searchResults');
+
+        if (query.length < 2) {
+            resultsDiv.classList.add('d-none');
+            return;
+        }
+
+        fetch('/search/suggestions/?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+                if (data.suggestions.length > 0) {
+                    let html = '<div class="card">';
+                    data.suggestions.forEach(item => {
+                        html += `<a href="${item.url}" class="list-group-item list-group-item-action">
+                        <i class="${item.icon}"></i> ${item.title}
+                        <small class="text-muted float-end">${item.type}</small>
+                    </a>`;
+                    });
+                    html += '</div>';
+                    resultsDiv.innerHTML = html;
+                    resultsDiv.classList.remove('d-none');
+                } else {
+                    resultsDiv.classList.add('d-none');
+                }
+            });
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.search-box')) {
+            document.getElementById('searchResults').classList.add('d-none');
+        }
+    });
+</script>
 {% endblock %}

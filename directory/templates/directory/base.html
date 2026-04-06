@@ -8,22 +8,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}دایرکتوری وب‌سایت{% endblock %}</title>
 
-    <!-- Bootstrap RTL CSS (Local) -->
+    <!-- Bootstrap RTL CSS -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.rtl.min.css' %}">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
-    <!-- Custom CSS -->
-    <<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <style>
+        body {
+            font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+        }
 
-        <style>
-            body {
-                font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
-            }
-        </style>
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-        {% block extra_css %}{% endblock %}
+        .search-results {
+            position: absolute;
+            width: 100%;
+            z-index: 1000;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
@@ -44,9 +51,31 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'submit_website' %}">ثبت وب‌سایت</a>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_dashboard' %}">پنل کاربری</a>
+                    </li>
+                    {% endif %}
                     {% if user.is_staff %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'admin_dashboard' %}">مدیریت</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="nav-link">{{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">خروج</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">ورود</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">ثبت‌نام</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -70,12 +99,29 @@
 
     <!-- Footer -->
     <footer class="bg-light py-4 mt-5">
-        <div class="container text-center">
-            <p class="text-muted mb-0">© ۱۴۰۴ - تمامی حقوق محفوظ است</p>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>دایرکتوری وب‌سایت</h5>
+                    <p class="text-muted">معرفی بهترین وب‌سایت‌های فارسی و خارجی</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>لینک‌های مفید</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'about' %}">درباره ما</a></li>
+                        <li><a href="{% url 'terms' %}">قوانین و مقررات</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>ارتباط با ما</h5>
+                    <p class="text-muted">info@example.com</p>
+                </div>
+            </div>
+            <hr>
+            <p class="text-center text-muted mb-0">© ۱۴۰۴ - تمامی حقوق محفوظ است</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
 

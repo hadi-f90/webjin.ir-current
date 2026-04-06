@@ -8,20 +8,31 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, default='bi-folder', blank=True)  # Bootstrap icon
     
     class Meta:
         verbose_name_plural = "Categories"
+        ordering = ['name']
     
     def __str__(self):
         return self.name
+    
+    def get_website_count(self):
+        return self.website_set.filter(status='approved').count()
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(unique=True)
     
+    class Meta:
+        ordering = ['name']
+    
     def __str__(self):
         return self.name
+    
+    def get_website_count(self):
+        return self.websites.filter(status='approved').count()
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -40,13 +51,13 @@ class Website(models.Model):
     slug = models.SlugField(max_length=220, unique=True, blank=True)
     url = models.URLField()
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='website_set')
     tags = models.ManyToManyField(Tag, blank=True, related_name='websites')
     
     # Owner info
     owner_name = models.CharField(max_length=100)
     owner_email = models.EmailField()
-    hide_owner_info = models.BooleanField(default=False, verbose_name='مخفی کردن اطلاعات صاحب وب‌سایت')
+    hide_owner_info = models.BooleanField(default=False, verbose_name='مخفی کردن اطلاعات')
     
     # Status
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -54,7 +65,7 @@ class Website(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    # Rating (cached average)
+    # Rating
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     total_ratings = models.PositiveIntegerField(default=0)
     
@@ -84,7 +95,6 @@ class Website(models.Model):
         return reverse('website_detail', kwargs={'slug': self.slug})
     
     def update_rating(self):
-        """Recalculate average rating"""
         ratings = self.ratings.all()
         if ratings.exists():
             total = sum(r.rating for r in ratings)
@@ -97,21 +107,19 @@ class Website(models.Model):
 
 
 class Rating(models.Model):
-    """Rating model - requires login"""
     website = models.ForeignKey(Website, on_delete=models.CASCADE, related_name='ratings')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])  # 1-5 stars
+    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        unique_together = ['website', 'user']  # One rating per user per website
+        unique_together = ['website', 'user']
     
     def __str__(self):
         return f"{self.website.title} - {self.rating} stars"
 
 
 class Review(models.Model):
-    """Review model - requires login"""
     website = models.ForeignKey(Website, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
@@ -127,7 +135,6 @@ class Review(models.Model):
 
 
 class Report(models.Model):
-    """Report model - requires login"""
     REPORT_CHOICES = [
         ('broken', 'لینک خراب'),
         ('shutdown', 'وب‌سایت غیرفعال'),
@@ -147,4 +154,4 @@ class Report(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"Report on {self.website.title} - {self.get_report_type_display()}"
+        return f"Report on {self.website.title}"

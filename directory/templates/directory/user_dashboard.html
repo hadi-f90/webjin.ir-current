@@ -1,0 +1,82 @@
+{% extends 'directory/base.html' %}
+
+{% block title %}پنل کاربری{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">پنل کاربری</h2>
+
+<div class="row">
+    <!-- My Websites -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">وب‌سایت‌های ثبت شده توسط من</h5>
+            </div>
+            <div class="card-body">
+                {% if my_websites %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>عنوان</th>
+                            <th>وضعیت</th>
+                            <th>تاریخ</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for website in my_websites %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a>
+                            </td>
+                            <td>
+                                {% if website.status == 'approved' %}
+                                <span class="badge bg-success">تأیید شده</span>
+                                {% elif website.status == 'pending' %}
+                                <span class="badge bg-warning">در انتظار</span>
+                                {% else %}
+                                <span class="badge bg-danger">رد شده</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ website.created_at|date:"Y/m/d" }}</td>
+                            <td>
+                                <a href="{% url 'delete_my_website' website.pk %}" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('آیا مطمئن هستید؟')">حذف</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted">شما هنوز وب‌سایتی ثبت نکرده‌اید.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- My Reviews -->
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">نظرات من</h5>
+            </div>
+            <div class="card-body">
+                {% if my_reviews %}
+                {% for review in my_reviews %}
+                <div class="border-bottom pb-3 mb-3">
+                    <strong>{{ review.website.title }}</strong>
+                    <p class="mb-1">{{ review.content }}</p>
+                    <small class="text-muted">
+                        {{ review.created_at|date:"Y/m/d" }}
+                        <a href="{% url 'delete_my_review' review.pk %}" class="text-danger">حذف</a>
+                    </small>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">شما هنوز نظری ثبت نکرده‌اید.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
