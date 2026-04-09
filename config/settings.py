@@ -33,12 +33,15 @@ INSTALLED_APPS = [
     # My apps
     'directory',
     'contact',
+    # my filters
+    "FarsiSaz",
     # installed addons
     'django_cleanup',  # Optional: for cleaning up uploaded files
     'crispy_forms',
     'crispy_bootstrap5',
     "django_check_seo",# seo apps
     "captcha",
+    # "jalali_date",
 ]
 
 MIDDLEWARE = [
