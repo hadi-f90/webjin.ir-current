@@ -1,285 +1,142 @@
 {% load static %}
 {% block head %}
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<meta name="description" content="" />
-<meta name="author" content="" />
-<title>{{ title }}</title>
-<!-- Favicon-->
-<link rel="icon" type="image/x-icon" href="{% static '/images/icon.png' %}" />
 
-<!-- jQuery (load first) -->
-<script type="text/javascript" src="{% static '/js/jquery.min.js' %}"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}راهنمای وب ایران - دایرکتوری وب‌سایت{% endblock %}</title>
 
-<!-- Bootstrap JS -->
-<script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
+    {% block meta_tags %}
+    <meta name="description" content="دایرکتوری وب‌سایت‌ها • راهنمای وب ایران">
+    <meta name="keywords" content="دایرکتوری, لینک, وب‌سایت, لینک‌یاب">
+    <meta name="theme-color" content="#2563eb">
+    {% endblock meta_tags %}
 
-<!-- Stylesheets -->
-<link rel="stylesheet" href="{% static '/css/all.min.css' %}">
-<link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
-<link rel="stylesheet" href="{% static '/css/jquery-ui.min.css' %}">
-<link href="{% static '/css/styles.css' %}" rel="stylesheet" />
+    {% block favicon %}
+    <link rel="icon" href="{% static 'images/favicon.ico' %}"> {# <-- Add your favicon path #}
+    {% endblock favicon %}
 
-<style>
-    /* ========================
-       THEME CSS VARIABLES
-       ======================== */
-    :root {
-        --bg-primary: #ffffff;
-        --bg-secondary: #f8f9fa;
-        --bg-tertiary: #e9ecef;
-        --text-primary: #212529;
-        --text-secondary: #6c757d;
-        --text-muted: #adb5bd;
-        --border-color: #dee2e6;
-        --card-bg: #ffffff;
-        --card-border: #dee2e6;
-        --nav-bg: #ffffff;
-        --nav-text: #212529;
-        --footer-bg: #ffffff;
-        --link-color: #0d6efd;
-        --link-hover: #0a58ca;
-        --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
+    <!-- Vazirmatn Font (Best Persian Font) -->
 
-    [data-theme="dark"] {
-        --bg-primary: #1a1d20;
-        --bg-secondary: #212529;
-        --bg-tertiary: #2b3035;
-        --text-primary: #f8f9fa;
-        --text-secondary: #adb5bd;
-        --text-muted: #6c757d;
-        --border-color: #373b3e;
-        --card-bg: #212529;
-        --card-border: #373b3e;
-        --nav-bg: #1a1d20;
-        --nav-text: #f8f9fa;
-        --footer-bg: #1a1d20;
-        --link-color: #6ea8fe;
-        --link-hover: #9ec5fe;
-        --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
-        --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
-    }
+    <!-- Bootstrap RTL CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.rtl.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link href="{% static 'css/Vazirmatn-Variable-font-face.css' %}" rel="stylesheet" type="text/css" />
 
-    /* ========================
-       BASE THEME STYLES
-       ======================== */
-    body {
-        background-color: var(--bg-primary) !important;
-        color: var(--text-primary) !important;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+        }
 
-    /* ========================
-       NAVBAR FIX - NO TRANSPARENCY
-       ======================== */
-    .navbar-theme {
-        background-color: var(--nav-bg) !important;
-        border-bottom: 1px solid var(--border-color) !important;
-        box-shadow: var(--shadow) !important;
-        transition: background-color 0.3s ease;
-    }
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.7;
+        }
 
-    .navbar-theme .navbar-brand,
-    .navbar-theme .nav-link {
-        color: var(--nav-text) !important;
-    }
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    .navbar-theme .nav-link:hover {
-        color: var(--link-color) !important;
-    }
+        .website-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
 
-    .navbar-theme .navbar-toggler {
-        background-color: var(--bg-secondary);
-        border-color: var(--border-color);
-    }
+        .website-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
 
-    .navbar-theme .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(33, 37, 41, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-    }
+        .search-box {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
 
-    [data-theme="dark"] .navbar-theme .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(248, 249, 250, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-    }
+        .search-box .form-control {
+            border-radius: 50px;
+            padding: 15px 25px;
+            border: 2px solid #e2e8f0;
+            font-size: 1.1rem;
+        }
 
-    /* ========================
-       DROPDOWN MENU
-       ======================== */
-    .dropdown-menu-theme {
-        background-color: var(--bg-secondary) !important;
-        border: 1px solid var(--border-color) !important;
-        box-shadow: var(--shadow-lg) !important;
-    }
+        .search-box .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
 
-    .dropdown-menu-theme .dropdown-item {
-        color: var(--text-primary) !important;
-    }
+        .search-box .btn {
+            border-radius: 50px;
+            padding: 12px 30px;
+        }
 
-    .dropdown-menu-theme .dropdown-item:hover,
-    .dropdown-menu-theme .dropdown-item:focus {
-        background-color: var(--bg-tertiary) !important;
-        color: var(--link-color) !important;
-    }
+        /* Tag Chips */
+        .tag-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
 
-    .dropdown-menu-theme .dropdown-divider {
-        border-color: var(--border-color) !important;
-    }
+        .tag-chip {
+            display: inline-flex;
+            align-items: center;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
 
-    /* ========================
-       FOOTER
-       ======================== */
-    .footer-theme {
-        background-color: var(--footer-bg) !important;
-        border-top: 1px solid var(--border-color) !important;
-        color: var(--text-primary) !important;
-    }
+        .tag-chip .remove-tag {
+            margin-right: 6px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
 
-    .footer-theme h5,
-    .footer-theme h6 {
-        color: var(--text-primary) !important;
-    }
+        .tag-chip .remove-tag:hover {
+            opacity: 1;
+        }
 
-    .footer-theme p,
-    .footer-theme li,
-    .footer-theme a {
-        color: var(--text-secondary) !important;
-    }
+        /* Autocomplete */
+        .tag-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
 
-    .footer-theme a:hover {
-        color: var(--link-color) !important;
-    }
+        .tag-suggestions.show {
+            display: block;
+        }
 
-    /* ========================
-       THEME TOGGLE BUTTON
-       ======================== */
-    .theme-toggle {
-        cursor: pointer;
-        padding: 0.4rem 0.6rem;
-        border-radius: 0.25rem;
-        border: 1px solid var(--border-color);
-        background-color: var(--bg-secondary);
-        color: var(--text-primary);
-        transition: all 0.3s ease;
-    }
+        .tag-suggestion-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
 
-    .theme-toggle:hover {
-        background-color: var(--bg-tertiary);
-        color: var(--link-color);
-    }
+        .tag-suggestion-item:hover {
+            background: #f8fafc;
+        }
 
-    /* ========================
-       USER AVATAR
-       ======================== */
-    .user-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background-color: var(--link-color);
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 0.875rem;
-    }
+        .tag-suggestion-item:last-child {
+            border-bottom: none;
+        }
+    </style>
 
-    /* ========================
-       UTILITY CLASSES
-       ======================== */
-    .bg-primary-theme {
-        background-color: var(--bg-primary) !important;
-    }
-
-    .bg-secondary-theme {
-        background-color: var(--bg-secondary) !important;
-    }
-
-    .bg-tertiary-theme {
-        background-color: var(--bg-tertiary) !important;
-    }
-
-    .text-primary-theme {
-        color: var(--text-primary) !important;
-    }
-
-    .text-secondary-theme {
-        color: var(--text-secondary) !important;
-    }
-
-    .text-muted-theme {
-        color: var(--text-muted) !important;
-    }
-
-    .border-theme {
-        border-color: var(--border-color) !important;
-    }
-
-    .card-theme {
-        background-color: var(--card-bg) !important;
-        border-color: var(--card-border) !important;
-    }
-
-    .shadow-theme {
-        box-shadow: var(--shadow) !important;
-    }
-
-    .shadow-lg-theme {
-        box-shadow: var(--shadow-lg) !important;
-    }
-
-    /* ========================
-       LINKS & BUTTONS
-       ======================== */
-    a {
-        color: var(--link-color);
-        transition: color 0.3s ease;
-    }
-
-    a:hover {
-        color: var(--link-hover);
-    }
-
-    .btn-outline-primary {
-        color: var(--link-color) !important;
-        border-color: var(--link-color) !important;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: var(--link-color) !important;
-        border-color: var(--link-color) !important;
-        color: #ffffff !important;
-    }
-
-    /* ========================
-       CARDS & ALERTS
-       ======================== */
-    .card {
-        background-color: var(--card-bg) !important;
-        border-color: var(--card-border) !important;
-        color: var(--text-primary) !important;
-    }
-
-    .alert-warning {
-        background-color: var(--bg-secondary) !important;
-        border-color: var(--border-color) !important;
-        color: var(--text-primary) !important;
-    }
-
-    /* ========================
-       DROPDOWN Z-INDEX
-       ======================== */
-    .dropdown-menu {
-        z-index: 1050 !important;
-    }
-</style>
-
-<!-- Initialize Theme (Prevent Flash) -->
-<script>
-    (function () {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    })();
-</script>
+    {% block extra_css %}{% endblock %}
+</head>
 
 {% endblock head %}

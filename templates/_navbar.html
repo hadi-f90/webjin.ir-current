@@ -1,130 +1,85 @@
 {% load static %}
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-theme sticky-top shadow-theme navbar-">
+<nav class="navbar navbar-expand-lg navbar-dark bg-white sticky-top">
     <div class="container">
+
         <!-- Brand -->
         <a class="navbar-brand text-primary fw-bold" href="{% url 'index' %}">
-            <i class="bi bi-link-45deg"></i> وب‌جین: راهنمای وب ایران
+            <i class="bi bi-link-45deg"></i> راهنمای وب ایران
         </a>
 
-        <!-- Mobile Toggler -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <!-- Mobile button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- Collapsible Content -->
-        <div class="collapse navbar-collapse" id="navbarMain">
-            <!-- Public Navigation -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <!-- Left menu -->
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'index' %}">
-                        <i class="bi bi-house-door me-1"></i> خانه
-                    </a>
+                    <a class="nav-link text-dark" href="{% url 'index' %}">خانه</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'submit_website' %}">
-                        <i class="bi bi-plus-circle me-1"></i> ثبت وب‌سایت
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'contact_page' %}">
-                        <i class="bi bi-envelope me-1"></i> ارتباط با ما
-                    </a>
+                    <a class="nav-link text-dark" href="{% url 'submit_website' %}">ثبت وب‌سایت</a>
                 </li>
             </ul>
 
-            <!-- User Navigation -->
-            <ul class="navbar-nav mb-2 mb-lg-0">
+
+            <!-- Right menu -->
+            <ul class="navbar-nav">
+
                 {% if user.is_authenticated %}
-                <!-- User Dropdown -->
+
+                <!-- Profile Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
-                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="user-avatar me-2">
-                            {{ user.username|slice:":1"|upper }}
-                        </span>
-                        <span class="d-none d-md-inline">{{ user.username }}</span>
+                    <a class="nav-link dropdown-toggle text-dark" href="#" id="profileDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i> {{ user.username }}
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-theme" aria-labelledby="userDropdown">
+
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <li>
                             <a class="dropdown-item" href="{% url 'user_dashboard' %}">
-                                <i class="bi bi-speedometer2 me-2"></i> پنل کاربری
+                                <i class="bi bi-speedometer2"></i> پنل کاربری
                             </a>
                         </li>
+
                         {% if user.is_staff %}
                         <li>
-                            <hr class="dropdown-divider border-theme">
-                        </li>
-                        <li>
                             <a class="dropdown-item" href="{% url 'admin_dashboard' %}">
-                                <i class="bi bi-gear me-2"></i> مدیریت
+                                <i class="bi bi-shield-lock"></i> مدیریت
                             </a>
                         </li>
                         {% endif %}
+
                         <li>
-                            <hr class="dropdown-divider border-theme">
+                            <hr class="dropdown-divider">
                         </li>
+
                         <li>
                             <a class="dropdown-item text-danger" href="{% url 'logout' %}">
-                                <i class="bi bi-box-arrow-right me-2"></i> خروج
+                                <i class="bi bi-box-arrow-right"></i> خروج
                             </a>
                         </li>
                     </ul>
                 </li>
+
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link text-primary" href="{% url 'login' %}">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> ورود
-                    </a>
+                    <a class="nav-link text-primary" href="{% url 'login' %}">ورود</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link btn btn-outline-primary btn-sm ms-2 px-3" href="{% url 'register' %}">
-                        <i class="bi bi-person-plus me-1"></i> ثبت‌نام
-                    </a>
+                    <a class="nav-link text-primary" href="{% url 'register' %}">ثبت‌نام</a>
                 </li>
                 {% endif %}
 
-                <!-- Theme Toggle -->
-                {% comment %}
-                <li class="nav-item ms-2">
-                    <button class="theme-toggle nav-link d-flex align-items-center" id="themeToggle" title="تغییر تم">
-                        <i class="bi bi-moon-fill" id="themeIcon"></i>
-                    </button>
+                <!-- Contact -->
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'contact_page' %}">تماس با ما</a>
                 </li>
-                {% endcomment %}
+
             </ul>
         </div>
     </div>
 </nav>
-{% comment %}
-<!-- Theme Toggle Script -->
-<script>
-    (function () {
-        // Get saved theme or default to light
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-
-        // Theme toggle click handler
-        document.getElementById('themeToggle').addEventListener('click', function () {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('themeIcon');
-            if (theme === 'dark') {
-                icon.classList.remove('bi-moon-fill');
-                icon.classList.add('bi-sun-fill');
-            } else {
-                icon.classList.remove('bi-sun-fill');
-                icon.classList.add('bi-moon-fill');
-            }
-        }
-    })();
-</script>
-{% endcomment %}

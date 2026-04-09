@@ -1,29 +1,49 @@
 {% load static %}
-<!-- Footer-->
-<footer class="bg-white py-4 mt-5 border-top footer-theme">
+
+<footer class="bg-white py-4 mt-5 border-top">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h5 class="text-primary fw-bold">وب‌جین</h5>
-                <p class="text-muted small">
-                    راهنمای وب ایران</p>
+
+        <div class="row gy-4">
+
+            <!-- Brand + description -->
+            <div class="col-md-4 text-md-start text-center">
+                <h5 class="text-primary fw-bold">راهنمای وب ایران</h5>
+                <p class="text-muted small mb-0">
+                    راهنمای جامع وب‌سایت‌های فارسی
+                </p>
             </div>
-            <div class="col-md-4">
-                <h6>لینک‌های مفید</h6>
-                <ul class="list-unstyled">
+
+            <!-- Useful links -->
+            <div class="col-md-4 text-md-start text-center">
+                <h6 class="fw-bold">پیوندهای مفید</h6>
+                <ul class="list-unstyled small mb-0">
                     <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">درباره ما</a></li>
                     <li><a href="{% url 'terms' %}" class="text-decoration-none text-muted">قوانین و مقررات</a></li>
                     <li><a href="{% url 'contact_page' %}" class="text-decoration-none text-muted">تماس با ما</a></li>
                 </ul>
             </div>
+
+            <!-- Contact -->
+            <!-- <div class="col-md-4 text-md-start text-center">
+                <h6 class="fw-bold">ارتباط با ما</h6>
+                <p class="text-muted small mb-1">info@linkyab.ir</p>
+
+                Future social icons if needed
+                <div class="d-flex gap-3 justify-content-md-start justify-content-center">
+                    <a href="#" class="text-muted fs-5"><i class="bi bi-telegram"></i></a>
+                    <a href="#" class="text-muted fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="text-muted fs-5"><i class="bi bi-github"></i></a>
+                </div>
+
+            </div> -->
+
         </div>
-        <hr>
-        <p class="text-center text-muted small mb-0">© ۱۴۰۵ - تمامی حقوق محفوظ است | وب‌جین</p>
+
+        <p class="text-center text-muted small mb-0">
+            © ۱۴۰۵ — تمامی حقوق محفوظ است | راهنمای وب ایران
+        </p>
+
     </div>
 </footer>
 
-<!-- Django Jalali Datepicker -->
-{#- <script src="{% static 'admin/js/django_jalali.min.js' %}"></script> #}
-
-<!-- Core theme JS-->
-<script src="{% static '/js/scripts.js' %}"></script>
+<script src="{% static 'admin/js/django_jalali.min.js' %}"></script>

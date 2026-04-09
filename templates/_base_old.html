@@ -6,16 +6,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}راهنمای وب ایران - دایرکتوری وب‌سایت{% endblock %}</title>
 
     <!-- Vazirmatn Font (Best Persian Font) -->
-    <link href="{% static 'css/Vazirmatn-Variable-font-face.css' %}" rel="stylesheet" type="text/css" />
 
     <!-- Bootstrap RTL CSS -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.rtl.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link href="{% static 'css/Vazirmatn-Variable-font-face.css' %}" rel="stylesheet" type="text/css" />
 
     <style>
         :root {
@@ -133,7 +132,57 @@
 </head>
 
 <body>
-    {% include '_navbar.html' %}
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-white sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-primary fw-bold" href="{% url 'index' %}">
+                <i class="bi bi-link-45deg"></i> راهنمای وب ایران
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'index' %}">خانه</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'submit_website' %}">ثبت وب‌سایت</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'user_dashboard' %}">پنل کاربری</a>
+                    </li>
+                    {% endif %}
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'admin_dashboard' %}">مدیریت</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="nav-link text-dark">{{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{% url 'logout' %}">خروج</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-primary" href="{% url 'login' %}">ورود</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary" href="{% url 'register' %}">ثبت‌نام</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'contact_page' %}">تماس با ما</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
     <!-- Main Content -->
     <main class="container my-4">
@@ -152,8 +201,29 @@
     </main>
 
     <!-- Footer -->
-    {% include '_footer.html' %}
-
+    <footer class="bg-white py-4 mt-5 border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-primary fw-bold">راهنمای وبگاه‌های ایران</h5>
+                    <p class="text-muted small">راهنمای جامع وب‌سایت‌های فارسی </p>
+                </div>
+                <div class="col-md-4">
+                    <h6>لینک‌های مفید</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">دربارهٔ ما</a></li>
+                        <li><a href="{% url 'terms' %}" class="text-decoration-none text-muted">شرایط استفاده</a></li>
+                    </ul>
+                </div>
+                <!-- <div class="col-md-4">
+                    <h6>ارتباط با ما</h6>
+                    <p class="text-muted small">info@linkyab.ir</p>
+                </div> -->
+            </div>
+            <hr>
+            <p class="text-center text-muted small mb-0">© ۱۴۰۵ - تمامی حقوق محفوظ است | راهنمای وبگاه‌های ایران</p>
+        </div>
+    </footer>
 
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>

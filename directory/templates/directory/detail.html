@@ -1,6 +1,12 @@
-{% extends 'directory/base.html' %}
-{% load farsi_tags %}
-{% block title %}{{ website.title }} - راهنمای وب ایران{% endblock %}
+{% extends '_base.html' %}
+
+{% block title %}{{ website.title }} - دایرکتوری وب‌سایت{% endblock %}
+
+{% if is_owner %}
+<a href="{% url 'edit_website' website.slug %}" class="btn btn-sm btn-outline-primary me-2">
+    <i class="bi bi-pencil"></i> ویرایش
+</a>
+{% endif %}
 
 {% block content %}
 <!-- Edit Button (moved inside content block) -->
@@ -46,15 +52,15 @@
                     {% if website.total_ratings > 0 %}
                     <span class="text-warning">
                         {% for i in "12345" %}
-                        {% if forloop.counter <= website.average_rating|floatformat:0|to_hindi %}
+                        {% if forloop.counter <= website.average_rating|floatformat:0 %}
                         ⭐
                         {% else %}
                         ☆
                         {% endif %}
                         {% endfor %}
                     </span>
-                    <span class="text-muted">({{ website.average_rating|floatformat:1|to_hindi }} / ۵ -
-                        {{ website.total_ratings|to_hindi }} دیدگاه)</span>
+                    <span class="text-muted">({{ website.average_rating|floatformat:1 }} / ۵ -
+                        {{ website.total_ratings }} رأی)</span>
                     {% else %}
                     <span class="text-muted">بدون امتیاز</span>
                     {% endif %}
@@ -138,14 +144,14 @@
             <div class="card-body">
                 {% if user.is_authenticated %}
                 {% if user_rating %}
-                <p class="text-success">امتیاز شما: {{ user_rating.rating|to_hindi }} ⭐</p>
+                <p class="text-success">امتیاز شما: {{ user_rating.rating }} ⭐</p>
                 {% else %}
                 <form method="post" action="{% url 'rate_website' website.slug %}">
                     {% csrf_token %}
                     <div class="btn-group" role="group">
                         {% for i in "12345" %}
                         <button type="submit" name="rating" value="{{ forloop.counter }}"
-                            class="btn btn-outline-warning">
+                            class="btn btn-outline-warning {% if user_rating.rating == forloop.counter %}active{% endif %}">
                             {{ forloop.counter }} ⭐
                         </button>
                         {% endfor %}
@@ -153,7 +159,7 @@
                 </form>
                 {% endif %}
                 {% else %}
-                <p class="text-muted">برای امتیازدهی باید <a href="{% url 'login' %}">وارد شوید</a></p>
+                <p class="text-muted">برای امتیازدهی باید <a href="/admin/login/">وارد شوید</a></p>
                 {% endif %}
             </div>
         </div>
@@ -167,19 +173,19 @@
                 {% if user.is_authenticated %}
                 {% if user_review %}
                 <div class="alert alert-info">
-                    <strong>دیدگاه شما:</strong>
+                    <strong>نظر شما:</strong>
                     <p>{{ user_review.content }}</p>
-                    <small class="text-muted">{{ user_review.created_at|date:"Y/m/d"|to_jalali|to_hindi }}</small>
+                    <small class="text-muted">{{ user_review.created_at|date:"Y/m/d" }}</small>
                 </div>
                 {% else %}
                 <form method="post" action="{% url 'review_website' website.slug %}">
                     {% csrf_token %}
                     {{ review_form.as_p }}
-                    <button type="submit" class="btn btn-primary">ثبت دیدگاه</button>
+                    <button type="submit" class="btn btn-primary">ثبت نظر</button>
                 </form>
                 {% endif %}
                 {% else %}
-                <p class="text-muted">برای نوشتن دیدگاه باید <a href="{% url 'login' %}">وارد شوید</a></p>
+                <p class="text-muted">برای نوشتن نظر باید <a href="/admin/login/">وارد شوید</a></p>
                 {% endif %}
 
                 <hr>
@@ -195,6 +201,27 @@
             </div>
         </div>
 
+        <!-- Report Section -->
+        <div class="card mb-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-flag"></i> گزارش مشکل</h5>
+            </div>
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                {% if user_report %}
+                <p class="text-warning">شما قبلاً این وب‌سایت را گزارش کرده‌اید.</p>
+                {% else %}
+                <form method="post" action="{% url 'report_website' website.slug %}">
+                    {% csrf_token %}
+                    {{ report_form.as_p }}
+                    <button type="submit" class="btn btn-danger">ارسال گزارش</button>
+                </form>
+                {% endif %}
+                {% else %}
+                <p class="text-muted">برای گزارش باید <a href="/admin/login/">وارد شوید</a></p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <div class="col-md-4">
