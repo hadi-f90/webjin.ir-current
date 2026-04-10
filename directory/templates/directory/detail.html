@@ -53,15 +53,15 @@
                     {% if website.total_ratings > 0 %}
                     <span class="text-warning">
                         {% for i in "12345" %}
-                        {% if forloop.counter <= website.average_rating|floatformat:0 %}
+                        {% if forloop.counter <= website.average_rating|floatformat:0|to_farsi %}
                         ⭐
                         {% else %}
                         ☆
                         {% endif %}
                         {% endfor %}
                     </span>
-                    <span class="text-muted">({{ website.average_rating|floatformat:1 }} / ۵ -
-                        {{ website.total_ratings }} رأی)</span>
+                    <span class="text-muted">({{ website.average_rating|floatformat:1 |to_farsi }} از ۵ -
+                        {{ website.total_ratings|to_farsi }} نفر ثبت کرده)</span>
                     {% else %}
                     <span class="text-muted">بدون امتیاز</span>
                     {% endif %}
@@ -73,7 +73,11 @@
                 </p>
 
                 {% if website.category %}
-                <span class="badge bg-primary-theme">{{ website.category.name }}</span>
+                <a href="?category={{ website.category.slug }}"
+                    class="list-group-item list-group-item-action">
+                    <i class="{{ category.icon }}"></i>
+                <span class="badge bg-primary">{{ website.category.name }}</span>
+                </a>
                 {% endif %}
 
                 {% for tag in website.tags.all %}
@@ -91,7 +95,7 @@
                 <p><i class="bi bi-person"></i> {{ website.owner_name }}</p>
                 <p><i class="bi bi-envelope"></i> {{ website.owner_email }}</p>
                 {% else %}
-                <p class="text-muted"><i class="bi bi-eye-slash"></i> اطلاعات صاحب وب‌سایت پنهان شده است.</p>
+                <p class="text-muted"><i class="bi bi-eye-slash"></i> اطلاعات پیشنهاد دهندهٔ پنهان شده است.</p>
                 {% endif %}
 
                 <a href="{{ website.url }}" target="_blank" class="btn btn-primary btn-lg">
@@ -145,7 +149,7 @@
             <div class="card-body">
                 {% if user.is_authenticated %}
                 {% if user_rating %}
-                <p class="text-success">امتیاز شما: {{ user_rating.rating }} ⭐</p>
+                <p class="text-success">امتیاز شما: {{ user_rating.rating | to_farsi}} ⭐</p>
                 {% else %}
                 <form method="post" action="{% url 'rate_website' website.slug %}">
                     {% csrf_token %}
@@ -153,7 +157,7 @@
                         {% for i in "12345" %}
                         <button type="submit" name="rating" value="{{ forloop.counter }}"
                             class="btn btn-outline-warning {% if user_rating.rating == forloop.counter %}active{% endif %}">
-                            {{ forloop.counter }} ⭐
+                            {{ forloop.counter | to_farsi}} ⭐
                         </button>
                         {% endfor %}
                     </div>
@@ -168,7 +172,7 @@
         <!-- Review Section -->
         <div class="card mb-4 card-theme">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0">دیدگاه‌های دیگر کاربران</h5>
+                <h5 class="mb-0">دیدگاه‌های کاربران</h5>
             </div>
             <div class="card-body">
                 {% if user.is_authenticated %}
@@ -182,11 +186,11 @@
                 <form method="post" action="{% url 'review_website' website.slug %}">
                     {% csrf_token %}
                     {{ review_form.as_p }}
-                    <button type="submit" class="btn btn-primary">ثبت نظر</button>
+                    <button type="submit" class="btn btn-primary">ثبت دیدگاه</button>
                 </form>
                 {% endif %}
                 {% else %}
-                <p class="text-muted">برای نوشتن نظر باید <a href="/admin/login/">وارد شوید</a></p>
+                <p class="text-muted">برای نوشتن دیگاه باید <a href="/admin/login/">وارد شوید</a></p>
                 {% endif %}
 
                 <hr>
@@ -197,7 +201,7 @@
                     <p class="mb-0">{{ review.content }}</p>
                 </div>
                 {% empty %}
-                <p class="text-muted">هنوز دیدگاهی ثبت نشده است.</p>
+                <p class="text-muted">هنوز دیگاهی ثبت نشده است.</p>
                 {% endfor %}
             </div>
         </div>

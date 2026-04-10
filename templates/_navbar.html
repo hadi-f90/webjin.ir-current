@@ -21,7 +21,7 @@
                     <a class="nav-link text-dark" href="{% url 'index' %}">خانه</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="{% url 'submit_website' %}">ثبت وب‌سایت</a>
+                    <a class="nav-link text-dark" href="{% url 'submit_website' %}">پیشنهاد وب‌سایت</a>
                 </li>
             </ul>
 
@@ -49,6 +49,11 @@
                         <li>
                             <a class="dropdown-item" href="{% url 'admin_dashboard' %}">
                                 <i class="bi bi-shield-lock"></i> مدیریت
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_dashboard' %}#reviews">
+                            <i class="bi bi-comments"></i>یادداشت‌های من
                             </a>
                         </li>
                         {% endif %}

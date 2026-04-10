@@ -1,5 +1,5 @@
 {% extends '_base.html' %}
-
+{%load farsi_tags%}
 {% block title %}دایرکتوری وب‌سایت{% endblock %}
 
 {% block content %}
@@ -123,7 +123,7 @@
                         {% endif %}
                         {% if website.total_ratings > 0 %}
                         <span class="badge bg-warning text-dark">
-                            ⭐ {{ website.average_rating|floatformat:1|to_hindi }}
+                            ⭐ {{ website.average_rating|floatformat:1|to_farsi }}
                         </span>
                         {% endif %}
                     </div>

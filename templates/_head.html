@@ -24,21 +24,124 @@
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     <link href="{% static 'css/Vazirmatn-Variable-font-face.css' %}" rel="stylesheet" type="text/css" />
 
+    <!-- Theme CSS Variables -->
     <style>
         :root {
             --primary-color: #2563eb;
-            --secondary-color: #64748b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --navbar-bg: #ffffff;
+            --footer-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --navbar-bg: #1e293b;
+            --footer-bg: #1e293b;
         }
 
         body {
             font-family: 'Vazirmatn', Tahoma, sans-serif !important;
-            background-color: #f8fafc;
-            color: #334155;
-            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
         }
 
         .navbar {
+            background-color: var(--navbar-bg) !important;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .nav-link {
+            color: var(--text-color) !important;
+        }
+
+        .footer {
+            background-color: var(--footer-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .list-group-item {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--border-color);
+        }
+
+        /* User Dropdown */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            left: 0;
+            top: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-width: 180px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown-menu.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: block;
+            padding: 10px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .user-dropdown-item:hover {
+            background: var(--bg-color);
+            color: var(--primary-color);
+        }
+
+        .user-dropdown-item i {
+            width: 20px;
+            text-align: center;
+            margin-left: 8px;
+        }
+
+        .user-dropdown-divider {
+            border-top: 1px solid var(--border-color);
+            margin: 5px 0;
         }
 
         .website-card {
@@ -60,18 +163,15 @@
         .search-box .form-control {
             border-radius: 50px;
             padding: 15px 25px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--border-color);
             font-size: 1.1rem;
+            background: var(--card-bg);
+            color: var(--text-color);
         }
 
         .search-box .form-control:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-        }
-
-        .search-box .btn {
-            border-radius: 50px;
-            padding: 12px 30px;
         }
 
         /* Tag Chips */
@@ -92,6 +192,11 @@
             font-size: 0.9rem;
         }
 
+        [data-theme="dark"] .tag-chip {
+            background: #1e3a5f;
+            color: #7dd3fc;
+        }
+
         .tag-chip .remove-tag {
             margin-right: 6px;
             cursor: pointer;
@@ -102,14 +207,13 @@
             opacity: 1;
         }
 
-        /* Autocomplete */
         .tag-suggestions {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             max-height: 200px;
             overflow-y: auto;
@@ -124,15 +228,30 @@
         .tag-suggestion-item {
             padding: 10px 15px;
             cursor: pointer;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .tag-suggestion-item:hover {
-            background: #f8fafc;
+            background: var(--bg-color);
         }
 
-        .tag-suggestion-item:last-child {
-            border-bottom: none;
+        .form-control {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .breadcrumb-item a {
+            color: var(--primary-color);
+        }
+
+        .badge.bg-primary {
+            background-color: var(--primary-color) !important;
         }
     </style>
 
