@@ -218,7 +218,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # production directory
 # Additional directories to look for static files
 STATICFILES_DIRS = [
     BASE_DIR / "static/",
-    os.path.join(BASE_DIR, 'static/'),
 ]
 
 # Media files
