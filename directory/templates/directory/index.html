@@ -1,5 +1,6 @@
 {% extends '_base.html' %}
 {%load farsi_tags%}
+{%load static%}
 {% block title %}دایرکتوری وب‌سایت{% endblock %}
 
 {% block content %}
@@ -10,7 +11,7 @@
             <input type="text" name="search" class="form-control" placeholder="جستجو در وب‌سایت‌ها..."
                 value="{{ request.GET.search|default:'' }}" id="searchInput" autocomplete="off">
             <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i>
+                <img src="{% static 'icons/search.svg' %}" width="18" height="18" class="me-1">
             </button>
         </div>
         <!-- Search Suggestions -->
@@ -45,7 +46,8 @@
         <div class="card mb-4">
             <div class="card-header bg-secondary text-white">
                 <h6 class="mb-0" data-bs-toggle="collapse" data-bs-target="#tagsCollapse" style="cursor: pointer;">
-                    <i class="bi bi-tags"></i> برچسب‌های محبوب <i class="bi bi-chevron-down float-end"></i>
+                    <img src="{% static 'icons/tags.svg' %}" alt="Tags Icon" width="20" height="20">
+                     برچسب‌های محبوب <i class="bi bi-chevron-down float-end"></i>
                 </h6>
             </div>
             <div id="tagsCollapse" class="collapse show">
