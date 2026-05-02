@@ -34,14 +34,27 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django core
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Optional Django contrib
+    'django.contrib.humanize',
+    'django.contrib.sites',   # ✅ correct (instead of django.contrib.sites.models.Site)
+
+    # Third-party apps
+    'django_cleanup',        # Optional cleanup of uploaded files
+    'captcha',
+    'django_check_seo',
+
+    # Your apps
+    'admin_persian',
     'directory',
-    'django_cleanup',  # Optional: for cleaning up uploaded files
+    'contact',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +71,9 @@ ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [],
+    'DIRS': [
+        BASE_DIR / 'templates',
+    ],
     'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
@@ -70,7 +85,7 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
+SITE_ID = 1
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 

@@ -1,0 +1,51 @@
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-white sticky-top">
+    <div class="container">
+        <a class="navbar-brand text-primary fw-bold" href="{% url 'index' %}">
+            <i class="bi bi-link-45deg"></i> لینک‌یاب
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-dark icon" href="{% url 'index' %}">خانه</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'submit_website' %}">ثبت وب‌سایت</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'contact_page' %}">ارتباط با ما</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'user_dashboard' %}">پنل کاربری</a>
+                </li>
+                {% endif %}
+                {% if user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'admin_dashboard' %}">مدیریت</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <span class="nav-link text-dark">{{ user.username }}</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{% url 'logout' %}">خروج</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link text-primary" href="{% url 'login' %}">ورود</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-primary" href="{% url 'register' %}">ثبت‌نام</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

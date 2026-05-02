@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+{% load static %}
+
+<html lang="fa">
+    <head>
+        {% include "_head.html" %}
+        {% block head %}
+        {% endblock head %}
+        <!-- Todo: It's a good idea to use "block head" for heading and managing headings-->
+    </head>
+    <body>
+        <main class="flex-shrink-0">
+        {% include "_navbar.html" %}
+
+        {% block content %}
+        {% endblock content %}
+
+        {% include "_ads.html" %}
+
+        {% include "_footer.html" %}
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        </main>
+    </body>
+</html>

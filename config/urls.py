@@ -18,10 +18,14 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("captcha/", include("captcha.urls")),
+    re_path(r"^contact(_?(us|me))?/", include("contact.urls"), name="contact_page"),
+    re_path(r"^comments/", include("django_comments.urls")),
+    path("django-check-seo/", include("django_check_seo.urls")),
     path('', include('directory.urls')),
 ]
 
