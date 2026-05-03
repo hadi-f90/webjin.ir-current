@@ -237,8 +237,8 @@ def edit_website(request, slug):
             # Reset status to pending for re-approval if significant changes
             website.status = 'pending'
             website.save()
-            messages.success(request, 'وب‌سایت با موفقیت ویرایش شد!')
-            return redirect('website_detail', slug=website.slug)
+            messages.success(request, 'وب‌سایت با موفقیت ویرایش شد و در انتظار تأیید مجدد است.')
+            return redirect('user_dashboard')  # Redirect to dashboard instead of detail
     else:
         form = WebsiteSubmitForm(instance=website)
 
