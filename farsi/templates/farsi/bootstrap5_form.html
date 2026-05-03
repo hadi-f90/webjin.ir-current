@@ -1,0 +1,24 @@
+<!-- farsi/templates/farsi/bootstrap5_form.html -->
+{% load i18n %}
+
+<div class="mb-3">
+    {% if label %}
+    <label for="{{ id }}" class="form-label{% if required %} required{% endif %}">
+        {{ label }}
+    </label>
+    {% endif %}
+
+    {{ field }}
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+
+    {% if errors %}
+    <div class="invalid-feedback d-block">
+        {% for error in errors %}
+        <span>{{ error }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

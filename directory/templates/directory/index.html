@@ -1,6 +1,6 @@
 {% extends 'directory/base.html' %}
-
-{% block title %}دایرکتوری وب‌سایت{% endblock %}
+{%load farsi_tags%}
+{% block title %}راهنمای وب ایران{% endblock %}
 
 {% block content %}
 <!-- Big Search Bar -->
@@ -35,7 +35,7 @@
                 <a href="?category={{ category.slug }}"
                     class="list-group-item list-group-item-action {% if selected_category == category.slug %}active{% endif %}">
                     <i class="{{ category.icon }}"></i> {{ category.name }}
-                    <span class="badge bg-secondary float-end">{{ category.website_count }}</span>
+                    <span class="badge bg-secondary float-end">{{ category.website_count|to_hindi }}</span>
                 </a>
                 {% endfor %}
             </div>
@@ -52,7 +52,7 @@
                 <div class="card-body">
                     {% for tag in all_tags %}
                     <a href="?tag={{ tag.slug }}" class="badge bg-light text-dark text-decoration-none mb-1">
-                        {{ tag.name }} ({{ tag.website_count }})
+                        {{ tag.name }} ({{ tag.website_count|to_hindi }})
                     </a>
                     {% endfor %}
                 </div>
@@ -75,7 +75,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h6><a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a></h6>
-                                <p class="small text-muted mb-0">{{ website.description|truncatewords:10 }}</p>
+                                <p class="small text-muted mb-0">{{ website.description|truncate_persian:10 }}</p>
                             </div>
                         </div>
                     </div>
@@ -101,13 +101,13 @@
                                 {{ website.title }}
                             </a>
                         </h5>
-                        <p class="card-text text-muted small">{{ website.description|truncatewords:15 }}</p>
+                        <p class="card-text text-muted small">{{ website.description|truncate_persian:15 }}</p>
                         {% if website.category %}
                         <span class="badge bg-primary">{{ website.category.name }}</span>
                         {% endif %}
                         {% if website.total_ratings > 0 %}
                         <span class="badge bg-warning text-dark">
-                            ⭐ {{ website.average_rating|floatformat:1 }}
+                            ⭐ {{ website.average_rating|floatformat:1|to_hindi }}
                         </span>
                         {% endif %}
                     </div>
@@ -134,7 +134,7 @@
             <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1">اولین</a>
+                    <a class="page-link" href="?page=1">نخستین</a>
                 </li>
                 <li class="page-item">
                     <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
@@ -142,7 +142,7 @@
                 {% endif %}
 
                 <li class="page-item active">
-                    <span class="page-link">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
+                    <span class="page-link">صفحه {{ page_obj.number|to_hindi }} از {{ page_obj.paginator.num_pages|to_hindi }}</span>
                 </li>
 
                 {% if page_obj.has_next %}

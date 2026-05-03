@@ -1,0 +1,37 @@
+<!-- farsi/templates/farsi/persian_datepicker.html -->
+{% load farsi_tags %}
+
+<div class="mb-3">
+    {% if label %}
+    <label for="{{ id }}" class="form-label{% if required %} required{% endif %}">
+        {{ label }}
+    </label>
+    {% endif %}
+
+    <div class="input-group">
+        <input
+            type="text"
+            class="form-control persian-datepicker{% if required %} required{% endif %}"
+            id="{{ id }}"
+            name="{{ name }}"
+            value="{{ value }}"
+            placeholder="۱۴۰۲/۰۱/۰۱"
+            data-jdp
+            {{ extra_attrs|safe }}
+        >
+        <span class="input-group-text">
+            <i class="bi bi-calendar"></i>
+        </span>
+    </div>
+
+    {% if help_text %}
+    <div class="form-text">{{ help_text }}</div>
+    {% endif %}
+</div>
+
+<style>
+.persian-datepicker {
+    direction: rtl;
+    text-align: left;
+}
+</style>

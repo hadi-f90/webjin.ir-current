@@ -1,5 +1,5 @@
 {% extends 'directory/base.html' %}
-
+{% load farsi_tags %}
 {% block title %}پنل مدیریت - راهنمای وب ایران{% endblock %}
 
 {% block content %}
@@ -10,7 +10,7 @@
     <div class="col-md-12 mb-4">
         <div class="card border-warning">
             <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> در انتظار بررسی ({{ pending.count }})</h5>
+                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> در انتظار بررسی ({{ pending.count|to_hindi }})</h5>
             </div>
             <div class="card-body">
                 {% if pending %}
@@ -34,7 +34,7 @@
                                 </td>
                                 <td>{{ website.category.name|default:"-" }}</td>
                                 <td>{{ website.owner_name }}</td>
-                                <td>{{ website.created_at|date:"Y/m/d" }}</td>
+                                <td>{{ website.created_at|date:"Y/m/d"|to_jalali|to_hindi }}</td>
                                 <td>
                                     <a href="{% url 'approve_website' website.pk %}" class="btn btn-sm btn-success">
                                         <i class="bi bi-check-circle"></i> تأیید
@@ -59,7 +59,7 @@
     <div class="col-md-6 mb-4">
         <div class="card border-success">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-check-circle"></i> تأیید شده ({{ approved.count }})</h5>
+                <h5 class="mb-0"><i class="bi bi-check-circle"></i> تأیید شده ({{ approved.count|to_hindi }})</h5>
             </div>
             <div class="card-body">
                 {% if approved %}
@@ -85,7 +85,7 @@
     <div class="col-md-6 mb-4">
         <div class="card border-danger">
             <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="bi bi-x-circle"></i> رد شده ({{ rejected.count }})</h5>
+                <h5 class="mb-0"><i class="bi bi-x-circle"></i> رد شده ({{ rejected.count|to_hindi }})</h5>
             </div>
             <div class="card-body">
                 {% if rejected %}

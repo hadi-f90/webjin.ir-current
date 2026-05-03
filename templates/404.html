@@ -1,28 +1,67 @@
-{% extends "_base.html"%}
-{% block head %}
-<meta name="description" content="" />
-<meta name="author" content="" />
-<title>خطای ۴۰۴</title>
-{% endblock head %}
+{% extends '_base.html' %}
+
+{% block meta_title %}صفحه یافت نشد{% endblock %}
+{% block meta_description %}صفحه مورد نظر یافت نشد{% endblock %}
 
 {% block content %}
-<div id="layoutError">
-    <div id="layoutError_content">
-        <main>
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-6">
-                        <div class="text-center mt-4">
-                            <img class="mb-4 img-error" src="assets/img/error-404-monochrome.svg" alt="not found"/>
-                            <p class="lead">{{ message }}</p>
-                            <a href="{% url return_url_name %}">
-                                <i class="fas fa-arrow-right me-1"></i>
-                                بازگشت به پیش‌خوان
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<div class="container text-center py-5">
+    <div class="error-page">
+        <div class="error-icon mb-4">
+            <i class="bi bi-emoji-frown text-primary" style="font-size: 6rem;"></i>
+        </div>
+
+        <h1 class="display-1 fw-bold text-primary mb-2">۴۰۴</h1>
+        <h2 class="mb-3">صفحه مورد نظر یافت نشد!</h2>
+
+        <p class="lead text-muted mb-4">
+            متأسفانه صفحه‌ای که به دنبال آن هستید وجود ندارد یا منتقل شده است.
+        </p>
+
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+            <a href="{% url 'websites:home' %}" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-house-door me-2"></i>
+                بازگشت به خانه
+            </a>
+            <a href="{% url 'websites:search' %}" class="btn btn-outline-primary btn-lg px-4">
+                <i class="bi bi-search me-2"></i>
+                جستجوی وب‌سایت
+            </a>
+        </div>
+
+        <div class="card bg-light mx-auto" style="max-width: 500px;">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    شاید این‌ها مفید باشند:
+                </h5>
+                <ul class="list-unstyled text-start">
+                    <li class="mb-2">
+                        <a href="{% url 'websites:category_list' %}" class="text-decoration-none">
+                            <i class="bi bi-folder ms-2 text-primary"></i>
+                            مشاهده دسته‌بندی‌ها
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'websites:list' %}" class="text-decoration-none">
+                            <i class="bi bi-grid-3x3-gap ms-2 text-primary"></i>
+                            لیست وب‌سایت‌ها
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'pages:contact' %}" class="text-decoration-none">
+                            <i class="bi bi-envelope ms-2 text-primary"></i>
+                            گزارش لینک خراب
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{% url 'pages:detail' 'help' %}" class="text-decoration-none">
+                            <i class="bi bi-question-circle ms-2 text-primary"></i>
+                            راهنمای سایت
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </main>
+        </div>
     </div>
-{% endblock content %}
+</div>
+{% endblock %}

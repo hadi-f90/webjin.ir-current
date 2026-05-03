@@ -1,6 +1,6 @@
 {% extends 'directory/base.html' %}
-
-{% block title %}{{ website.title }} - دایرکتوری وب‌سایت{% endblock %}
+{% load farsi_tags %}
+{% block title %}{{ website.title }} - راهنمای وب ایران{% endblock %}
 
 {% if is_owner %}
 <a href="{% url 'edit_website' website.slug %}" class="btn btn-sm btn-outline-primary me-2">
@@ -30,14 +30,14 @@
                     {% if website.total_ratings > 0 %}
                         <span class="text-warning">
                             {% for i in "12345" %}
-                                {% if forloop.counter <= website.average_rating|floatformat:0 %}
+                                {% if forloop.counter <= website.average_rating|floatformat:0|to_hindi %}
                                     ⭐
                                 {% else %}
                                     ☆
                                 {% endif %}
                             {% endfor %}
                         </span>
-                        <span class="text-muted">({{ website.average_rating|floatformat:1 }} / ۵ - {{ website.total_ratings }} رأی)</span>
+                        <span class="text-muted">({{ website.average_rating|floatformat:1|to_hindi }} / ۵ - {{ website.total_ratings|to_hindi }} دیدگاه)</span>
                     {% else %}
                         <span class="text-muted">بدون امتیاز</span>
                     {% endif %}
@@ -67,7 +67,7 @@
                 <p><i class="bi bi-person"></i> {{ website.owner_name }}</p>
                 <p><i class="bi bi-envelope"></i> {{ website.owner_email }}</p>
                 {% else %}
-                <p class="text-muted"><i class="bi bi-eye-slash"></i> اطلاعات صاحب وب‌سایت مخفی شده است.</p>
+                <p class="text-muted"><i class="bi bi-eye-slash"></i> اطلاعات صاحب وب‌سایت پنهان شده است.</p>
                 {% endif %}
 
                 <a href="{{ website.url }}" target="_blank" class="btn btn-primary btn-lg">
@@ -84,7 +84,7 @@
             <div class="card-body">
                 {% if user.is_authenticated %}
                     {% if user_rating %}
-                        <p class="text-success">امتیاز شما: {{ user_rating.rating }} ⭐</p>
+                        <p class="text-success">امتیاز شما: {{ user_rating.rating|to_hindi }} ⭐</p>
                     {% else %}
                         <form method="post" action="{% url 'rate_website' website.slug %}">
                             {% csrf_token %}
@@ -107,36 +107,36 @@
         <!-- Review Section -->
         <div class="card mb-4">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0">نظرات کاربران</h5>
+                <h5 class="mb-0">دیگاه‌های دیگر کاربران</h5>
             </div>
             <div class="card-body">
                 {% if user.is_authenticated %}
                     {% if user_review %}
                         <div class="alert alert-info">
-                            <strong>نظر شما:</strong>
+                            <strong>دیدگاه شما:</strong>
                             <p>{{ user_review.content }}</p>
-                            <small class="text-muted">{{ user_review.created_at|date:"Y/m/d" }}</small>
+                            <small class="text-muted">{{ user_review.created_at|date:"Y/m/d"|to_jalali|to_hindi }}</small>
                         </div>
                     {% else %}
                         <form method="post" action="{% url 'review_website' website.slug %}">
                             {% csrf_token %}
                             {{ review_form.as_p }}
-                            <button type="submit" class="btn btn-primary">ثبت نظر</button>
+                            <button type="submit" class="btn btn-primary">ثبت دیدگاه</button>
                         </form>
                     {% endif %}
                 {% else %}
-                    <p class="text-muted">برای نوشتن نظر باید <a href="/admin/login/">وارد شوید</a></p>
+                    <p class="text-muted">برای نوشتن دیدگاه باید <a href="/admin/login/">وارد شوید</a></p>
                 {% endif %}
 
                 <hr>
                 {% for review in reviews %}
                 <div class="border-bottom pb-3 mb-3">
                     <strong>{{ review.user.username }}</strong>
-                    <small class="text-muted">{{ review.created_at|date:"Y/m/d" }}</small>
+                    <small class="text-muted">{{ review.created_at|date:"Y/m/d"|to_jalali|to_hindi }}</small>
                     <p class="mb-0">{{ review.content }}</p>
                 </div>
                 {% empty %}
-                <p class="text-muted">هنوز نظری ثبت نشده است.</p>
+                <p class="text-muted">هنوز دیدگاهی ثبت نشده است.</p>
                 {% endfor %}
             </div>
         </div>
@@ -174,10 +174,10 @@
                 <a href="{% url 'website_detail' related.slug %}" class="list-group-item list-group-item-action">
                     <strong>{{ related.title }}</strong>
                     <br>
-                    <small class="text-muted">{{ related.description|truncatewords:10 }}</small>
+                    <small class="text-muted">{{ related.description|truncate_persian:10 }}</small>
                 </a>
                 {% empty %}
-                <div class="list-group-item">وب‌سایت مرتبطی یافت نشد</div>
+                <div class="list-group-item">وب‌سایت مرتبطی پیدا نشد</div>
                 {% endfor %}
             </div>
         </div>

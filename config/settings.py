@@ -9,10 +9,12 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-from django.utils.translation import gettext_lazy as _
 
 import os
 from pathlib import Path
+
+from django.utils.translation import gettext_lazy as _
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,21 +43,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     # Optional Django contrib
     'django.contrib.humanize',
-    'django.contrib.sites',   # ✅ correct (instead of django.contrib.sites.models.Site)
-
+    'django.contrib.sites',  # ✅ correct (instead of django.contrib.sites.models.Site)
     # Third-party apps
-    'django_cleanup',        # Optional cleanup of uploaded files
+    'django_cleanup',  # Optional cleanup of uploaded files
     'captcha',
     'django_check_seo',
-
+    'crispy_forms',
+    'crispy_bootstrap5',
     # Your apps
     'admin_persian',
     'directory',
     'contact',
+    'farsi', # farsi tags
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -143,3 +146,7 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# crispy froms
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'

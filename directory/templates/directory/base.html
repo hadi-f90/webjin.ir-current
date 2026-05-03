@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}لینک‌یاب - دایرکتوری وب‌سایت{% endblock %}</title>
+    <title>{% block title %}راهنمای وب ایران - دایرکتوری وب‌سایت{% endblock %}</title>
 
     <!-- Vazirmatn Font (Best Persian Font) -->
     <link href="{% static 'css/Vazirmatn-Variable-font-face.css' %}" rel="stylesheet" type="text/css" />
@@ -149,29 +149,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white py-4 mt-5 border-top">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5 class="text-primary fw-bold">لینک‌یاب</h5>
-                    <p class="text-muted small">دایرکتوری جامع وب‌سایت‌های فارسی و خارجی</p>
-                </div>
-                <div class="col-md-4">
-                    <h6>لینک‌های مفید</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">درباره ما</a></li>
-                        <li><a href="{% url 'terms' %}" class="text-decoration-none text-muted">قوانین و مقررات</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h6>ارتباط با ما</h6>
-                    <p class="text-muted small">info@dirweb .ir</p>
-                </div>
-            </div>
-            <hr>
-            <p class="text-center text-muted small mb-0">© ۱۴۰۵ - تمامی حقوق محفوظ است | لینک‌یاب</p>
-        </div>
-    </footer>
+    {% include '_footer.html' %}
+
 
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
