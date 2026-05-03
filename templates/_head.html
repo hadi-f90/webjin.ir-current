@@ -1,4 +1,3 @@
-
 {% load static %}
 {% block head %}
 <meta charset="utf-8" />
@@ -9,13 +8,221 @@
 <!-- Favicon-->
 <link rel="icon" type="image/x-icon" href="{% static '/images/icon.png' %}" />
 
+<!-- jQuery (load first) -->
 <script type="text/javascript" src="{% static '/js/jquery.min.js' %}"></script>
 
+<!-- Bootstrap JS (MUST load before any dropdown code) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Stylesheets -->
 <link rel="stylesheet" href="{% static '/css/all.min.css' %}">
 <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
 <link rel="stylesheet" href="{% static 'admin/jquery.ui.datepicker.jalali/themes/base/jquery-ui.min.css' %}">
-
-<!-- Core theme CSS (includes Bootstrap)-->
 <link href="{% static '/css/styles.css' %}" rel="stylesheet" />
+
+<!-- Theme CSS Variables (keep your existing styles here) -->
+<style>
+    :root {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8f9fa;
+        --bg-tertiary: #e9ecef;
+        --text-primary: #212529;
+        --text-secondary: #6c757d;
+        --text-muted: #adb5bd;
+        --border-color: #dee2e6;
+        --card-bg: #ffffff;
+        --card-border: #dee2e6;
+        --nav-bg: #ffffff;
+        --nav-text: #212529;
+        --footer-bg: #ffffff;
+        --link-color: #0d6efd;
+        --link-hover: #0a58ca;
+        --btn-outline-primary-color: #0d6efd;
+        --btn-outline-primary-border: #0d6efd;
+        --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    [data-theme="dark"] {
+        --bg-primary: #1a1d20;
+        --bg-secondary: #212529;
+        --bg-tertiary: #2b3035;
+        --text-primary: #f8f9fa;
+        --text-secondary: #adb5bd;
+        --text-muted: #6c757d;
+        --border-color: #373b3e;
+        --card-bg: #212529;
+        --card-border: #373b3e;
+        --nav-bg: #1a1d20;
+        --nav-text: #f8f9fa;
+        --footer-bg: #1a1d20;
+        --link-color: #6ea8fe;
+        --link-hover: #9ec5fe;
+        --btn-outline-primary-color: #6ea8fe;
+        --btn-outline-primary-border: #6ea8fe;
+        --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+    }
+
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .bg-primary-theme {
+        background-color: var(--bg-primary) !important;
+    }
+
+    .bg-secondary-theme {
+        background-color: var(--bg-secondary) !important;
+    }
+
+    .bg-tertiary-theme {
+        background-color: var(--bg-tertiary) !important;
+    }
+
+    .text-primary-theme {
+        color: var(--text-primary) !important;
+    }
+
+    .text-secondary-theme {
+        color: var(--text-secondary) !important;
+    }
+
+    .text-muted-theme {
+        color: var(--text-muted) !important;
+    }
+
+    .border-theme {
+        border-color: var(--border-color) !important;
+    }
+
+    .card-theme {
+        background-color: var(--card-bg) !important;
+        border-color: var(--card-border) !important;
+    }
+
+    .shadow-theme {
+        box-shadow: var(--shadow) !important;
+    }
+
+    .shadow-lg-theme {
+        box-shadow: var(--shadow-lg) !important;
+    }
+
+    a {
+        color: var(--link-color);
+        transition: color 0.3s ease;
+    }
+
+    a:hover {
+        color: var(--link-hover);
+    }
+
+    .btn-outline-primary {
+        color: var(--btn-outline-primary-color);
+        border-color: var(--btn-outline-primary-border);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--btn-outline-primary-color);
+        border-color: var(--btn-outline-primary-border);
+        color: var(--bg-primary);
+    }
+
+    .navbar-theme {
+        background-color: var(--nav-bg) !important;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.3s ease;
+    }
+
+    .navbar-theme .nav-link,
+    .navbar-theme .navbar-brand {
+        color: var(--nav-text) !important;
+    }
+
+    .navbar-theme .navbar-toggler {
+        border-color: var(--border-color);
+    }
+
+    .navbar-theme .navbar-toggler-icon {
+        filter: invert(0);
+    }
+
+    [data-theme="dark"] .navbar-theme .navbar-toggler-icon {
+        filter: invert(1);
+    }
+
+    .footer-theme {
+        background-color: var(--footer-bg) !important;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .dropdown-menu-theme {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+    }
+
+    .dropdown-menu-theme .dropdown-item {
+        color: var(--text-primary);
+    }
+
+    .dropdown-menu-theme .dropdown-item:hover {
+        background-color: var(--bg-tertiary);
+        color: var(--link-color);
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-color: var(--card-border);
+    }
+
+    .alert-warning {
+        background-color: var(--bg-secondary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .theme-toggle {
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+        background-color: var(--bg-tertiary);
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: var(--link-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.875rem;
+    }
+
+    /* Dropdown z-index fix */
+    .dropdown-menu {
+        z-index: 1050;
+    }
+</style>
+
+<!-- Initialize Theme (Prevent Flash) -->
+<script>
+    (function () {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+</script>
 
 {% endblock head %}
