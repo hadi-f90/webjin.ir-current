@@ -23,31 +23,31 @@ def index(request):
     websites = Website.objects.filter(status='approved')
     categories = Category.objects.annotate(website_count=Count('website_set'))
     all_tags = Tag.objects.annotate(website_count=Count('websites')).order_by('-website_count')[:10]
-    
+
     category_slug = request.GET.get('category')
     if category_slug:
         websites = websites.filter(category__slug=category_slug)
-    
+
     tag_slug = request.GET.get('tag')
     if tag_slug:
         websites = websites.filter(tags__slug=tag_slug)
-    
+
     search = request.GET.get('search')
     if search:
         websites = websites.filter(
-            Q(title__icontains=search) | 
+            Q(title__icontains=search) |
             Q(description__icontains=search) |
             Q(tags__name__icontains=search)
         ).distinct()
-    
+
     featured_websites = list(Website.objects.filter(status='approved'))
     random.shuffle(featured_websites)
     featured_websites = featured_websites[:6]
-    
+
     paginator = Paginator(websites, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         'page_obj': page_obj,
         'categories': categories,
@@ -60,19 +60,19 @@ def index(request):
 
 def search_suggestions(request):
     query = request.GET.get('q', '')
-    
+
     if len(query) < 2:
         return JsonResponse({'suggestions': []})
-    
+
     websites = Website.objects.filter(
         status='approved',
         title__icontains=query
     )[:5]
-    
+
     tags = Tag.objects.filter(name__icontains=query)[:5]
-    
+
     suggestions = []
-    
+
     for w in websites:
         suggestions.append({
             'type': 'website',
@@ -80,7 +80,7 @@ def search_suggestions(request):
             'url': w.get_absolute_url(),
             'icon': 'bi-globe'
         })
-    
+
     for t in tags:
         suggestions.append({
             'type': 'tag',
@@ -88,34 +88,35 @@ def search_suggestions(request):
             'url': f'?tag={t.slug}',
             'icon': 'bi-tag'
         })
-    
+
     return JsonResponse({'suggestions': suggestions[:10]})
 
 
 def website_detail(request, slug):
     website = get_object_or_404(Website, slug=slug, status='approved')
+    is_owner = (website.created_by == request.user) or request.user.is_staff
     related_websites = Website.objects.filter(
-        category=website.category, 
+        category=website.category,
         status='approved'
     ).exclude(id=website.id)[:4]
-    
+
     reviews = website.reviews.filter(is_approved=True)[:10]
-    
+
     user_rating = None
     user_review = None
     user_report = None
     is_owner = False
-    
+
     if request.user.is_authenticated:
         user_rating = website.ratings.filter(user=request.user).first()
         user_review = website.reviews.filter(user=request.user).first()
         user_report = website.reports.filter(user=request.user).first()
         is_owner = website.created_by == request.user
-    
+
     rating_form = RatingForm()
     review_form = ReviewForm()
     report_form = ReportForm()
-    
+
     context = {
         'website': website,
         'related_websites': related_websites,
@@ -136,7 +137,7 @@ def website_detail(request, slug):
 @login_required
 def rate_website(request, slug):
     website = get_object_or_404(Website, slug=slug, status='approved')
-    
+
     if request.method == 'POST':
         rating_value = request.POST.get('rating')
         if rating_value:
@@ -147,14 +148,14 @@ def rate_website(request, slug):
             )
             website.update_rating()
             messages.success(request, 'امتیاز شما ثبت شد!')
-    
+
     return redirect('website_detail', slug=slug)
 
 
 @login_required
 def review_website(request, slug):
     website = get_object_or_404(Website, slug=slug, status='approved')
-    
+
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -167,20 +168,20 @@ def review_website(request, slug):
                 }
             )
             messages.success(request, 'نظر شما ثبت شد!')
-    
+
     return redirect('website_detail', slug=slug)
 
 
 @login_required
 def report_website(request, slug):
     website = get_object_or_404(Website, slug=slug, status='approved')
-    
+
     existing_report = website.reports.filter(user=request.user).exists()
-    
+
     if existing_report:
         messages.warning(request, 'شما قبلاً این وب‌سایت را گزارش کرده‌اید.')
         return redirect('website_detail', slug=slug)
-    
+
     if request.method == 'POST':
         form = ReportForm(request.POST)
         if form.is_valid():
@@ -191,7 +192,7 @@ def report_website(request, slug):
                 description=form.cleaned_data.get('description', '')
             )
             messages.success(request, 'گزارش شما ثبت شد. متشکریم!')
-    
+
     return redirect('website_detail', slug=slug)
 
 
@@ -210,10 +211,10 @@ def submit_website(request):
             return redirect('success')
     else:
         form = WebsiteSubmitForm()
-    
+
     categories = Category.objects.all()
     return render(request, 'directory/submit.html', {
-        'form': form, 
+        'form': form,
         'categories': categories
     })
 
@@ -223,12 +224,12 @@ def submit_website(request):
 @login_required
 def edit_website(request, slug):
     website = get_object_or_404(Website, slug=slug)
-    
+
     # Only owner or admin can edit
     if website.created_by != request.user and not request.user.is_staff:
         messages.error(request, 'شما اجازه ویرایش این وب‌سایت را ندارید.')
         return redirect('website_detail', slug=slug)
-    
+
     if request.method == 'POST':
         form = WebsiteSubmitForm(request.POST, instance=website)
         if form.is_valid():
@@ -240,11 +241,11 @@ def edit_website(request, slug):
             return redirect('website_detail', slug=website.slug)
     else:
         form = WebsiteSubmitForm(instance=website)
-    
+
     categories = Category.objects.all()
     # Pre-fill tags
     current_tags = ', '.join([tag.name for tag in website.tags.all()])
-    
+
     return render(request, 'directory/edit_website.html', {
         'form': form,
         'categories': categories,
@@ -269,7 +270,7 @@ def register(request):
             return redirect('index')
     else:
         form = UserCreationForm()
-    
+
     return render(request, 'directory/register.html', {'form': form})
 
 
@@ -286,7 +287,7 @@ def user_login(request):
                 return redirect('index')
     else:
         form = AuthenticationForm()
-    
+
     return render(request, 'directory/login.html', {'form': form})
 
 
@@ -303,7 +304,7 @@ def user_dashboard(request):
     my_websites = Website.objects.filter(created_by=request.user)
     my_ratings = Rating.objects.filter(user=request.user)
     my_reviews = Review.objects.filter(user=request.user)
-    
+
     context = {
         'my_websites': my_websites,
         'my_ratings': my_ratings,
@@ -348,7 +349,7 @@ def admin_dashboard(request):
     reports = Report.objects.filter(is_resolved=False)
     categories = Category.objects.all()
     tags = Tag.objects.all()
-    
+
     context = {
         'pending': pending_websites,
         'approved': approved_websites,
