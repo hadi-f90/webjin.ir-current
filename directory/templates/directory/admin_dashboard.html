@@ -2,25 +2,86 @@
 {% load farsi_tags %}
 {% block title %}پنل مدیریت - راهنمای وب ایران{% endblock %}
 
-{% block content %}
-<h1 class="mb-4"><i class="bi bi-speedometer2"></i> پنل مدیریت</h1>
+{% block extra_css %}
+<style>
+    .modal-header.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000;
+    }
 
-<div class="row">
-    <!-- Pending Websites -->
-    <div class="col-md-12 mb-4">
-        <div class="card border-warning">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> در انتظار بررسی ({{ pending.count|to_hindi }})</h5>
-            </div>
+    .modal-header.bg-danger {
+        background-color: #dc3545 !important;
+        color: #fff;
+    }
+
+    .modal-header.bg-success {
+        background-color: #198754 !important;
+        color: #fff;
+    }
+
+    .status-badge {
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0"><i class="bi bi-speedometer2"></i> پنل مدیریت</h1>
+    <div>
+        <a href="#addCategoryModal" class="btn btn-outline-primary" data-bs-toggle="modal">
+            <i class="bi bi-plus-circle"></i> دسته‌بندی جدید
+        </a>
+        <a href="#addTagModal" class="btn btn-outline-secondary" data-bs-toggle="modal">
+            <i class="bi bi-tags"></i> برچسب جدید
+        </a>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-content"
+            type="button" role="tab">
+            <i class="bi bi-hourglass-split"></i> در انتظار بررسی <span
+                class="badge bg-warning text-dark">{{ pending.count|to_hindi }}</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports-content" type="button"
+            role="tab">
+            <i class="bi bi-flag"></i> گزارش‌ها <span class="badge bg-danger">{{ reports.count|to_hindi }}</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="approved-tab" data-bs-toggle="tab" data-bs-target="#approved-content" type="button"
+            role="tab">
+            <i class="bi bi-check-circle"></i> تأیید شده‌ها
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected-content" type="button"
+            role="tab">
+            <i class="bi bi-x-circle"></i> رد شده‌ها
+        </button>
+    </li>
+</ul>
+
+<!-- Tabs Content -->
+<div class="tab-content" id="adminTabsContent">
+
+    <!-- Pending Websites Tab -->
+    <div class="tab-pane fade show active" id="pending-content" role="tabpanel">
+        <div class="card shadow-sm">
             <div class="card-body">
                 {% if pending %}
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
                             <tr>
                                 <th>عنوان</th>
-                                <th>نشانی</th>
-                                <th>دسته‌بندی</th>
+                                <th>لینک</th>
+                                <th>دسته</th>
                                 <th>ثبت‌کننده</th>
                                 <th>تاریخ</th>
                                 <th>عملیات</th>
@@ -29,19 +90,36 @@
                         <tbody>
                             {% for website in pending %}
                             <tr>
-                                <td>{{ website.title }}</td>
-                                <td><a href="{{ website.url }}" target="_blank">{{ website.url|truncatechars:30 }}</a>
+                                <td>
+                                    <strong>{{ website.title }}</strong>
+                                </td>
+                                <td>
+                                    <a href="{{ website.url }}" target="_blank" class="text-decoration-none">
+                                        <i class="bi bi-box-arrow-up-right"></i> مشاهده
+                                    </a>
                                 </td>
                                 <td>{{ website.category.name|default:"-" }}</td>
                                 <td>{{ website.owner_name }}</td>
-                                <td>{{ website.created_at|date:"Y/m/d"|to_jalali|to_hindi }}</td>
+                                <td>{{ website.created_at|date:"Y/m/d" }}</td>
                                 <td>
-                                    <a href="{% url 'approve_website' website.pk %}" class="btn btn-sm btn-success">
-                                        <i class="bi bi-check-circle"></i> تأیید
-                                    </a>
-                                    <a href="{% url 'reject_website' website.pk %}" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-x-circle"></i> رد
-                                    </a>
+                                    <!-- Approve Button -->
+                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                        data-bs-target="#confirmModal"
+                                        data-action="{% url 'approve_website_ajax' website.pk %}"
+                                        data-title="تأیید وب‌سایت"
+                                        data-message="آیا مطمئن هستید که می‌خواهید این وب‌سایت را تأیید کنید؟"
+                                        data-website-id="{{ website.pk }}" data-type="approve">
+                                        <i class="bi bi-check-lg"></i> تأیید
+                                    </button>
+
+                                    <!-- Reject Button -->
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#confirmModal"
+                                        data-action="{% url 'reject_website_ajax' website.pk %}" data-title="رد وب‌سایت"
+                                        data-message="آیا مطمئن هستید که می‌خواهید این وب‌سایت را رد کنید؟"
+                                        data-website-id="{{ website.pk }}" data-type="reject">
+                                        <i class="bi bi-x-lg"></i> رد
+                                    </button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -49,59 +127,319 @@
                     </table>
                 </div>
                 {% else %}
-                <p class="text-muted mb-0">هیچ وب‌سایتی در انتظار بررسی نیست.</p>
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-check-circle display-4"></i>
+                    <p class="mt-2">هیچ وب‌سایتی در انتظار بررسی نیست.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Approved Websites -->
-    <div class="col-md-6 mb-4">
-        <div class="card border-success">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-check-circle"></i> تأیید شده ({{ approved.count|to_hindi }})</h5>
+    <!-- Reports Tab -->
+    <div class="tab-pane fade" id="reports-content" role="tabpanel">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if reports %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>وب‌سایت</th>
+                                <th>گزارش‌دهنده</th>
+                                <th>نوع گزارش</th>
+                                <th>تاریخ</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in reports %}
+                            <tr>
+                                <td>
+                                    <a href="{{ report.website.get_absolute_url }}" target="_blank">
+                                        {{ report.website.title }}
+                                    </a>
+                                </td>
+                                <td>{{ report.user.username }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ report.get_report_type_display }}
+                                    </span>
+                                </td>
+                                <td>{{ report.created_at|date:"Y/m/d" }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                        data-bs-target="#confirmModal"
+                                        data-action="{% url 'resolve_report_ajax' report.pk %}" data-title="حل گزارش"
+                                        data-message="آیا می‌خواهید این گزارش را به عنوان حل شده علامت بزنید؟"
+                                        data-report-id="{{ report.pk }}" data-type="resolve">
+                                        <i class="bi bi-check-all"></i> حل شد
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-flag display-4"></i>
+                    <p class="mt-2">گزارش جدیدی وجود ندارد.</p>
+                </div>
+                {% endif %}
             </div>
+        </div>
+    </div>
+
+    <!-- Approved Websites Tab -->
+    <div class="tab-pane fade" id="approved-content" role="tabpanel">
+        <div class="card shadow-sm">
             <div class="card-body">
                 {% if approved %}
                 <ul class="list-group list-group-flush">
-                    {% for website in approved|slice:":10" %}
+                    {% for website in approved %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a>
-                        <span class="badge bg-success rounded-pill">فعال</span>
+                        <div>
+                            <a href="{% url 'website_detail' website.slug %}" class="text-decoration-none fw-bold">
+                                {{ website.title }}
+                            </a>
+                            <br>
+                            <small class="text-muted">{{ website.category.name|default:"بدون دسته" }}</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">تأیید شده</span>
                     </li>
                     {% endfor %}
                 </ul>
-                {% if approved.count > 10 %}
-                <small class="text-muted">و {{ approved.count|add:"-10" }} وب‌سایت دیگر...</small>
-                {% endif %}
                 {% else %}
-                <p class="text-muted mb-0">هیچ وب‌سایت تأیید شده‌ای نیست.</p>
+                <p class="text-muted text-center py-3">وب‌سایتی یافت نشد.</p>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Rejected Websites -->
-    <div class="col-md-6 mb-4">
-        <div class="card border-danger">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="bi bi-x-circle"></i> رد شده ({{ rejected.count|to_hindi }})</h5>
-            </div>
+    <!-- Rejected Websites Tab -->
+    <div class="tab-pane fade" id="rejected-content" role="tabpanel">
+        <div class="card shadow-sm">
             <div class="card-body">
                 {% if rejected %}
                 <ul class="list-group list-group-flush">
-                    {% for website in rejected|slice:":10" %}
+                    {% for website in rejected %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ website.title }}
+                        <div>
+                            <a href="{% url 'website_detail' website.slug %}"
+                                class="text-decoration-none fw-bold text-muted">
+                                {{ website.title }}
+                            </a>
+                        </div>
                         <span class="badge bg-danger rounded-pill">رد شده</span>
                     </li>
                     {% endfor %}
                 </ul>
                 {% else %}
-                <p class="text-muted mb-0">هیچ وب‌سایت رد شده‌ای نیست.</p>
+                <p class="text-muted text-center py-3">وب‌سایتی یافت نشد.</p>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+
+<!-- Generic Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalTitle">تأیید عملیات</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">آیا مطمئن هستید؟</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-primary" id="confirmActionBtn">تأیید</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">افزودن دسته‌بندی جدید</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'add_category' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">نام دسته</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">توضیحات</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">آیکون (Bootstrap Icon)</label>
+                        <input type="text" name="icon" class="form-control" placeholder="bi-folder" value="bi-folder">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Tag Modal -->
+<div class="modal fade" id="addTagModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">افزودن برچسب جدید</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'add_tag' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">نام برچسب</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">ذخیره</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle Modal Data Population
+    var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    var modalTitle = document.getElementById('modalTitle');
+    var modalMessage = document.getElementById('modalMessage');
+    var confirmBtn = document.getElementById('confirmActionBtn');
+
+    // Variables to store current action details
+    var currentActionUrl = '';
+    var currentType = ''; // approve, reject, resolve
+    var currentWebsiteId = null;
+    var currentReportId = null;
+
+    // When modal is shown, populate it with data from the clicked button
+    var myModalEl = document.getElementById('confirmModal');
+    myModalEl.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Button that triggered the modal
+        var actionUrl = button.getAttribute('data-action');
+        var title = button.getAttribute('data-title');
+        var message = button.getAttribute('data-message');
+        var type = button.getAttribute('data-type');
+        var websiteId = button.getAttribute('data-website-id');
+        var reportId = button.getAttribute('data-report-id');
+
+        currentActionUrl = actionUrl;
+        currentType = type;
+        currentWebsiteId = websiteId;
+        currentReportId = reportId;
+
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+    });
+
+    // When confirm button is clicked, send AJAX request
+    confirmBtn.addEventListener('click', function () {
+        if (!currentActionUrl) return;
+
+        // Disable button to prevent double submission
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'در حال پردازش...';
+
+        // Send POST request
+        fetch(currentActionUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken') // Helper function defined below
+            },
+            body: new FormData() // Empty body for POST
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Show success alert
+                    showAlert('success', data.message);
+
+                    // If approved or rejected, we might want to refresh the page or move the row.
+                    // For simplicity, we reload the page to reflect changes immediately
+                    if (currentType === 'approve' || currentType === 'reject') {
+                        location.reload();
+                    } else if (currentType === 'resolve') {
+                        // Remove the row from the table for better UX
+                        // Note: This requires the button to have a parent <tr>
+                        var row = document.querySelector(`button[data-report-id="${currentReportId}"]`).closest('tr');
+                        if (row) {
+                            row.remove();
+                            // Check if table is empty
+                            if (document.querySelector('#reports-content tbody tr').length === 0) {
+                                location.reload(); // Reload if last one removed to show empty state
+                            }
+                        }
+                    }
+
+                    confirmModal.hide();
+                } else {
+                    showAlert('danger', 'خطایی رخ داد.');
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'تأیید';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('danger', 'خطا در برقراری ارتباط.');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'تأیید';
+            });
+    });
+
+    // Helper: Get CSRF Token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Helper: Show Alert
+    function showAlert(type, message) {
+        var alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+</script>
 {% endblock %}

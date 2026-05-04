@@ -9,6 +9,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 from django.db.models import Q, Count
 from django_ratelimit.decorators import ratelimit
+import json
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import Website, Category, Tag, Rating, Review, Report
 from .forms import WebsiteSubmitForm, RatingForm, ReviewForm, ReportForm
 import random
@@ -345,10 +349,12 @@ def terms(request):
 
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    pending_websites = Website.objects.filter(status='pending')
-    approved_websites = Website.objects.filter(status='approved')
-    rejected_websites = Website.objects.filter(status='rejected')
-    reports = Report.objects.filter(is_resolved=False)
+    # We use select_related to optimize queries
+    pending_websites = Website.objects.select_related('category').filter(status='pending')
+    approved_websites = Website.objects.select_related('category').filter(status='approved')
+    rejected_websites = Website.objects.select_related('category').filter(status='rejected')
+    reports = Report.objects.select_related('website', 'user').filter(is_resolved=False)
+
     categories = Category.objects.all()
     tags = Tag.objects.all()
 
@@ -363,31 +369,35 @@ def admin_dashboard(request):
     return render(request, 'directory/admin_dashboard.html', context)
 
 
-@user_passes_test(is_admin)
-def approve_website(request, pk):
+@require_POST
+@staff_member_required
+def approve_website_ajax(request, pk):
     website = get_object_or_404(Website, pk=pk)
     website.status = 'approved'
     website.save()
-    messages.success(request, f'{website.title} تأیید شد!')
-    return redirect('admin_dashboard')
+    return JsonResponse(
+        {'status': 'success', 'message': f"{website.title} تأیید شد!", "new_status": "approved"}
+    )
 
 
-@user_passes_test(is_admin)
-def reject_website(request, pk):
+@require_POST
+@staff_member_required
+def reject_website_ajax(request, pk):
     website = get_object_or_404(Website, pk=pk)
     website.status = 'rejected'
     website.save()
-    messages.warning(request, f'{website.title} رد شد.')
-    return redirect('admin_dashboard')
+    return JsonResponse(
+        {'status': 'success', 'message': f"{website.title} رد شد.", "new_status": "rejected"}
+    )
 
 
-@user_passes_test(is_admin)
-def resolve_report(request, pk):
+@require_POST
+@staff_member_required
+def resolve_report_ajax(request, pk):
     report = get_object_or_404(Report, pk=pk)
     report.is_resolved = True
     report.save()
-    messages.success(request, 'گزارش حل شد.')
-    return redirect('admin_dashboard')
+    return JsonResponse({'status': 'success', 'message': "گزارش حل شد.", "resolved": True})
 
 
 @user_passes_test(is_admin)
