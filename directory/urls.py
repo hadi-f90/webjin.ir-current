@@ -36,7 +36,14 @@ urlpatterns = [
     # Admin
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('approve/<int:pk>/', views.approve_website_ajax, name='approve_website'),
-    path('reject/<int:pk>/', views.reject_website_ajax, name='reject_website'),
+    path('ajax/reject/<int:pk>/', views.reject_website_ajax, name='reject_website_ajax'),
+    path('ajax/delete/<int:pk>/', views.delete_website_ajax, name='delete_website_ajax'),
+    path(
+        'ajax/update-status/<int:pk>/',
+        views.update_website_status_ajax,
+        name='update_website_status_ajax',
+    ),
+    path('ajax/edit-website/<int:pk>/', views.edit_website_ajax, name='edit_website_ajax'),
     path('resolve-report/<int:pk>/', views.resolve_report_ajax, name='resolve_report'),
     path('add-category/', views.add_category, name='add_category'),
     path('add-tag/', views.add_tag, name='add_tag'),

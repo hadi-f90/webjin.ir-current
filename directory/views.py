@@ -10,7 +10,6 @@ from django.http import JsonResponse
 from django.db.models import Q, Count
 from django_ratelimit.decorators import ratelimit
 import json
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Website, Category, Tag, Rating, Review, Report
@@ -386,9 +385,68 @@ def reject_website_ajax(request, pk):
     website = get_object_or_404(Website, pk=pk)
     website.status = 'rejected'
     website.save()
+    return JsonResponse({
+        'status': 'success',
+        'message': f'{website.title} رد شد.',
+        'new_status': 'rejected'
+    })
+
+@require_POST
+@staff_member_required
+def delete_website_ajax(request, pk):
+    website = get_object_or_404(Website, pk=pk)
+    website_title = website.title
+    website.delete()
     return JsonResponse(
-        {'status': 'success', 'message': f"{website.title} رد شد.", "new_status": "rejected"}
+        {'status': 'success', 'message': f"{website_title} حذف شد.", "deleted": True}
     )
+
+
+@require_POST
+@staff_member_required
+def update_website_status_ajax(request, pk):
+    """Handles changing status from Approved to Rejected via dropdown"""
+    website = get_object_or_404(Website, pk=pk)
+    new_status = request.POST.get('status')
+
+    if new_status in {'pending', 'approved', 'rejected'}:
+        website.status = new_status
+        website.save()
+        return JsonResponse({
+            'status': 'success',
+            'message': f"وضعیت {website.title} به {website.get_status_display} تغییر کرد.",
+            'new_status': new_status,
+        })
+    return JsonResponse({'status': 'error', 'message': 'Invalid status'}, status=400)
+
+
+@require_POST
+@staff_member_required
+def edit_website_ajax(request, pk):
+    """Handles saving edited website details"""
+    website = get_object_or_404(Website, pk=pk)
+
+    title = request.POST.get('title')
+    url = request.POST.get('url')
+    description = request.POST.get('description')
+    category_id = request.POST.get('category')
+
+    if not title or not url:
+        return JsonResponse({'status': 'error', 'message': 'Title and URL are required'}, status=400)
+
+    website.title = title
+    website.url = url
+    website.description = description
+    if category_id:
+        website.category_id = category_id
+
+    website.save()
+    return JsonResponse({
+        'status': 'success',
+        'message': 'وب‌سایت ویرایش شد.',
+        'updated_title': website.title,
+        'updated_url': website.url
+    })
 
 
 @require_POST
