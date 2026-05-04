@@ -287,30 +287,94 @@
         </div>
     </div>
 
-    <!-- Rejected Websites Tab -->
-    <div class="tab-pane fade" id="rejected-content" role="tabpanel">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                {% if rejected %}
-                <ul class="list-group list-group-flush">
-                    {% for website in rejected %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <a href="{% url 'website_detail' website.slug %}"
-                                class="text-decoration-none fw-bold text-muted">
-                                {{ website.title }}
-                            </a>
-                        </div>
-                        <span class="badge bg-danger rounded-pill">رد شده</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <p class="text-muted text-center py-3">وب‌سایتی یافت نشد.</p>
-                {% endif %}
+        <!-- Rejected Websites Tab -->
+        <div class="tab-pane fade" id="rejected-content" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    {% if rejected %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>عنوان</th>
+                                    <th>لینک</th>
+                                    <th>دسته</th>
+                                    <th>تاریخ</th>
+                                    <th>وضعیت</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for website in rejected %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ website.title }}</strong>
+                                    </td>
+                                    <td>
+                                        <a href="{{ website.url }}" target="_blank" class="text-decoration-none">
+                                            <i class="bi bi-box-arrow-up-right"></i> مشاهده
+                                        </a>
+                                    </td>
+                                    <td>{{ website.category.name|default:"-" }}</td>
+                                    <td>{{ website.created_at|date:"Y/m/d"|to_jalali|to_hindi }}</td>
+                                    <td>
+                                        <span class="badge bg-danger rounded-pill">رد شده</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <!-- Edit Button -->
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                data-bs-target="#editModal"
+                                                data-action="{% url 'edit_website_ajax' website.pk %}"
+                                                data-id="{{ website.pk }}" data-title="{{ website.title }}"
+                                                data-url="{{ website.url }}" data-desc="{{ website.description|escapejs }}"
+                                                data-category="{{ website.category.pk|default:'' }}" title="ویرایش">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+
+                                            <!-- Actions Dropdown -->
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    مدیریت
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <button class="dropdown-item text-success" data-bs-toggle="modal"
+                                                            data-bs-target="#confirmStatusModal"
+                                                            data-action="{% url 'update_website_status_ajax' website.pk %}"
+                                                            data-status="approved" data-title="تغییر وضعیت به تأیید شده"
+                                                            data-message="آیا می‌خواهید این وب‌سایت را پس از اصلاح، تأیید کنید؟">
+                                                            <i class="bi bi-check-circle"></i> تأیید نهایی
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item text-danger" data-bs-toggle="modal"
+                                                            data-bs-target="#confirmDeleteModal"
+                                                            data-action="{% url 'delete_website_ajax' website.pk %}"
+                                                            data-title="حذف وب‌سایت"
+                                                            data-message="آیا مطمئن هستید که می‌خواهید این وب‌سایت را به‌طور کامل حذف کنید؟">
+                                                            <i class="bi bi-trash"></i> حذف کامل
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-x-circle display-4"></i>
+                        <p class="mt-2">هیچ وب‌سایت رد شده‌ای یافت نشد.</p>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
 </div>
 
 <!-- Generic Confirmation Modal -->
