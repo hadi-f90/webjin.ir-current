@@ -70,12 +70,23 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
+# security variables
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_SSL_REDIRECT = True  # In production
 CSRF_COOKIE_SECURE = True   # In production
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True  # In production
+CSRF_COOKIE_HTTPONLY = True
+CSP_SCRIPT_SRC = ("'self'", 'https://cdn.yektanet.com', 'https://cdn.ampproject.org')
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'") # 'unsafe-inline' is needed for your inline styles
+CSP_FRAME_SRC = ("'self'", 'https://cdn.ampproject.org')
+
 
 ROOT_URLCONF = 'config.urls'
 
