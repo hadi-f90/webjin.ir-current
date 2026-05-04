@@ -26,16 +26,81 @@
 {% endblock %}
 
 {% block content %}
+<!-- Hidden CSRF Token for JavaScript -->
 <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="mb-0"><i class="bi bi-speedometer2"></i> پنل مدیریت</h1>
     <div>
-        <a href="#addCategoryModal" class="btn btn-outline-primary" data-bs-toggle="modal">
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
             <i class="bi bi-plus-circle"></i> دسته‌بندی جدید
-        </a>
-        <a href="#addTagModal" class="btn btn-outline-secondary" data-bs-toggle="modal">
+        </button>
+        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addTagModal">
             <i class="bi bi-tags"></i> برچسب جدید
-        </a>
+        </button>
+    </div>
+</div>
+
+<!-- Categories Management Section -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-folder"></i> مدیریت دسته‌بندی‌ها</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>آیکون</th>
+                        <th>نام</th>
+                        <th>تعداد وب‌سایت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td>
+                            <i class="{{ cat.icon }}" style="font-size: 1.5rem;"></i>
+                        </td>
+                        <td>
+                            <strong>{{ cat.name }}</strong>
+                            <br>
+                            <small class="text-muted">{{ cat.description|truncatechars:50 }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ cat.website_set.count }}</span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <!-- Edit Button -->
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                    data-bs-target="#editCategoryModal"
+                                    data-action="{% url 'edit_category_ajax' cat.pk %}" data-id="{{ cat.pk }}"
+                                    data-name="{{ cat.name }}" data-desc="{{ cat.description|escapejs }}"
+                                    data-icon="{{ cat.icon }}" title="ویرایش">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <!-- Delete Button -->
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#confirmDeleteCategoryModal"
+                                    data-action="{% url 'delete_category_ajax' cat.pk %}" data-name="{{ cat.name }}"
+                                    data-count="{{ cat.website_set.count }}" title="حذف">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if not categories %}
+        <div class="text-center py-4 text-muted">
+            <p>هیچ دسته‌بندی‌ای وجود ندارد.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -404,7 +469,7 @@
                 <h5 class="modal-title">افزودن دسته‌بندی جدید</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'add_category' %}">
+            <form method="post" action="{% url 'add_category_ajax' %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
@@ -532,6 +597,93 @@
         </div>
     </div>
 </div>
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">افزودن دسته‌بندی جدید</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="mb-3">
+                        <label class="form-label">نام دسته</label>
+                        <input type="text" id="addCatName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">توضیحات</label>
+                        <textarea id="addCatDesc" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">آیکون (Bootstrap Icon)</label>
+                        <input type="text" id="addCatIcon" class="form-control" placeholder="bi-folder"
+                            value="bi-folder">
+                        <small class="text-muted">مثال: bi-book, bi-shop, bi-code-slash</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-primary" id="saveAddCategoryBtn">ذخیره</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">ویرایش دسته‌بندی</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <input type="hidden" id="editCatActionUrl">
+                    <input type="hidden" id="editCatId">
+
+                    <div class="mb-3">
+                        <label class="form-label">نام دسته</label>
+                        <input type="text" id="editCatName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">توضیحات</label>
+                        <textarea id="editCatDesc" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">آیکون (Bootstrap Icon)</label>
+                        <input type="text" id="editCatIcon" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-primary" id="saveEditCategoryBtn">ذخیره تغییرات</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Delete Category Modal -->
+<div class="modal fade" id="confirmDeleteCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteCatModalTitle">حذف دسته‌بندی</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteCatModalMessage">آیا مطمئن هستید؟</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteCategoryBtn">حذف</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -555,11 +707,201 @@
         setTimeout(() => { alertDiv.remove(); }, 3000);
     }
 
-    // ==================== Edit Website Logic ====================
+    // ==================== Category: Add ====================
+    var saveAddCategoryBtn = document.getElementById('saveAddCategoryBtn');
+    saveAddCategoryBtn.addEventListener('click', function () {
+        var name = document.getElementById('addCatName').value;
+        var desc = document.getElementById('addCatDesc').value;
+        var icon = document.getElementById('addCatIcon').value || 'bi-folder';
+
+        if (!name) {
+            showAlert('danger', 'نام دسته‌بندی الزامی است.');
+            return;
+        }
+
+        var csrftoken = getCsrfToken();
+        if (!csrftoken) {
+            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
+            return;
+        }
+
+        saveAddCategoryBtn.disabled = true;
+        saveAddCategoryBtn.textContent = 'در حال ذخیره...';
+
+        fetch("{% url 'add_category_ajax' %}", {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ 'name': name, 'description': desc, 'icon': icon })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlert('success', data.message);
+                    location.reload(); // Reload to show new category
+                } else {
+                    showAlert('danger', data.message);
+                }
+                saveAddCategoryBtn.disabled = false;
+                saveAddCategoryBtn.textContent = 'ذخیره';
+            })
+            .catch(error => {
+                showAlert('danger', 'خطا در ارتباط.');
+                saveAddCategoryBtn.disabled = false;
+                saveAddCategoryBtn.textContent = 'ذخیره';
+            });
+    });
+
+    // ==================== Category: Edit ====================
+    var editCatModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+    var saveEditCategoryBtn = document.getElementById('saveEditCategoryBtn');
+
+    // Populate Edit Modal
+    document.getElementById('editCategoryModal').addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var actionUrl = button.getAttribute('data-action');
+        var id = button.getAttribute('data-id');
+        var name = button.getAttribute('data-name');
+        var desc = button.getAttribute('data-desc');
+        var icon = button.getAttribute('data-icon');
+
+        document.getElementById('editCatActionUrl').value = actionUrl;
+        document.getElementById('editCatId').value = id;
+        document.getElementById('editCatName').value = name;
+        document.getElementById('editCatDesc').value = desc;
+        document.getElementById('editCatIcon').value = icon;
+    });
+
+    // Save Edit
+    saveEditCategoryBtn.addEventListener('click', function () {
+        var actionUrl = document.getElementById('editCatActionUrl').value;
+        var id = document.getElementById('editCatId').value;
+        var name = document.getElementById('editCatName').value;
+        var desc = document.getElementById('editCatDesc').value;
+        var icon = document.getElementById('editCatIcon').value;
+
+        if (!name) {
+            showAlert('danger', 'نام دسته‌بندی الزامی است.');
+            return;
+        }
+
+        var csrftoken = getCsrfToken();
+        if (!csrftoken) {
+            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
+            return;
+        }
+
+        saveEditCategoryBtn.disabled = true;
+        saveEditCategoryBtn.textContent = 'در حال ذخیره...';
+
+        fetch(actionUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ 'name': name, 'description': desc, 'icon': icon })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlert('success', data.message);
+                    // Update the row in the table without reload
+                    var row = document.querySelector(`button[data-id="${id}"]`).closest('tr');
+                    if (row) {
+                        row.querySelector('td strong').textContent = data.updated_name;
+                        row.querySelector('td i').className = data.updated_icon;
+                    }
+                    editCatModal.hide();
+                } else {
+                    showAlert('danger', data.message);
+                }
+                saveEditCategoryBtn.disabled = false;
+                saveEditCategoryBtn.textContent = 'ذخیره تغییرات';
+            })
+            .catch(error => {
+                showAlert('danger', 'خطا در ارتباط.');
+                saveEditCategoryBtn.disabled = false;
+                saveEditCategoryBtn.textContent = 'ذخیره تغییرات';
+            });
+    });
+
+    // ==================== Category: Delete ====================
+    var deleteCatModal = new bootstrap.Modal(document.getElementById('confirmDeleteCategoryModal'));
+    var deleteCatModalTitle = document.getElementById('deleteCatModalTitle');
+    var deleteCatModalMessage = document.getElementById('deleteCatModalMessage');
+    var confirmDeleteCategoryBtn = document.getElementById('confirmDeleteCategoryBtn');
+    var currentDeleteCatActionUrl = '';
+
+    document.getElementById('confirmDeleteCategoryModal').addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        currentDeleteCatActionUrl = button.getAttribute('data-action');
+        var catName = button.getAttribute('data-name');
+        var catCount = button.getAttribute('data-count');
+
+        deleteCatModalTitle.textContent = 'حذف دسته‌بندی';
+        if (parseInt(catCount) > 0) {
+            deleteCatModalMessage.textContent = `هشدار: این دسته‌بندی شامل ${catCount} وب‌سایت است. آیا مطمئن هستید؟`;
+            deleteCatModalMessage.className = 'text-warning';
+        } else {
+            deleteCatModalMessage.textContent = 'آیا مطمئن هستید که می‌خواهید این دسته‌بندی را حذف کنید؟';
+            deleteCatModalMessage.className = '';
+        }
+    });
+
+    confirmDeleteCategoryBtn.addEventListener('click', function () {
+        if (!currentDeleteCatActionUrl) return;
+
+        var csrftoken = getCsrfToken();
+        if (!csrftoken) {
+            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
+            return;
+        }
+
+        confirmDeleteCategoryBtn.disabled = true;
+        confirmDeleteCategoryBtn.textContent = 'در حال حذف...';
+
+        fetch(currentDeleteCatActionUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({})
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlert('success', data.message);
+                    location.reload();
+                } else {
+                    showAlert('danger', data.message);
+                    confirmDeleteCategoryBtn.disabled = false;
+                    confirmDeleteCategoryBtn.textContent = 'حذف';
+                }
+            })
+            .catch(error => {
+                showAlert('danger', 'خطا در ارتباط.');
+                confirmDeleteCategoryBtn.disabled = false;
+                confirmDeleteCategoryBtn.textContent = 'حذف';
+            });
+    });
+
+    // ==================== Website Logic (Edit/Delete/Status) ====================
+    // (Copy the rest of the website logic from the previous response here)
+
+    // Helper: Show Alert (already defined above, but included here for completeness if needed)
+    // ... (rest of the website JS logic from previous response)
+
+    // ==================== Website: Edit ====================
     var editModal = new bootstrap.Modal(document.getElementById('editModal'));
     var saveEditBtn = document.getElementById('saveEditBtn');
 
-    // Populate Edit Modal
     document.getElementById('editModal').addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
         var actionUrl = button.getAttribute('data-action');
@@ -577,7 +919,6 @@
         document.getElementById('editCategory').value = category;
     });
 
-    // Save Edit
     saveEditBtn.addEventListener('click', function () {
         var actionUrl = document.getElementById('editActionUrl').value;
         var websiteId = document.getElementById('editWebsiteId').value;
@@ -593,7 +934,7 @@
 
         var csrftoken = getCsrfToken();
         if (!csrftoken) {
-            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد. لطفاً صفحه را رفرش کنید.');
+            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
             return;
         }
 
@@ -615,15 +956,12 @@
             })
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
             })
             .then(data => {
                 if (data.status === 'success') {
                     showAlert('success', data.message);
-                    // Update the row in the table without reload
                     var row = document.querySelector(`button[data-id="${websiteId}"]`).closest('tr');
                     if (row) {
                         row.querySelector('td strong').textContent = data.updated_title;
@@ -638,71 +976,69 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                showAlert('danger', 'خطا در ارتباط. لطفاً دوباره تلاش کنید.');
+                showAlert('danger', 'خطا در ارتباط.');
                 saveEditBtn.disabled = false;
                 saveEditBtn.textContent = 'ذخیره تغییرات';
             });
     });
 
-        // ==================== Status Change (Reject from Approved) ====================
-            var statusModal = new bootstrap.Modal(document.getElementById('confirmStatusModal'));
-            var statusModalTitle = document.getElementById('statusModalTitle');
-            var statusModalMessage = document.getElementById('statusModalMessage');
-            var confirmStatusBtn = document.getElementById('confirmStatusBtn');
+    // ==================== Website: Status Change ====================
+    var statusModal = new bootstrap.Modal(document.getElementById('confirmStatusModal'));
+    var statusModalTitle = document.getElementById('statusModalTitle');
+    var statusModalMessage = document.getElementById('statusModalMessage');
+    var confirmStatusBtn = document.getElementById('confirmStatusBtn');
 
-            var currentStatusActionUrl = '';
-            var currentStatusValue = ''; // Store the status value here
+    var currentStatusActionUrl = '';
+    var currentStatusValue = '';
 
-            document.getElementById('confirmStatusModal').addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget;
-                currentStatusActionUrl = button.getAttribute('data-action');
-                currentStatusValue = button.getAttribute('data-status'); // Get status from the clicked button
-                statusModalTitle.textContent = button.getAttribute('data-title');
-                statusModalMessage.textContent = button.getAttribute('data-message');
-            });
+    document.getElementById('confirmStatusModal').addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        currentStatusActionUrl = button.getAttribute('data-action');
+        currentStatusValue = button.getAttribute('data-status');
+        statusModalTitle.textContent = button.getAttribute('data-title');
+        statusModalMessage.textContent = button.getAttribute('data-message');
+    });
 
-            confirmStatusBtn.addEventListener('click', function () {
-                if (!currentStatusActionUrl) return;
+    confirmStatusBtn.addEventListener('click', function () {
+        if (!currentStatusActionUrl) return;
 
-                var csrftoken = getCsrfToken();
-                if (!csrftoken) {
-                    showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-                    return;
+        var csrftoken = getCsrfToken();
+        if (!csrftoken) {
+            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
+            return;
+        }
+
+        confirmStatusBtn.disabled = true;
+        confirmStatusBtn.textContent = 'در حال پردازش...';
+
+        fetch(currentStatusActionUrl, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ 'status': currentStatusValue })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlert('success', data.message);
+                    location.reload();
+                } else {
+                    showAlert('danger', data.message);
+                    confirmStatusBtn.disabled = false;
+                    confirmStatusBtn.textContent = 'تغییر وضعیت';
                 }
-
-                confirmStatusBtn.disabled = true;
-                confirmStatusBtn.textContent = 'در حال پردازش...';
-
-                // Use the stored value
-                fetch(currentStatusActionUrl, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': csrftoken,
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({ 'status': currentStatusValue })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            showAlert('success', data.message);
-                            location.reload();
-                        } else {
-                            showAlert('danger', data.message);
-                            confirmStatusBtn.disabled = false;
-                            confirmStatusBtn.textContent = 'تغییر وضعیت';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Status Change Error:', error);
-                        showAlert('danger', 'خطا در ارتباط. لطفاً کنسول را بررسی کنید.');
-                        confirmStatusBtn.disabled = false;
-                        confirmStatusBtn.textContent = 'تغییر وضعیت';
-                    });
+            })
+            .catch(error => {
+                showAlert('danger', 'خطا در ارتباط.');
+                confirmStatusBtn.disabled = false;
+                confirmStatusBtn.textContent = 'تغییر وضعیت';
             });
+    });
 
-    // ==================== Delete Website ====================
+    // ==================== Website: Delete ====================
     var deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
     var deleteModalTitle = document.getElementById('deleteModalTitle');
     var deleteModalMessage = document.getElementById('deleteModalMessage');

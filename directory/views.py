@@ -458,16 +458,73 @@ def resolve_report_ajax(request, pk):
     return JsonResponse({'status': 'success', 'message': "گزارش حل شد.", "resolved": True})
 
 
-@user_passes_test(is_admin)
-def add_category(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
-        icon = request.POST.get('icon', 'bi-folder')
-        if name:
-            Category.objects.create(name=name, description=description, icon=icon)
-            messages.success(request, 'دسته‌بندی اضافه شد!')
-    return redirect('admin_dashboard')
+@require_POST
+@staff_member_required
+def add_category_ajax(request):
+    name = request.POST.get('name')
+    description = request.POST.get('description', '')
+    icon = request.POST.get('icon', 'bi-folder')
+
+    if not name:
+        return JsonResponse(
+            {'status': 'error', 'message': "نام دسته\u200cبندی الزامی است."}, status=400
+        )
+
+    from django.utils.text import slugify
+
+    slug = slugify(name)
+    if Category.objects.filter(slug=slug).exists():
+        return JsonResponse(
+            {'status': 'error', 'message': "این دسته\u200cبندی قبلاً وجود دارد."}, status=400
+        )
+
+    Category.objects.create(name=name, description=description, icon=icon)
+    return JsonResponse({
+        'status': 'success',
+        'message': "دسته\u200cبندی اضافه شد!",
+        "id": Category.objects.last().pk,
+    })
+
+
+@require_POST
+@staff_member_required
+def edit_category_ajax(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    name = request.POST.get('name')
+    description = request.POST.get('description', '')
+    icon = request.POST.get('icon', 'bi-folder')
+
+    if not name:
+        return JsonResponse({'status': 'error', 'message': "نام دسته‌بندی الزامی است."}, status=400)
+
+    category.name = name
+    category.description = description
+    category.icon = icon
+    category.save()
+
+    return JsonResponse({
+        'status': 'success',
+        'message': "دسته‌بندی ویرایش شد.",
+        'updated_name': category.name,
+        'updated_icon': category.icon,
+    })
+
+@require_POST
+@staff_member_required
+def delete_category_ajax(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+
+    # Check if category is in use
+    if category.website_set.exists():
+        return JsonResponse({
+            'status': 'error',
+            'message': f"این دسته‌بندی شامل {category.website_set.count()} وب‌سایت است. لطفاً ابتدا وب‌سایت‌ها را تغییر دهید.",
+            },
+            status=400,
+        )
+
+    category.delete()
+    return JsonResponse({'status': 'success', 'message': "دسته‌بندی حذف شد."})
 
 
 @user_passes_test(is_admin)
