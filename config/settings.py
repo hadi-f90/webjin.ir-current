@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_check_seo',
     'crispy_forms',
     'crispy_bootstrap5',
+    'django_ratelimit',
     # Your apps
     'admin_persian',
     'directory',
@@ -69,6 +70,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True  # In production
+CSRF_COOKIE_SECURE = True   # In production
 
 ROOT_URLCONF = 'config.urls'
 
@@ -106,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [{
     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',

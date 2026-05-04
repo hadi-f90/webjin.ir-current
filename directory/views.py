@@ -8,6 +8,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse
 from django.db.models import Q, Count
+from django_ratelimit.decorators import ratelimit
 from .models import Website, Category, Tag, Rating, Review, Report
 from .forms import WebsiteSubmitForm, RatingForm, ReviewForm, ReportForm
 import random
@@ -135,6 +136,7 @@ def website_detail(request, slug):
 # ==================== Rating, Review, Report ====================
 
 @login_required
+@ratelimit(key='user', rate='5/m')
 def rate_website(request, slug):
     website = get_object_or_404(Website, slug=slug, status='approved')
 
