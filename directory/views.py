@@ -503,10 +503,11 @@ def edit_category_ajax(request, pk):
     category.save()
 
     return JsonResponse({
-        'status': 'success',
-        'message': "دسته‌بندی ویرایش شد.",
-        'updated_name': category.name,
-        'updated_icon': category.icon,
+    'status': 'success',
+    'message': "دسته‌بندی ویرایش شد.",
+    'updated_name': category.name,
+    'updated_icon': category.icon,
+    'updated_id': category.pk,  # Added to help JS identify row
     })
 
 @require_POST
@@ -527,11 +528,60 @@ def delete_category_ajax(request, pk):
     return JsonResponse({'status': 'success', 'message': "دسته‌بندی حذف شد."})
 
 
-@user_passes_test(is_admin)
+@require_POST
+@staff_member_required
 def add_tag(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         if name:
-            Tag.objects.get_or_create(name=name)
-            messages.success(request, 'برچسب اضافه شد!')
+            # Check if tag exists
+            tag, created = Tag.objects.get_or_create(name=name)
+            if created:
+                messages.success(request, "برچسب اضافه شد!")
+            else:
+                messages.info(request, "این برچسب قبلاً وجود دارد.")
     return redirect('admin_dashboard')
+
+# ==========================================
+# NEW FUNCTIONS FOR TAG MANAGEMENT
+# ==========================================
+
+@require_POST
+@staff_member_required
+def delete_tag_ajax(request, pk):
+    """Handles deletion of a tag via AJAX"""
+    tag = get_object_or_404(Tag, pk=pk)
+
+    # Check if tag is in use
+    if tag.websites.exists():
+        return JsonResponse({
+            'status': 'error',
+            'message': f"این برچسب شامل {tag.websites.count()} وب‌سایت است. لطفاً ابتدا وب‌سایت‌ها را تغییر دهید.",
+            },
+            status=400,
+        )
+
+    tag.delete()
+    return JsonResponse({'status': 'success', 'message': "برچسب حذف شد."})
+
+
+@require_POST
+@staff_member_required
+def edit_tag_ajax(request, pk):
+    """Handles editing a tag via AJAX"""
+    tag = get_object_or_404(Tag, pk=pk)
+    name = request.POST.get('name')
+
+    if not name:
+        return JsonResponse({'status': 'error', 'message': "نام برچسب الزامی است."}, status=400)
+
+    # Check for duplicate names (excluding current tag)
+    if Tag.objects.filter(name=name).exclude(pk=pk).exists():
+        return JsonResponse({'status': 'error', 'message': "این نام برچسب تکراری است."}, status=400)
+
+    tag.name = name
+    tag.save()
+
+    return JsonResponse(
+        {'status': 'success', 'message': "برچسب ویرایش شد.", "updated_name": tag.name}
+    )
