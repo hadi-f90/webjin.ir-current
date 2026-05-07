@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'directory',
     'contact',
     'farsi',
+    'taggit',
 ]
 
 MIDDLEWARE = [

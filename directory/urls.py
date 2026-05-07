@@ -50,9 +50,9 @@ urlpatterns = [
     path('ajax/edit-category/<int:pk>/', views.edit_category_ajax, name='edit_category_ajax'),
     path('ajax/delete-category/<int:pk>/', views.delete_category_ajax, name='delete_category_ajax'),
         # Tag AJAX URLs
-    path('ajax/add-tag/', views.add_tag, name='add_tag'),     # Note: This redirects, maybe make it AJAX too? For now keeping as is.
+    path('ajax/add-tag/', views.add_tag_ajax, name='add_tag_ajax'),     # Note: This redirects, maybe make it AJAX too? For now keeping as is.
     path('ajax/edit-tag/<int:pk>/', views.edit_tag_ajax, name='edit_tag_ajax'),
     path('ajax/delete-tag/<int:pk>/', views.delete_tag_ajax, name='delete_tag_ajax'),
-    path('add-tag/', views.add_tag, name='add_tag'),
+    path('add-tag/', views.add_tag_ajax, name='add_tag'),
     path('tags/suggestions/', tag_suggestions, name='tag_suggestions'),
 ]

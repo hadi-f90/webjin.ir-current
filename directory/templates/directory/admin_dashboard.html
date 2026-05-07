@@ -628,7 +628,7 @@
                 <h5 class="modal-title">افزودن برچسب جدید</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'add_tag' %}">
+            <form method="post" action="{% url 'add_tag_ajax' %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
@@ -838,589 +838,473 @@
 </div>
 {% endblock %}
 
+
 {% block extra_js %}
 <script>
-    // Get CSRF Token from the hidden input in the template
+    // ==========================================
+    // Helper Functions
+    // ==========================================
+
+    // Get CSRF Token from cookie or meta tag
     function getCsrfToken() {
-        const tokenElement = document.getElementById('csrfToken');
-        return tokenElement ? tokenElement.value : null;
+        // Try to get from meta tag first
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        if (metaTag) {
+            return metaTag.getAttribute('content');
+        }
+        // Fallback to cookie
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, 10) === 'csrftoken=') {
+                    cookieValue = decodeURIComponent(cookie.substring(10));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 
-    // Helper: Show Alert
+    // Show Alert Message
     function showAlert(type, message) {
-        var alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        // Remove existing alerts
+        const existingAlerts = document.querySelectorAll('.dynamic-alert');
+        existingAlerts.forEach(alert => alert.remove());
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show dynamic-alert position-fixed top-0 start-50 translate-middle-x mt-3`;
         alertDiv.style.zIndex = '9999';
+        alertDiv.style.width = '50%';
         alertDiv.innerHTML = `
             ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
         document.body.appendChild(alertDiv);
-        setTimeout(() => { alertDiv.remove(); }, 3000);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 3000);
     }
 
-    // ==================== Category: Add ====================
-    var saveAddCategoryBtn = document.getElementById('saveAddCategoryBtn');
-    saveAddCategoryBtn.addEventListener('click', function () {
-        var name = document.getElementById('addCatName').value;
-        var desc = document.getElementById('addCatDesc').value;
-        var icon = document.getElementById('addCatIcon').value || 'bi-folder';
-
-        if (!name) {
-            showAlert('danger', 'نام دسته‌بندی الزامی است.');
-            return;
-        }
-
-        var csrftoken = getCsrfToken();
+    // Generic AJAX POST Helper
+    function sendAjaxRequest(url, data, successCallback, failCallback) {
+        const csrftoken = getCsrfToken();
         if (!csrftoken) {
             showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
+            if (failCallback) failCallback();
             return;
         }
 
-        saveAddCategoryBtn.disabled = true;
-        saveAddCategoryBtn.textContent = 'در حال ذخیره...';
-
-        fetch("{% url 'add_category_ajax' %}", {
+        const options = {
             method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': csrftoken,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: new URLSearchParams({ 'name': name, 'description': desc, 'icon': icon })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('success', data.message);
-                    location.reload(); // Reload to show new category
-                } else {
-                    showAlert('danger', data.message);
-                }
-                saveAddCategoryBtn.disabled = false;
-                saveAddCategoryBtn.textContent = 'ذخیره';
-            })
-            .catch(error => {
-                showAlert('danger', 'خطا در ارتباط.');
-                saveAddCategoryBtn.disabled = false;
-                saveAddCategoryBtn.textContent = 'ذخیره';
-            });
-    });
+            body: new URLSearchParams(data)
+        };
 
-    // ==================== Category: Edit ====================
-    var editCatModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-    var saveEditCategoryBtn = document.getElementById('saveEditCategoryBtn');
-
-    // Populate Edit Modal
-    document.getElementById('editCategoryModal').addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        var actionUrl = button.getAttribute('data-action');
-        var id = button.getAttribute('data-id');
-        var name = button.getAttribute('data-name');
-        var desc = button.getAttribute('data-desc');
-        var icon = button.getAttribute('data-icon');
-
-        document.getElementById('editCatActionUrl').value = actionUrl;
-        document.getElementById('editCatId').value = id;
-        document.getElementById('editCatName').value = name;
-        document.getElementById('editCatDesc').value = desc;
-        document.getElementById('editCatIcon').value = icon;
-    });
-
-    // Save Edit
-    saveEditCategoryBtn.addEventListener('click', function () {
-        var actionUrl = document.getElementById('editCatActionUrl').value;
-        var id = document.getElementById('editCatId').value;
-        var name = document.getElementById('editCatName').value;
-        var desc = document.getElementById('editCatDesc').value;
-        var icon = document.getElementById('editCatIcon').value;
-
-        if (!name) {
-            showAlert('danger', 'نام دسته‌بندی الزامی است.');
-            return;
-        }
-
-        var csrftoken = getCsrfToken();
-        if (!csrftoken) {
-            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-            return;
-        }
-
-        saveEditCategoryBtn.disabled = true;
-        saveEditCategoryBtn.textContent = 'در حال ذخیره...';
-
-        fetch(actionUrl, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({ 'name': name, 'description': desc, 'icon': icon })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('success', data.message);
-                    // Update the row in the table without reload
-                    var row = document.querySelector(`button[data-id="${id}"]`).closest('tr');
-                    if (row) {
-                        row.querySelector('td strong').textContent = data.updated_name;
-                        row.querySelector('td i').className = data.updated_icon;
-                    }
-                    editCatModal.hide();
-                } else {
-                    showAlert('danger', data.message);
-                }
-                saveEditCategoryBtn.disabled = false;
-                saveEditCategoryBtn.textContent = 'ذخیره تغییرات';
-            })
-            .catch(error => {
-                showAlert('danger', 'خطا در ارتباط.');
-                saveEditCategoryBtn.disabled = false;
-                saveEditCategoryBtn.textContent = 'ذخیره تغییرات';
-            });
-    });
-
-    // ==================== Category: Delete ====================
-    var deleteCatModal = new bootstrap.Modal(document.getElementById('confirmDeleteCategoryModal'));
-    var deleteCatModalTitle = document.getElementById('deleteCatModalTitle');
-    var deleteCatModalMessage = document.getElementById('deleteCatModalMessage');
-    var confirmDeleteCategoryBtn = document.getElementById('confirmDeleteCategoryBtn');
-    var currentDeleteCatActionUrl = '';
-
-    document.getElementById('confirmDeleteCategoryModal').addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        currentDeleteCatActionUrl = button.getAttribute('data-action');
-        var catName = button.getAttribute('data-name');
-        var catCount = button.getAttribute('data-count');
-
-        deleteCatModalTitle.textContent = 'حذف دسته‌بندی';
-        if (parseInt(catCount) > 0) {
-            deleteCatModalMessage.textContent = `هشدار: این دسته‌بندی شامل ${catCount} وب‌سایت است. آیا مطمئن هستید؟`;
-            deleteCatModalMessage.className = 'text-warning';
-        } else {
-            deleteCatModalMessage.textContent = 'آیا مطمئن هستید که می‌خواهید این دسته‌بندی را حذف کنید؟';
-            deleteCatModalMessage.className = '';
-        }
-    });
-
-    confirmDeleteCategoryBtn.addEventListener('click', function () {
-        if (!currentDeleteCatActionUrl) return;
-
-        var csrftoken = getCsrfToken();
-        if (!csrftoken) {
-            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-            return;
-        }
-
-        confirmDeleteCategoryBtn.disabled = true;
-        confirmDeleteCategoryBtn.textContent = 'در حال حذف...';
-
-        fetch(currentDeleteCatActionUrl, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('success', data.message);
-                    location.reload();
-                } else {
-                    showAlert('danger', data.message);
-                    confirmDeleteCategoryBtn.disabled = false;
-                    confirmDeleteCategoryBtn.textContent = 'حذف';
-                }
-            })
-            .catch(error => {
-                showAlert('danger', 'خطا در ارتباط.');
-                confirmDeleteCategoryBtn.disabled = false;
-                confirmDeleteCategoryBtn.textContent = 'حذف';
-            });
-    });
-
-    // ==================== Website Logic (Edit/Delete/Status) ====================
-    // (Copy the rest of the website logic from the previous response here)
-
-    // Helper: Show Alert (already defined above, but included here for completeness if needed)
-    // ... (rest of the website JS logic from previous response)
-
-    // ==================== Website: Edit ====================
-    var editModal = new bootstrap.Modal(document.getElementById('editModal'));
-    var saveEditBtn = document.getElementById('saveEditBtn');
-
-    document.getElementById('editModal').addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        var actionUrl = button.getAttribute('data-action');
-        var id = button.getAttribute('data-id');
-        var title = button.getAttribute('data-title');
-        var url = button.getAttribute('data-url');
-        var desc = button.getAttribute('data-desc');
-        var category = button.getAttribute('data-category');
-
-        document.getElementById('editActionUrl').value = actionUrl;
-        document.getElementById('editWebsiteId').value = id;
-        document.getElementById('editTitle').value = title;
-        document.getElementById('editUrl').value = url;
-        document.getElementById('editDescription').value = desc;
-        document.getElementById('editCategory').value = category;
-    });
-
-    saveEditBtn.addEventListener('click', function () {
-        var actionUrl = document.getElementById('editActionUrl').value;
-        var websiteId = document.getElementById('editWebsiteId').value;
-        var title = document.getElementById('editTitle').value;
-        var url = document.getElementById('editUrl').value;
-        var desc = document.getElementById('editDescription').value;
-        var category = document.getElementById('editCategory').value;
-
-        if (!title || !url) {
-            showAlert('danger', 'عنوان و آدرس الزامی است.');
-            return;
-        }
-
-        var csrftoken = getCsrfToken();
-        if (!csrftoken) {
-            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-            return;
-        }
-
-        saveEditBtn.disabled = true;
-        saveEditBtn.textContent = 'در حال ذخیره...';
-
-        fetch(actionUrl, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                'title': title,
-                'url': url,
-                'description': desc,
-                'category': category
-            })
-        })
+        fetch(url, options)
             .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
                 return response.json();
             })
             .then(data => {
                 if (data.status === 'success') {
+                    if (successCallback) successCallback(data);
+                } else {
+                    showAlert('danger', data.message || 'خطا در عملیات.');
+                    if (failCallback) failCallback();
+                }
+            })
+            .catch(error => {
+                console.error('AJAX Error:', error);
+                showAlert('danger', 'خطا در ارتباط با سرور.');
+                if (failCallback) failCallback();
+            });
+    }
+
+    // ==========================================
+    // Category Management
+    // ==========================================
+
+    // --- Add Category ---
+    const saveAddCategoryBtn = document.getElementById('saveAddCategoryBtn');
+    if (saveAddCategoryBtn) {
+        saveAddCategoryBtn.addEventListener('click', function () {
+            const name = document.getElementById('addCatName').value;
+            const desc = document.getElementById('addCatDesc').value;
+            const icon = document.getElementById('addCatIcon').value || 'bi-folder';
+
+            if (!name) {
+                showAlert('danger', 'نام دسته‌بندی الزامی است.');
+                return;
+            }
+
+            saveAddCategoryBtn.disabled = true;
+            saveAddCategoryBtn.textContent = 'در حال ذخیره...';
+
+            sendAjaxRequest("{% url 'add_category_ajax' %}", {
+                'name': name,
+                'description': desc,
+                'icon': icon
+            }, function (data) {
+                showAlert('success', data.message);
+                // Optional: Update UI without reload if needed, or just reload
+                location.reload();
+            }, function () {
+                saveAddCategoryBtn.disabled = false;
+                saveAddCategoryBtn.textContent = 'ذخیره';
+            });
+        });
+    }
+
+    // --- Edit Category ---
+    const editCatModal = document.getElementById('editCategoryModal');
+    const saveEditCategoryBtn = document.getElementById('saveEditCategoryBtn');
+
+    if (editCatModal) {
+        editCatModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const actionUrl = button.getAttribute('data-action');
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
+            const desc = button.getAttribute('data-desc');
+            const icon = button.getAttribute('data-icon');
+
+            document.getElementById('editCatActionUrl').value = actionUrl;
+            document.getElementById('editCatId').value = id;
+            document.getElementById('editCatName').value = name;
+            document.getElementById('editCatDesc').value = desc;
+            document.getElementById('editCatIcon').value = icon;
+        });
+
+        if (saveEditCategoryBtn) {
+            saveEditCategoryBtn.addEventListener('click', function () {
+                const actionUrl = document.getElementById('editCatActionUrl').value;
+                const name = document.getElementById('editCatName').value;
+                const desc = document.getElementById('editCatDesc').value;
+                const icon = document.getElementById('editCatIcon').value;
+
+                if (!name) {
+                    showAlert('danger', 'نام دسته‌بندی الزامی است.');
+                    return;
+                }
+
+                saveEditCategoryBtn.disabled = true;
+                saveEditCategoryBtn.textContent = 'در حال ذخیره...';
+
+                sendAjaxRequest(actionUrl, {
+                    'name': name,
+                    'description': desc,
+                    'icon': icon
+                }, function (data) {
                     showAlert('success', data.message);
-                    var row = document.querySelector(`button[data-id="${websiteId}"]`).closest('tr');
+                    // Update row content dynamically
+                    const row = document.querySelector(`button[data-id="${document.getElementById('editCatId').value}"]`).closest('tr');
                     if (row) {
-                        row.querySelector('td strong').textContent = data.updated_title;
-                        row.querySelector('td a').href = data.updated_url;
+                        row.querySelector('td strong').textContent = data.updated_name;
+                        const iconCell = row.querySelector('td i');
+                        if (iconCell) iconCell.className = data.updated_icon;
                     }
-                    editModal.hide();
-                } else {
-                    showAlert('danger', data.message || 'خطا در ویرایش.');
-                }
-                saveEditBtn.disabled = false;
-                saveEditBtn.textContent = 'ذخیره تغییرات';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlert('danger', 'خطا در ارتباط.');
-                saveEditBtn.disabled = false;
-                saveEditBtn.textContent = 'ذخیره تغییرات';
+                    bootstrap.Modal.getInstance(editCatModal).hide();
+                }, function () {
+                    saveEditCategoryBtn.disabled = false;
+                    saveEditCategoryBtn.textContent = 'ذخیره تغییرات';
+                });
             });
-    });
-
-    // ==================== Website: Status Change ====================
-    var statusModal = new bootstrap.Modal(document.getElementById('confirmStatusModal'));
-    var statusModalTitle = document.getElementById('statusModalTitle');
-    var statusModalMessage = document.getElementById('statusModalMessage');
-    var confirmStatusBtn = document.getElementById('confirmStatusBtn');
-
-    var currentStatusActionUrl = '';
-    var currentStatusValue = '';
-
-    document.getElementById('confirmStatusModal').addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        currentStatusActionUrl = button.getAttribute('data-action');
-        currentStatusValue = button.getAttribute('data-status');
-        statusModalTitle.textContent = button.getAttribute('data-title');
-        statusModalMessage.textContent = button.getAttribute('data-message');
-    });
-
-    confirmStatusBtn.addEventListener('click', function () {
-        if (!currentStatusActionUrl) return;
-
-        var csrftoken = getCsrfToken();
-        if (!csrftoken) {
-            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-            return;
         }
+    }
 
-        confirmStatusBtn.disabled = true;
-        confirmStatusBtn.textContent = 'در حال پردازش...';
+    // --- Delete Category ---
+    const confirmDeleteCategoryBtn = document.getElementById('confirmDeleteCategoryBtn');
+    const deleteCatModal = new bootstrap.Modal(document.getElementById('confirmDeleteCategoryModal'));
 
-        fetch(currentStatusActionUrl, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({ 'status': currentStatusValue })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('success', data.message);
-                    location.reload();
-                } else {
-                    showAlert('danger', data.message);
-                    confirmStatusBtn.disabled = false;
-                    confirmStatusBtn.textContent = 'تغییر وضعیت';
-                }
-            })
-            .catch(error => {
-                showAlert('danger', 'خطا در ارتباط.');
-                confirmStatusBtn.disabled = false;
-                confirmStatusBtn.textContent = 'تغییر وضعیت';
+    if (confirmDeleteCategoryBtn) {
+        document.getElementById('confirmDeleteCategoryModal').addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            document.getElementById('currentDeleteCatActionUrl').value = button.getAttribute('data-action');
+            const catName = button.getAttribute('data-name');
+            const catCount = button.getAttribute('data-count');
+
+            document.getElementById('deleteCatModalMessage').textContent =
+                `آیا مطمئن هستید که می‌خواهید دسته‌بندی "${catName}" را حذف کنید؟`;
+        });
+
+        confirmDeleteCategoryBtn.addEventListener('click', function () {
+            const actionUrl = document.getElementById('currentDeleteCatActionUrl').value;
+            if (!actionUrl) return;
+
+            confirmDeleteCategoryBtn.disabled = true;
+            confirmDeleteCategoryBtn.textContent = 'در حال حذف...';
+
+            sendAjaxRequest(actionUrl, {}, function (data) {
+                showAlert('success', data.message);
+                location.reload();
+            }, function () {
+                confirmDeleteCategoryBtn.disabled = false;
+                confirmDeleteCategoryBtn.textContent = 'حذف';
             });
-    });
+        });
+    }
 
-    // ==================== Website: Delete ====================
-    var deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-    var deleteModalTitle = document.getElementById('deleteModalTitle');
-    var deleteModalMessage = document.getElementById('deleteModalMessage');
-    var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    var currentDeleteActionUrl = '';
+    // ==========================================
+    // Tag Management
+    // ==========================================
 
-    document.getElementById('confirmDeleteModal').addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        currentDeleteActionUrl = button.getAttribute('data-action');
-        deleteModalTitle.textContent = button.getAttribute('data-title');
-        deleteModalMessage.textContent = button.getAttribute('data-message');
-    });
+    // --- Add Tag ---
+    const saveAddTagBtn = document.getElementById('saveAddTagBtn');
+    if (saveAddTagBtn) {
+        saveAddTagBtn.addEventListener('click', function () {
+            const tagName = document.getElementById('addTagName').value;
 
-    confirmDeleteBtn.addEventListener('click', function () {
-        if (!currentDeleteActionUrl) return;
+            if (!tagName) {
+                showAlert('danger', 'نام برچسب الزامی است.');
+                return;
+            }
 
-        var csrftoken = getCsrfToken();
-        if (!csrftoken) {
-            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-            return;
-        }
+            saveAddTagBtn.disabled = true;
+            saveAddTagBtn.textContent = 'در حال ذخیره...';
 
-        confirmDeleteBtn.disabled = true;
-        confirmDeleteBtn.textContent = 'در حال حذف...';
-
-        fetch(currentDeleteActionUrl, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('success', data.message);
-                    location.reload();
-                } else {
-                    showAlert('danger', data.message);
-                    confirmDeleteBtn.disabled = false;
-                    confirmDeleteBtn.textContent = 'حذف';
-                }
-            })
-            .catch(error => {
-                showAlert('danger', 'خطا در ارتباط.');
-                confirmDeleteBtn.disabled = false;
-                confirmDeleteBtn.textContent = 'حذف';
+            sendAjaxRequest("{% url 'add_tag_ajax' %}", {
+                'tag_name': tagName
+            }, function (data) {
+                showAlert('success', data.message);
+                location.reload();
+            }, function () {
+                saveAddTagBtn.disabled = false;
+                saveAddTagBtn.textContent = 'ذخیره';
             });
-    });
+        });
+    }
 
-    // ==================== Pending Items (Approve/Reject/Resolve) ====================
-    var pendingBtn = document.getElementById('confirmStatusBtn');
-    var currentPendingActionUrl = '';
-    var currentPendingType = '';
+    // --- Edit Tag ---
+    const editTagModal = document.getElementById('editTagModal');
+    const saveEditTagBtn = document.getElementById('saveEditTagBtn');
 
-    document.getElementById('confirmStatusModal').addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget;
-        if (button.hasAttribute('data-type')) {
-            currentPendingActionUrl = button.getAttribute('data-action');
-            statusModalTitle.textContent = button.getAttribute('data-title');
-            statusModalMessage.textContent = button.getAttribute('data-message');
-            currentPendingType = button.getAttribute('data-type');
-        }
-    });
-
-    pendingBtn.addEventListener('click', function () {
-        if (!currentPendingActionUrl) return;
-
-        var csrftoken = getCsrfToken();
-        if (!csrftoken) {
-            showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-            return;
-        }
-
-        pendingBtn.disabled = true;
-        pendingBtn.textContent = 'در حال پردازش...';
-
-        fetch(currentPendingActionUrl, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({})
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('success', data.message);
-                    location.reload();
-                } else {
-                    showAlert('danger', data.message);
-                    pendingBtn.disabled = false;
-                    pendingBtn.textContent = 'تأیید';
-                }
-            })
-            .catch(error => {
-                showAlert('danger', 'خطا در ارتباط.');
-                pendingBtn.disabled = false;
-                pendingBtn.textContent = 'تأیید';
-            });
-    });
-        // ==================== Tag Management ====================
-
-        // --- Add Tag Modal (If using AJAX for add, otherwise ignore) ---
-        // Assuming 'add_tag' still redirects, we skip AJAX add logic for tags unless changed.
-
-        // --- Edit Tag Modal ---
-        var editTagModal = new bootstrap.Modal(document.getElementById('editTagModal')); // Make sure ID matches HTML
-        var saveEditTagBtn = document.getElementById('saveEditTagBtn');
-
-        // Populate Edit Tag Modal
-        document.getElementById('editTagModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var actionUrl = button.getAttribute('data-action');
-            var id = button.getAttribute('data-id');
-            var name = button.getAttribute('data-name');
+    if (editTagModal) {
+        editTagModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const actionUrl = button.getAttribute('data-action');
+            const id = button.getAttribute('data-id');
+            const name = button.getAttribute('data-name');
 
             document.getElementById('editTagActionUrl').value = actionUrl;
             document.getElementById('editTagId').value = id;
             document.getElementById('editTagName').value = name;
         });
 
-        // Save Edit Tag
-        saveEditTagBtn.addEventListener('click', function () {
-            var actionUrl = document.getElementById('editTagActionUrl').value;
-            var id = document.getElementById('editTagId').value;
-            var name = document.getElementById('editTagName').value;
+        if (saveEditTagBtn) {
+            saveEditTagBtn.addEventListener('click', function () {
+                const actionUrl = document.getElementById('editTagActionUrl').value;
+                const id = document.getElementById('editTagId').value;
+                const name = document.getElementById('editTagName').value;
 
-            if (!name) {
-                showAlert('danger', 'نام برچسب الزامی است.');
-                return;
-            }
+                if (!name) {
+                    showAlert('danger', 'نام برچسب الزامی است.');
+                    return;
+                }
 
-            var csrftoken = getCsrfToken();
-            if (!csrftoken) {
-                showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-                return;
-            }
+                saveEditTagBtn.disabled = true;
+                saveEditTagBtn.textContent = 'در حال ذخیره...';
 
-            saveEditTagBtn.disabled = true;
-            saveEditTagBtn.textContent = 'در حال ذخیره...';
-
-            fetch(actionUrl, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({ 'name': name })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        showAlert('success', data.message);
-                        // Update the row in the table
-                        var row = document.querySelector(`button[data-id="${id}"]`).closest('tr');
-                        if (row) {
-                            row.querySelector('td strong').textContent = data.updated_name;
-                        }
-                        editTagModal.hide();
-                    } else {
-                        showAlert('danger', data.message);
+                sendAjaxRequest(actionUrl, {
+                    'name': name
+                }, function (data) {
+                    showAlert('success', data.message);
+                    // Update row
+                    const row = document.querySelector(`button[data-id="${id}"]`).closest('tr');
+                    if (row) {
+                        row.querySelector('td strong').textContent = data.updated_name;
                     }
-                    saveEditTagBtn.disabled = false;
-                    saveEditTagBtn.textContent = 'ذخیره تغییرات';
-                })
-                .catch(error => {
-                    showAlert('danger', 'خطا در ارتباط.');
+                    bootstrap.Modal.getInstance(editTagModal).hide();
+                }, function () {
                     saveEditTagBtn.disabled = false;
                     saveEditTagBtn.textContent = 'ذخیره تغییرات';
                 });
-        });
+            });
+        }
+    }
 
-        // --- Delete Tag Modal ---
-        var deleteTagModal = new bootstrap.Modal(document.getElementById('confirmDeleteTagModal'));
-        var confirmDeleteTagBtn = document.getElementById('confirmDeleteTagBtn');
-        var currentDeleteTagActionUrl = '';
+    // --- Delete Tag ---
+    const confirmDeleteTagBtn = document.getElementById('confirmDeleteTagBtn');
+    const deleteTagModal = new bootstrap.Modal(document.getElementById('confirmDeleteTagModal'));
 
+    if (confirmDeleteTagBtn) {
         document.getElementById('confirmDeleteTagModal').addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            currentDeleteTagActionUrl = button.getAttribute('data-action');
-            var tagName = button.getAttribute('data-name');
-            var tagCount = button.getAttribute('data-count'); // If you pass count from backend
+            const button = event.relatedTarget;
+            document.getElementById('currentDeleteTagActionUrl').value = button.getAttribute('data-action');
+            const tagName = button.getAttribute('data-name');
 
-            document.getElementById('deleteTagModalTitle').textContent = 'حذف برچسب';
-            document.getElementById('deleteTagModalMessage').textContent = `آیا مطمئن هستید که می‌خواهید برچسب "${tagName}" را حذف کنید؟`;
+            document.getElementById('deleteTagModalMessage').textContent =
+                `آیا مطمئن هستید که می‌خواهید برچسب "${tagName}" را حذف کنید؟`;
         });
 
         confirmDeleteTagBtn.addEventListener('click', function () {
-            if (!currentDeleteTagActionUrl) return;
-
-            var csrftoken = getCsrfToken();
-            if (!csrftoken) {
-                showAlert('danger', 'خطای امنیتی: CSRF Token یافت نشد.');
-                return;
-            }
+            const actionUrl = document.getElementById('currentDeleteTagActionUrl').value;
+            if (!actionUrl) return;
 
             confirmDeleteTagBtn.disabled = true;
             confirmDeleteTagBtn.textContent = 'در حال حذف...';
 
-            fetch(currentDeleteTagActionUrl, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({})
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        showAlert('success', data.message);
-                        location.reload(); // Reload to reflect changes
-                    } else {
-                        showAlert('danger', data.message);
-                        confirmDeleteTagBtn.disabled = false;
-                        confirmDeleteTagBtn.textContent = 'حذف';
-                    }
-                })
-                .catch(error => {
-                    showAlert('danger', 'خطا در ارتباط.');
-                    confirmDeleteTagBtn.disabled = false;
-                    confirmDeleteTagBtn.textContent = 'حذف';
-                });
+            sendAjaxRequest(actionUrl, {}, function (data) {
+                showAlert('success', data.message);
+                location.reload();
+            }, function () {
+                confirmDeleteTagBtn.disabled = false;
+                confirmDeleteTagBtn.textContent = 'حذف';
+            });
         });
+    }
+
+    // ==========================================
+    // Website Management (Edit/Delete/Status)
+    // ==========================================
+
+    // --- Edit Website ---
+    const editModal = new bootstrap.Modal(document.getElementById('editWebsiteModal')); // Ensure ID matches HTML
+    const saveEditBtn = document.getElementById('saveEditWebsiteBtn'); // Ensure ID matches HTML
+
+    if (editModal) {
+        editModal._element.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const actionUrl = button.getAttribute('data-action');
+            const id = button.getAttribute('data-id');
+            const title = button.getAttribute('data-title');
+            const url = button.getAttribute('data-url');
+            const desc = button.getAttribute('data-desc');
+            const category = button.getAttribute('data-category');
+
+            document.getElementById('editWebsiteActionUrl').value = actionUrl;
+            document.getElementById('editWebsiteId').value = id;
+            document.getElementById('editWebsiteTitle').value = title;
+            document.getElementById('editWebsiteUrl').value = url;
+            document.getElementById('editWebsiteDesc').value = desc;
+            document.getElementById('editWebsiteCategory').value = category;
+        });
+
+        if (saveEditBtn) {
+            saveEditBtn.addEventListener('click', function () {
+                const actionUrl = document.getElementById('editWebsiteActionUrl').value;
+                const websiteId = document.getElementById('editWebsiteId').value;
+                const title = document.getElementById('editWebsiteTitle').value;
+                const url = document.getElementById('editWebsiteUrl').value;
+                const desc = document.getElementById('editWebsiteDesc').value;
+                const category = document.getElementById('editWebsiteCategory').value;
+
+                if (!title || !url) {
+                    showAlert('danger', 'عنوان و آدرس الزامی است.');
+                    return;
+                }
+
+                saveEditBtn.disabled = true;
+                saveEditBtn.textContent = 'در حال ذخیره...';
+
+                sendAjaxRequest(actionUrl, {
+                    'title': title,
+                    'url': url,
+                    'description': desc,
+                    'category': category
+                }, function (data) {
+                    showAlert('success', data.message);
+                    const row = document.querySelector(`button[data-id="${websiteId}"]`).closest('tr');
+                    if (row) {
+                        row.querySelector('td strong').textContent = data.updated_title;
+                        const linkCell = row.querySelector('td a');
+                        if (linkCell) linkCell.href = data.updated_url;
+                    }
+                    editModal.hide();
+                }, function () {
+                    saveEditBtn.disabled = false;
+                    saveEditBtn.textContent = 'ذخیره تغییرات';
+                });
+            });
+        }
+    }
+
+    // --- Status Change (Approve/Reject) ---
+    const statusModal = new bootstrap.Modal(document.getElementById('confirmStatusModal'));
+    const confirmStatusBtn = document.getElementById('confirmStatusBtn');
+
+    if (confirmStatusBtn) {
+        statusModal._element.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            document.getElementById('currentStatusActionUrl').value = button.getAttribute('data-action');
+            document.getElementById('currentStatusValue').value = button.getAttribute('data-status');
+
+            document.getElementById('statusModalTitle').textContent = button.getAttribute('data-title');
+            document.getElementById('statusModalMessage').textContent = button.getAttribute('data-message');
+        });
+
+        confirmStatusBtn.addEventListener('click', function () {
+            const actionUrl = document.getElementById('currentStatusActionUrl').value;
+            const statusValue = document.getElementById('currentStatusValue').value;
+
+            if (!actionUrl) return;
+
+            confirmStatusBtn.disabled = true;
+            confirmStatusBtn.textContent = 'در حال پردازش...';
+
+            sendAjaxRequest(actionUrl, {
+                'status': statusValue
+            }, function (data) {
+                showAlert('success', data.message);
+                location.reload();
+            }, function () {
+                confirmStatusBtn.disabled = false;
+                confirmStatusBtn.textContent = 'تغییر وضعیت';
+            });
+        });
+    }
+
+    // --- Delete Website ---
+    const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+    if (confirmDeleteBtn) {
+        deleteModal._element.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            document.getElementById('currentDeleteActionUrl').value = button.getAttribute('data-action');
+
+            document.getElementById('deleteModalTitle').textContent = button.getAttribute('data-title');
+            document.getElementById('deleteModalMessage').textContent = button.getAttribute('data-message');
+        });
+
+        confirmDeleteBtn.addEventListener('click', function () {
+            const actionUrl = document.getElementById('currentDeleteActionUrl').value;
+            if (!actionUrl) return;
+
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.textContent = 'در حال حذف...';
+
+            sendAjaxRequest(actionUrl, {}, function (data) {
+                showAlert('success', data.message);
+                location.reload();
+            }, function () {
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.textContent = 'حذف';
+            });
+        });
+    }
+
+    // --- Resolve Report ---
+    const resolveReportBtn = document.getElementById('resolveReportBtn'); // You need to add this button in the modal logic or use the existing one
+    // Assuming you have a generic resolve button in the report modal
+    if (resolveReportBtn) {
+        // This logic assumes you have a modal for resolving reports similar to delete/status
+        // If you use the same confirmStatusModal for reports, ensure data-status is 'resolved'
+        // But since resolve_report_ajax is separate, let's assume a specific flow or reuse status modal with 'resolved' status
+        // For simplicity, if you use the status modal for reports:
+        // Ensure data-action points to resolve_report_ajax and data-status="resolved"
+    }
+
 </script>
 {% endblock %}

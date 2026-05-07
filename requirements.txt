@@ -10,11 +10,15 @@ django-check-seo==2.1.1
 django-cleanup==9.0.0
 django-contrib-comments==2.2.0
 django-crispy-forms==2.6
+django-csp==4.0
 django-jalali==7.4.0
 django-jalali-date==2.0.0
 django-ranged-response==0.2.0
+django-ratelimit==4.1.0
 django-simple-captcha==0.6.3
 django-sitemaps==2.0.2
+django-taggit==6.1.0
+django-taggit-autosuggest==0.4.2
 easy-thumbnails==2.10.1
 fabio==2025.10.0
 fonttools==4.62.1
@@ -38,6 +42,8 @@ PyQt6==6.11.0
 PyQt6-Qt6==6.11.0
 PyQt6_sip==13.11.1
 python-dateutil==2.9.0.post0
+python-dotenv==1.2.2
+redis==7.4.0
 ruamel.yaml==0.19.1
 scipy==1.17.1
 silx==2.2.2
