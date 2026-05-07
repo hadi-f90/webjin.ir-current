@@ -1061,109 +1061,120 @@
     // ==========================================
 
     // --- Add Tag ---
-    const saveAddTagBtn = document.getElementById('saveAddTagBtn');
-    if (saveAddTagBtn) {
-        saveAddTagBtn.addEventListener('click', function () {
-            const tagName = document.getElementById('addTagName').value;
+        // The modal uses a form, so we intercept the submit event
+        const addTagModal = document.getElementById('addTagModal');
+        if (addTagModal) {
+            const addTagForm = addTagModal.querySelector('form');
+            if (addTagForm) {
+                addTagForm.addEventListener('submit', function (e) {
+                    e.preventDefault(); // Prevent standard form submission
 
-            if (!tagName) {
-                showAlert('danger', 'نام برچسب الزامی است.');
-                return;
-            }
+                    const tagName = this.querySelector('input[name="name"]').value;
 
-            saveAddTagBtn.disabled = true;
-            saveAddTagBtn.textContent = 'در حال ذخیره...';
-
-            sendAjaxRequest("{% url 'add_tag_ajax' %}", {
-                'tag_name': tagName
-            }, function (data) {
-                showAlert('success', data.message);
-                location.reload();
-            }, function () {
-                saveAddTagBtn.disabled = false;
-                saveAddTagBtn.textContent = 'ذخیره';
-            });
-        });
-    }
-
-    // --- Edit Tag ---
-    const editTagModal = document.getElementById('editTagModal');
-    const saveEditTagBtn = document.getElementById('saveEditTagBtn');
-
-    if (editTagModal) {
-        editTagModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const actionUrl = button.getAttribute('data-action');
-            const id = button.getAttribute('data-id');
-            const name = button.getAttribute('data-name');
-
-            document.getElementById('editTagActionUrl').value = actionUrl;
-            document.getElementById('editTagId').value = id;
-            document.getElementById('editTagName').value = name;
-        });
-
-        if (saveEditTagBtn) {
-            saveEditTagBtn.addEventListener('click', function () {
-                const actionUrl = document.getElementById('editTagActionUrl').value;
-                const id = document.getElementById('editTagId').value;
-                const name = document.getElementById('editTagName').value;
-
-                if (!name) {
-                    showAlert('danger', 'نام برچسب الزامی است.');
-                    return;
-                }
-
-                saveEditTagBtn.disabled = true;
-                saveEditTagBtn.textContent = 'در حال ذخیره...';
-
-                sendAjaxRequest(actionUrl, {
-                    'name': name
-                }, function (data) {
-                    showAlert('success', data.message);
-                    // Update row
-                    const row = document.querySelector(`button[data-id="${id}"]`).closest('tr');
-                    if (row) {
-                        row.querySelector('td strong').textContent = data.updated_name;
+                    if (!tagName) {
+                        showAlert('danger', 'نام برچسب الزمانی است.');
+                        return;
                     }
-                    bootstrap.Modal.getInstance(editTagModal).hide();
+
+                    // Find the submit button to show loading state
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'در حال ذخیره...';
+
+                    sendAjaxRequest("{% url 'add_tag_ajax' %}", {
+                        'tag_name': tagName
+                    }, function (data) {
+                        showAlert('success', data.message);
+                        // Optional: Add tag to list dynamically without reload
+                        // For now, reload as per original intent
+                        setTimeout(() => location.reload(), 1500);
+                    }, function () {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    });
+                });
+            }
+        }
+
+        // --- Edit Tag ---
+        const editTagModal = document.getElementById('editTagModal');
+        const saveEditTagBtn = document.getElementById('saveEditTagBtn');
+
+        if (editTagModal) {
+            editTagModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const actionUrl = button.getAttribute('data-action');
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+
+                document.getElementById('editTagActionUrl').value = actionUrl;
+                document.getElementById('editTagId').value = id;
+                document.getElementById('editTagName').value = name;
+            });
+
+            if (saveEditTagBtn) {
+                saveEditTagBtn.addEventListener('click', function () {
+                    const actionUrl = document.getElementById('editTagActionUrl').value;
+                    const id = document.getElementById('editTagId').value;
+                    const name = document.getElementById('editTagName').value;
+
+                    if (!name) {
+                        showAlert('danger', 'نام برچسب الزامی است.');
+                        return;
+                    }
+
+                    saveEditTagBtn.disabled = true;
+                    saveEditTagBtn.textContent = 'در حال ذخیره...';
+
+                    sendAjaxRequest(actionUrl, {
+                        'name': name
+                    }, function (data) {
+                        showAlert('success', data.message);
+                        // Update row
+                        const row = document.querySelector(`button[data-id="${id}"]`).closest('tr');
+                        if (row) {
+                            row.querySelector('td strong').textContent = data.updated_name;
+                        }
+                        bootstrap.Modal.getInstance(editTagModal).hide();
+                    }, function () {
+                        saveEditTagBtn.disabled = false;
+                        saveEditTagBtn.textContent = 'ذخیره تغییرات';
+                    });
+                });
+            }
+        }
+
+        // --- Delete Tag ---
+        const confirmDeleteTagBtn = document.getElementById('confirmDeleteTagBtn');
+        const deleteTagModal = new bootstrap.Modal(document.getElementById('confirmDeleteTagModal'));
+
+        if (confirmDeleteTagBtn) {
+            document.getElementById('confirmDeleteTagModal').addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('currentDeleteTagActionUrl').value = button.getAttribute('data-action');
+                const tagName = button.getAttribute('data-name');
+
+                document.getElementById('deleteTagModalMessage').textContent =
+                    `آیا مطمئن هستید که می‌خواهید برچسب "${tagName}" را حذف کنید؟`;
+            });
+
+            confirmDeleteTagBtn.addEventListener('click', function () {
+                const actionUrl = document.getElementById('currentDeleteTagActionUrl').value;
+                if (!actionUrl) return;
+
+                confirmDeleteTagBtn.disabled = true;
+                confirmDeleteTagBtn.textContent = 'در حال حذف...';
+
+                sendAjaxRequest(actionUrl, {}, function (data) {
+                    showAlert('success', data.message);
+                    location.reload();
                 }, function () {
-                    saveEditTagBtn.disabled = false;
-                    saveEditTagBtn.textContent = 'ذخیره تغییرات';
+                    confirmDeleteTagBtn.disabled = false;
+                    confirmDeleteTagBtn.textContent = 'حذف';
                 });
             });
         }
-    }
-
-    // --- Delete Tag ---
-    const confirmDeleteTagBtn = document.getElementById('confirmDeleteTagBtn');
-    const deleteTagModal = new bootstrap.Modal(document.getElementById('confirmDeleteTagModal'));
-
-    if (confirmDeleteTagBtn) {
-        document.getElementById('confirmDeleteTagModal').addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            document.getElementById('currentDeleteTagActionUrl').value = button.getAttribute('data-action');
-            const tagName = button.getAttribute('data-name');
-
-            document.getElementById('deleteTagModalMessage').textContent =
-                `آیا مطمئن هستید که می‌خواهید برچسب "${tagName}" را حذف کنید؟`;
-        });
-
-        confirmDeleteTagBtn.addEventListener('click', function () {
-            const actionUrl = document.getElementById('currentDeleteTagActionUrl').value;
-            if (!actionUrl) return;
-
-            confirmDeleteTagBtn.disabled = true;
-            confirmDeleteTagBtn.textContent = 'در حال حذف...';
-
-            sendAjaxRequest(actionUrl, {}, function (data) {
-                showAlert('success', data.message);
-                location.reload();
-            }, function () {
-                confirmDeleteTagBtn.disabled = false;
-                confirmDeleteTagBtn.textContent = 'حذف';
-            });
-        });
-    }
 
     // ==========================================
     // Website Management (Edit/Delete/Status)
