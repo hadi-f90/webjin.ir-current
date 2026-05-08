@@ -44,7 +44,7 @@ urlpatterns = [
         name='update_website_status_ajax',
     ),
     path('ajax/edit-website/<int:pk>/', views.edit_website_ajax, name='edit_website_ajax'),
-    path('resolve-report/<int:pk>/', views.resolve_report_ajax, name='resolve_report'),
+    path('resolve-report/<int:pk>/', views.resolve_report_ajax, name='resolve_report_ajax'),
     # Category AJAX URLs
     path('ajax/add-category/', views.add_category_ajax, name='add_category_ajax'),
     path('ajax/edit-category/<int:pk>/', views.edit_category_ajax, name='edit_category_ajax'),
