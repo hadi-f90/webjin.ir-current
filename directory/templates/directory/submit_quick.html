@@ -1,0 +1,96 @@
+{% extends 'directory/base.html' %}
+{% block title %}ثبت سریع وب‌سایت{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> ثبت وب‌سایت</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="quickSubmitForm">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.title.label }}</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.url.label }}</label>
+                        {{ form.url }}
+                        <div class="form-text">می‌توانید بدون http:// وارد کنید.</div>
+                        {% if form.url.errors %}
+                        <div class="text-danger small mt-1">{{ form.url.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- بخش اختیاری: افزودن جزئیات بیشتر -->
+                    <div class="mb-3">
+                        <a href="#" class="text-primary small" id="toggleDetails">
+                            <i class="bi bi-chevron-down"></i> افزودن توضیحات و دسته‌بندی (اختیاری)
+                        </a>
+                        <div id="extraDetails" class="mt-3 d-none">
+                            <div class="mb-2">
+                                <label class="form-label">دسته‌بندی</label>
+                                <select name="category" class="form-select">
+                                    <option value="">انتخاب کنید...</option>
+                                    {% for cat in categories %}
+                                    <option value="{{ cat.pk }}">{{ cat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">توضیحات کوتاه</label>
+                                <textarea name="description" class="form-control" rows="2"
+                                    placeholder="یک توضیح کوتاه درباره سایت..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">{{ form.captcha.label }}</label>
+                        {{ form.captcha }}
+                        <!-- اگر از Google ReCaptcha استفاده می‌کنید، اینجا widget را رندر کنید -->
+                        <!-- {{ form.captcha }} -->
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-send"></i> ثبت وب‌سایت
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{% url 'index' %}" class="text-muted text-decoration-none small">بازگشت به صفحه اصلی</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // اسکریپت ساده برای نمایش/مخفی کردن فیلدهای اختیاری
+    document.getElementById('toggleDetails').addEventListener('click', function (e) {
+        e.preventDefault();
+        const extraDiv = document.getElementById('extraDetails');
+        extraDiv.classList.toggle('d-none');
+
+        const icon = this.querySelector('i');
+        if (extraDiv.classList.contains('d-none')) {
+            icon.classList.remove('bi-chevron-up');
+            icon.classList.add('bi-chevron-down');
+        } else {
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-up');
+        }
+    });
+</script>
+{% endblock %}

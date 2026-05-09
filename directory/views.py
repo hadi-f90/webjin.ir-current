@@ -13,7 +13,7 @@ import json
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Website, Category, Rating, Review, Report
-from .forms import WebsiteSubmitForm, RatingForm, ReviewForm, ReportForm
+from .forms import WebsiteSubmitForm, RatingForm, ReviewForm, ReportForm, QuickSubmitForm
 from taggit.models import Tag
 import random
 
@@ -188,34 +188,74 @@ def report_website(request, slug):
     return redirect('website_detail', slug=slug)
 
 # ==================== Submit Website ====================
+# def submit_website(request):
+#     if request.method == 'POST':
+#         form = WebsiteSubmitForm(request.POST)
+#         if form.is_valid():
+#             website = form.save(commit=False)
+#             website.status = 'pending'
+#             if request.user.is_authenticated:
+#                 website.created_by = request.user
+#             website.save()
+#             # taggit handles the many-to-many saving in form.save() if commit=True,
+#             # but since we did commit=False, we need to save the tags manually if they were modified.
+#             # However, WebsiteSubmitForm.save() handles it.
+#             # Note: In the form save, we called website.tags.set(). This requires the website to be saved first.
+#             # So the form logic should be:
+#             # 1. save instance
+#             # 2. set tags
+#             # Let's adjust form.save() slightly to ensure tags are saved.
+
+#             messages.success(request, 'وب‌سایت شما با موفقیت ثبت شد!')
+#             return redirect('success')
+#     else:
+#         form = WebsiteSubmitForm()
+
+#     categories = Category.objects.all()
+#     return render(request, 'directory/submit.html', {
+#         'form': form,
+#         'categories': categories
+#     })
+
 def submit_website(request):
+    # اگر کاربر لاگین است، فرم کامل را نشان بده (یا همان فرم ساده با فیلدهای پر شده)
+    # اما برای سناریوی شما (مهمان)، فرم سریع را در نظر می‌گیریم.
+
     if request.method == 'POST':
-        form = WebsiteSubmitForm(request.POST)
+        # استفاده از فرم سریع
+        form = QuickSubmitForm(request.POST)
+
         if form.is_valid():
-            website = form.save(commit=False)
-            website.status = 'pending'
+            # 1. ایجاد آبجکت Website با مقادیر حداقلی
+            new_website = Website(
+                title=form.cleaned_data['title'],
+                url=form.cleaned_data['url'],
+                description="وب‌سایت توسط کاربر ثبت شده است. لطفاً توضیحات را تکمیل کنید.",  # متن پیش‌فرض
+                status='pending',
+                # برای فیلدهای اجباری مدل که خالی هستند:
+                owner_name="ناشناس",
+                owner_email="",  # اگر ایمیل نمی‌خواهید، می‌توانید یک ایمیل سیستمی بگذارید یا فیلد را در مدل Optional کنید
+                category=None,  # یا یک دسته پیش‌فرض مثل "سایر"
+            )
+
+            # اگر کاربر لاگین است، نویسنده را ست کن
             if request.user.is_authenticated:
-                website.created_by = request.user
-            website.save()
-            # taggit handles the many-to-many saving in form.save() if commit=True,
-            # but since we did commit=False, we need to save the tags manually if they were modified.
-            # However, WebsiteSubmitForm.save() handles it.
-            # Note: In the form save, we called website.tags.set(). This requires the website to be saved first.
-            # So the form logic should be:
-            # 1. save instance
-            # 2. set tags
-            # Let's adjust form.save() slightly to ensure tags are saved.
+                new_website.created_by = request.user
+                # در این صورت می‌توانیم از ایمیل و نام کاربر لاگین شده استفاده کنیم
+                new_website.owner_name = request.user.get_full_name() or request.user.username
+                new_website.owner_email = request.user.email
 
-            messages.success(request, 'وب‌سایت شما با موفقیت ثبت شد!')
+            new_website.save()
+
+            # 2. پیام موفقیت
+            messages.success(request, "وب‌سایت شما با موفقیت ثبت شد! پس از بررسی منتشر خواهد شد.")
             return redirect('success')
+            messages.error(request, "لطفا اطلاعات را به درستی وارد کنید یا کد امنیتی را چک کنید.")
     else:
-        form = WebsiteSubmitForm()
+        form = QuickSubmitForm()
 
-    categories = Category.objects.all()
-    return render(request, 'directory/submit.html', {
-        'form': form,
-        'categories': categories
-    })
+    # نمایش فرم در تمپلیت
+    return render(request, 'directory/submit_quick.html', {'form': form})
 
 # ==================== Edit Website ====================
 @login_required

@@ -29,7 +29,7 @@ class Website(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
     url = models.URLField()
-    description = models.TextField()
+    description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='website_set'
     )
@@ -39,8 +39,8 @@ class Website(models.Model):
     tags = TaggableManager(blank=True, related_name='websites_tagged')
 
     # Owner info
-    owner_name = models.CharField(max_length=100)
-    owner_email = models.EmailField()
+    owner_name = models.CharField(max_length=100, blank=True, null=True)
+    owner_email = models.EmailField(blank=True, null=True)
     hide_owner_info = models.BooleanField(default=False, verbose_name="مخفی کردن اطلاعات")
 
     # Status
