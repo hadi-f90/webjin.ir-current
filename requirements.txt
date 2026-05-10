@@ -23,6 +23,7 @@ easy-thumbnails==2.10.1
 fabio==2025.10.0
 fonttools==4.62.1
 greenlet==3.4.0
+gunicorn==26.0.0
 h5py==3.16.0
 hdf5plugin==6.0.0
 jalali_core==1.0.0
