@@ -72,7 +72,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 SITE_ID = 1
 
 
-if False:
+if not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -81,6 +81,9 @@ if False:
             'PASSWORD': os.environ.get('DB_PASSWORD', 'secure_password'),
             'HOST': os.environ.get('DB_HOST', 'localhost'),
             'PORT': os.environ.get('DB_PORT', '5432'),
+            'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }}
 else:
     DATABASES = {
