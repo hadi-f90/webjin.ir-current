@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from .models import Website
 from taggit.models import Tag  # Import from taggit, not local
+from captcha.fields import CaptchaField  # <--- 1. Import this
 
 class WebsiteSubmitForm(forms.ModelForm):
     custom_slug = forms.SlugField(
@@ -124,51 +125,59 @@ class ReportForm(forms.Form):
         label='توضیحات'
     )
 
-class QuickSubmitForm(forms.Form):
+class QuickSubmitForm(forms.ModelForm):
     """
     فرم ساده برای کاربران مهمان جهت ثبت سریع وب‌سایت
     """
     title = forms.CharField(
         max_length=200,
-        label="عنوان وب‌سایت",
-        widget=forms.TextInput(
-            attrs={'class': 'form-control', 'placeholder': "مثال: فروشگاه آنلاین دیجی‌کالا"}
-    ),)
-    url = forms.URLField(
-        label="آدرس وب‌سایت",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'example.com'}),
+        label='عنوان وب‌سایت',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'مثال: فروشگاه آنلاین دیجی‌کالا'
+        })
     )
-    # نکته: برای کپچا بهتر است از django-recaptcha یا similar استفاده کنید.
-    # اینجا یک فیلد نمادین برای مثال می‌گذاریم.
-    captcha = forms.CharField(
-        widget=forms.TextInput(
-            attrs={'class': 'form-control', 'placeholder': "لطفا کد امنیتی را وارد کنید"}
-        ),
-        label="کد امنیتی",
+    url = forms.URLField(
+        label='آدرس وب‌سایت',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'example.com'
+        })
+    )
+
+    # <--- 1. Add CaptchaField here
+    # We customize the widget to ensure it has the right classes for Bootstrap
+    captcha = CaptchaField(
+        label='کد امنیتی',
     )
 
     def clean_url(self):
         url = self.cleaned_data.get('url', '').strip()
         if not url:
-            raise ValidationError("آدرس وب‌سایت الزامی است.")
+            raise ValidationError('آدرس وب‌سایت الزامی است.')
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         try:
             validator = URLValidator(schemes=['http', 'https'])
             validator(url)
         except ValidationError:
-            raise ValidationError("آدرس وب‌سایت معتبر نیست.")
+            raise ValidationError('آدرس وب‌سایت معتبر نیست.')
         return url
 
     def clean_title(self):
         title = self.cleaned_data.get('title', '').strip()
         if not title:
-            raise ValidationError("عنوان وب‌سایت الزامی است.")
+            raise ValidationError('عنوان وب‌سایت الزامی است.')
         return title
 
-    # تابع validate_captcha را باید بر اساس سرویس کپچای خودتان (مثل Google reCAPTCHA) بنویسید
-    # مثال فرضی:
-    def clean_captcha(self):
-        captcha_value = self.cleaned_data.get('captcha', '')
-        # اینجا باید کدی بنویسید که به API گوگل یا سرویس دیگر درخواست بزند
-        return captcha_value
+    class Meta:
+        """fields to be used by form."""
+
+        model = Website
+        exclude = (
+        )
+        labels = {
+            'captcha': "تشخیص ربات",
+        }
+
+        help_text = {'captcha': "انسان یا ربات؟"}

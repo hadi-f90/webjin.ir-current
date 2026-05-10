@@ -196,3 +196,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # --- Crispy Forms ---
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+CAPTCHA_FONT_SIZE = 30
+CAPTCHA_LETTER_ROTATION = (-35, 35)
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'
