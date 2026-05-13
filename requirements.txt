@@ -1,6 +1,5 @@
 asgiref==3.11.1
 beautifulsoup4==4.14.3
-crispy==0.8.0
 crispy-bootstrap5==2026.3
 Django==6.0.3
 django-admin-persian-fonts==0.2

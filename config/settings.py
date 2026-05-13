@@ -17,7 +17,7 @@ if not SECRET_KEY:
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Only allow these hosts in production
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['dirweb.ir','www.dirweb.ir','webjin.ir','www.webjin.ir']#os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'contact',
     'farsi',
     'taggit',
+    'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'csp.middleware.CSPMiddleware',  # CSP MUST be after SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,6 +64,7 @@ TEMPLATES = [{
     'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
+            'django.template.context_processors.debug',
             'django.template.context_processors.request',
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
@@ -75,15 +78,19 @@ SITE_ID = 1
 if not DEBUG:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('DB_NAME', 'dirweb'),
-            'USER': os.environ.get('DB_USER', 'dirweb_user'),
-            'PASSWORD': os.environ.get('DB_PASSWORD', 'secure_password'),
-            'HOST': os.environ.get('DB_HOST', 'localhost'),
-            'PORT': os.environ.get('DB_PORT', '5432'),
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'dirwebir_direct',
+            'USER': 'dirwebir__user',
+            'PASSWORD': 'mhJMq:pErC6rh',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
             'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+                'charset': 'utf8mb4',
+                'connect_timeout': 20,
+                'read_timeout': 30,
+                'write_timeout': 30,
+            },
+            'CONN_MAX_AGE': 60,  # Keep connections alive
     }}
 else:
     DATABASES = {
@@ -188,10 +195,17 @@ LANGUAGES = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- Static & Media Files ---
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+if not DEBUG:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
