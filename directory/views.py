@@ -21,15 +21,22 @@ def is_admin(user):
     return user.is_staff
 
 # ==================== Home Page ====================
+import random
+
+
 def index(request):
     websites = Website.objects.filter(status='approved')
     categories = Category.objects.annotate(website_count=Count('website_set'))
 
     # Use taggit's tag model for annotations
-    all_tags = Tag.objects.annotate(website_count=Count('websites_tagged')).order_by('-website_count')[:10]
+    all_tags = Tag.objects.annotate(website_count=Count('websites_tagged')).order_by(
+        '-website_count'
+    )[:10]
     category_slug = request.GET.get('category')
+
     if category_slug:
         websites = websites.filter(category__slug=category_slug)
+        selected_category = Category.objects.get(slug=category_slug)
 
     tag_slug = request.GET.get('tag')
     if tag_slug:
@@ -38,9 +45,9 @@ def index(request):
     search = request.GET.get('search')
     if search:
         websites = websites.filter(
-            Q(title__icontains=search) |
-            Q(description__icontains=search) |
-            Q(tags__name__icontains=search)
+            Q(title__icontains=search)
+            | Q(description__icontains=search)
+            | Q(tags__name__icontains=search)
         ).distinct()
 
     featured_websites = list(Website.objects.filter(status='approved'))
@@ -56,8 +63,9 @@ def index(request):
         'categories': categories,
         'all_tags': all_tags,
         'featured_websites': featured_websites,
-        'selected_category': category_slug,
-        'tag_slug': tag_slug, # Add this to context for index.html
+        'category_slug': category_slug,
+        'selected_category': selected_category,
+        'tag_slug': tag_slug,  # Add this to context for index.html
     }
     return render(request, 'directory/index.html', context)
 

@@ -75,7 +75,7 @@
                         <div class="card h-100">
                             <div class="card-body">
                                 <h6><a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a></h6>
-                                <p class="small text-muted mb-0">{{ website.description|truncate_persian:10 }}</p>
+                                <p class="small text-muted mb-0">{{ website.description|truncate_persian:65 }}</p>
                             </div>
                         </div>
                     </div>
@@ -87,9 +87,20 @@
 
         <!-- Website List -->
         <h4 class="mb-3">
-            {% if selected_category %}{{ selected_category }}{% elif tag_slug %}برچسب:
-            {{ tag_slug }}{% elif request.GET.search %}نتایج جستجو{% else %}همه وب‌سایت‌ها{% endif %}
+            {% if selected_category %}
+            <span class="d-inline-flex align-items-center gap-2">
+                <i class="bi {{ selected_category.icon }}"></i>
+                <span>{{ selected_category.name }}</span>
+            </span>
+            {% elif tag_slug %}
+            برچسب: {{ tag_slug }}
+            {% elif request.GET.search %}
+            نتایج جستجو
+            {% else %}
+            همه وب‌سایت‌ها
+            {% endif %}
         </h4>
+
 
         <div class="row">
             {% for website in page_obj %}
@@ -101,9 +112,9 @@
                                 {{ website.title }}
                             </a>
                         </h5>
-                        <p class="card-text text-muted small">{{ website.description|truncate_persian:15 }}</p>
+                        <p class="card-text text-muted small">{{ website.description|truncate_persian:75 }}</p>
                         {% if website.category %}
-                        <span class="badge bg-primary">{{ website.category.name }}</span>
+                        <a href="?category={{ website.category.slug }}" class="badge bg-primary">{{ website.category.name }}</a>
                         {% endif %}
                         {% if website.total_ratings > 0 %}
                         <span class="badge bg-warning text-dark">
@@ -123,7 +134,7 @@
             </div>
             {% empty %}
             <div class="col-12">
-                <div class="alert alert-info">هیچ وب‌سایتی یافت نشد.</div>
+                <div class="alert alert-info">هیچ وب‌سایتی پیدا نشد.</div>
             </div>
             {% endfor %}
         </div>
