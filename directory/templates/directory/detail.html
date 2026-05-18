@@ -22,7 +22,14 @@
         <div class="card mb-4 card-theme">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-10"><h2>{{ website.title }}</h2></div>
+                    <div class="col-md-10">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <!-- Website Icon -->
+                            {% load website_tags %}
+                            {{ website|website_icon:64 }}
+                            <h2 class="mb-0">{{ website.title }}</h2>
+                        </div>
+                    </div>
                     <div class="col-md-2">
                         {% if is_owner %}
                         <div class="mb-3">
@@ -32,8 +39,6 @@
                         </div>
                         {% endif %}
                     </div>
-
-
                 </div>
 
                 <!-- Rating Display -->
@@ -90,8 +95,8 @@
                 <div class="accordion mb-4 card-theme" id="reportAccordion">
                     <div class="accordion-item border-danger">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed bg-danger text-white" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#reportCollapse">
+                            <button class="accordion-button collapsed bg-danger text-white" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#reportCollapse">
                                 <i class="bi bi-flag me-2"></i> گزارش مشکل
                             </button>
                         </h2>

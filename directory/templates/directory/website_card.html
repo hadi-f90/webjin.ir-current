@@ -1,0 +1,28 @@
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card website-card h-100">
+        <div class="card-body">
+            <h5 class="card-title">
+                <a href="{% url 'website_detail' website.slug %}" class="text-decoration-none">
+                    {{ website.title }}
+                </a>
+            </h5>
+            <p class="card-text text-muted small">{{ website.description|truncate_persian:75 }}</p>
+            {% if website.category %}
+            <a href="?category={{ website.category.slug }}" class="badge bg-primary">{{ website.category.name }}</a>
+            {% endif %}
+            {% if website.total_ratings > 0 %}
+            <span class="badge bg-warning text-dark">
+                ⭐ {{ website.average_rating|floatformat:1|to_hindi }}
+            </span>
+            {% endif %}
+        </div>
+        <div class="card-footer bg-transparent">
+            <a href="{{ website.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-box-arrow-up-right"></i> بازدید
+            </a>
+            <a href="{% url 'website_detail' website.slug %}" class="btn btn-sm btn-outline-secondary">
+                جزئیات
+            </a>
+        </div>
+    </div>
+</div>

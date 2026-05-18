@@ -1,5 +1,6 @@
 {% extends 'directory/base.html' %}
 {% load farsi_tags %}
+{% load website_tags %}
 {% block title %}راهنمای وب ایران{% endblock %}
 
 {% block content %}
@@ -74,8 +75,10 @@
                     <div class="col-md-4 col-sm-6 mb-3">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h6><a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a></h6>
-                                <p class="small text-muted mb-0">{{ website.description|truncate_persian:65 }}</p>
+                                <div>
+                                    <h6><a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a></h6>
+                                    <p class="small text-muted mb-0">{{ website.description|truncate_persian:50 }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -116,7 +119,8 @@
                         </h5>
                         <p class="card-text text-muted small">{{ website.description|truncate_persian:75 }}</p>
                         {% if website.category %}
-                        <a href="?category={{ website.category.slug }}" class="badge bg-primary">{{ website.category.name }}</a>
+                        <a href="?category={{ website.category.slug }}"
+                            class="badge bg-primary">{{ website.category.name }}</a>
                         {% endif %}
                         {% if website.total_ratings > 0 %}
                         <span class="badge bg-warning text-dark">
@@ -143,44 +147,44 @@
 
         <!-- Pagination -->
         {% include 'directory/paginator.html' %}
-{% endblock %}
+        {% endblock %}
 
-{% block extra_js %}
-<script>
-    document.getElementById('searchInput').addEventListener('input', function () {
-        const query = this.value;
-        const resultsDiv = document.getElementById('searchResults');
+        {% block extra_js %}
+        <script>
+            document.getElementById('searchInput').addEventListener('input', function () {
+                const query = this.value;
+                const resultsDiv = document.getElementById('searchResults');
 
-        if (query.length < 2) {
-            resultsDiv.classList.add('d-none');
-            return;
-        }
+                if (query.length < 2) {
+                    resultsDiv.classList.add('d-none');
+                    return;
+                }
 
-        fetch('/search/suggestions/?q=' + encodeURIComponent(query))
-            .then(response => response.json())
-            .then(data => {
-                if (data.suggestions.length > 0) {
-                    let html = '<div class="card">';
-                    data.suggestions.forEach(item => {
-                        html += `<a href="${item.url}" class="list-group-item list-group-item-action">
+                fetch('/search/suggestions/?q=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.suggestions.length > 0) {
+                            let html = '<div class="card">';
+                            data.suggestions.forEach(item => {
+                                html += `<a href="${item.url}" class="list-group-item list-group-item-action">
                         <i class="${item.icon}"></i> ${item.title}
                         <small class="text-muted float-end">${item.type}</small>
                     </a>`;
+                            });
+                            html += '</div>';
+                            resultsDiv.innerHTML = html;
+                            resultsDiv.classList.remove('d-none');
+                        } else {
+                            resultsDiv.classList.add('d-none');
+                        }
                     });
-                    html += '</div>';
-                    resultsDiv.innerHTML = html;
-                    resultsDiv.classList.remove('d-none');
-                } else {
-                    resultsDiv.classList.add('d-none');
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.search-box')) {
+                    document.getElementById('searchResults').classList.add('d-none');
                 }
             });
-    });
-
-    // Hide suggestions when clicking outside
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('.search-box')) {
-            document.getElementById('searchResults').classList.add('d-none');
-        }
-    });
-</script>
-{% endblock %}
+        </script>
+        {% endblock %}
