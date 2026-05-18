@@ -1,0 +1,39 @@
+{% load farsi_tags %}
+{% load querystring %}
+
+<div class="row">
+    <nav aria-label="Pagination">
+        <hr class="my-0" />
+        </br>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=1 %}">نخستین</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=page_obj.previous_page_number %}">قبلی</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">
+                    صفحهٔ {{ page_obj.number|to_hindi }} از {{ page_obj.paginator.num_pages|to_hindi }}
+                </span>
+            </li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=page_obj.next_page_number %}">بعدی</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=page_obj.paginator.num_pages %}">
+                    آخرین ({{ page_obj.paginator.num_pages|to_hindi }})
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
+    </nav>
+</div>
