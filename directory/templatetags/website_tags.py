@@ -1,7 +1,8 @@
-from urllib.parse import urlparse
+# directory/templatetags/website_tags.py
 
 from django import template
 from django.utils.safestring import mark_safe
+import hashlib
 
 register = template.Library()
 
@@ -9,64 +10,87 @@ register = template.Library()
 @register.filter
 def website_icon(website, size=32):
     """
-    Returns the favicon URL for a website.
-    Falls back to a default icon if not found.
-
-    Usage: {{ website|website_icon }} or {{ website|website_icon:48 }}
+    Returns the website's own favicon.ico
+    Falls back to a generated initial-based icon.
     """
     if not website or not website.url:
-        return default_icon_url(size)
+        return default_icon(size, '🌐')
 
-    # Extract domain from URL
     try:
-
+        from urllib.parse import urlparse
         parsed = urlparse(website.url)
         domain = parsed.netloc or parsed.path.split('/')[0]
+
+        if domain:
+            # Try to get favicon from the website itself
+            favicon_url = f"https://{domain}/favicon.ico"
+
+            return mark_safe(f'''
+                <img src="{favicon_url}"
+                     alt="{website.title}"
+                     width="{size}"
+                     height="{size}"
+                     style="border-radius: 6px; object-fit: contain; background: white;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                     loading="lazy">
+                <div class="website-icon-fallback" style="display: none; width: {size}px; height: {size}px;
+                     border-radius: 6px; background: {get_color_from_domain(domain)};
+                     color: white; font-size: {size//2}px; font-weight: bold;
+                     display: flex; align-items: center; justify-content: center;">
+                    {get_initial(website.title)}
+                </div>
+            ''')
     except Exception:
-        return default_icon_url(size)
+        pass
 
-    # Use multiple favicon services for reliability
-    # 1. DuckDuckGo's favicon service (most reliable)
-    # 2. Google Favicon API (fallback)
-    # 3. Direct /favicon.ico attempt
-
-    favicon_url = f"https://icons.duckduckgo.com/ip3/{domain}.ico"
-
-    return mark_safe(
-        f"""
-        <img src="{favicon_url}"
-            alt="{website.title} icon"
-            width="{size}"
-            height="{size}"
-            style="border-radius: 4px; object-fit: contain;"
-            onerror="this.onerror=null; this.src='https://icons.duckduckgo.com/ip3/www.google.com.ico';"
-            loading="lazy">
-    """
-    )
-
+    return default_icon(size, get_initial(website.title))
 
 
 @register.simple_tag
-def website_icon_url(website, size=32):
-    """
-    Returns just the favicon URL (not HTML).
-    Use this when you want to control the img tag yourself.
-
-    Usage: <img src="{% website_icon_url website 32 %}">
-    """
+def website_icon_url(website):
+    """Returns just the favicon URL."""
     if not website or not website.url:
-        return default_icon_url(size)
+        return ''
 
     try:
-
+        from urllib.parse import urlparse
         parsed = urlparse(website.url)
         domain = parsed.netloc or parsed.path.split('/')[0]
+
+        if domain:
+            return f"https://{domain}/favicon.ico"
     except Exception:
-        return default_icon_url(size)
+        pass
 
-    return f"https://icons.duckduckgo.com/ip3/{domain}.ico"
+    return ''
 
 
-def default_icon_url(size):
-    """Returns a default placeholder icon URL."""
-    return f"https://via.placeholder.com/{size}x{size}/64748b/ffffff?text=🌐"
+def get_initial(title):
+    """Get first letter/character of title for fallback icon."""
+    if not title:
+        return '?'
+    # Get first Persian/English word
+    words = title.split()
+    first_word = words[0] if words else title
+    return first_word[0].upper()
+
+
+def get_color_from_domain(domain):
+    """Generate a consistent color from domain name."""
+    colors = [
+        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+        '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'
+    ]
+    hash_value = int(hashlib.md5(domain.encode()).hexdigest(), 16)
+    return colors[hash_value % len(colors)]
+
+
+def default_icon(size, content):
+    """Default placeholder icon."""
+    return mark_safe(f'''
+        <div style="width: {size}px; height: {size}px; border-radius: 6px;
+             background: #64748b; color: white; font-size: {size//2}px;
+             display: flex; align-items: center; justify-content: center;">
+            {content}
+        </div>
+    ''')
