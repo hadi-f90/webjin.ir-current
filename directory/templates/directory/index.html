@@ -1,5 +1,5 @@
 {% extends 'directory/base.html' %}
-{%load farsi_tags%}
+{% load farsi_tags %}
 {% block title %}راهنمای وب ایران{% endblock %}
 
 {% block content %}
@@ -92,8 +92,10 @@
                 <i class="bi {{ selected_category.icon }}"></i>
                 <span>{{ selected_category.name }}</span>
             </span>
+            {% elif tag_slug and selected_tag %}
+            <i class="bi bi-tags"></i> <span>{{ selected_tag.name }}</span>
             {% elif tag_slug %}
-            برچسب: {{ tag_slug }}
+            <i class="bi bi-tags"></i> <span>{{ tag_slug }}</span>
             {% elif request.GET.search %}
             نتایج جستجو
             {% else %}
@@ -140,6 +142,8 @@
         </div>
 
         <!-- Pagination -->
+        {% include 'directory/paginator.html' %}
+{% comment %}
         {% if page_obj.has_other_pages %}
         <nav>
             <ul class="pagination justify-content-center">
@@ -149,6 +153,10 @@
                 </li>
                 <li class="page-item">
                     <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+                </li>
+                {% else %}
+                <li class="page-item active" tabindex="-1">
+                    <a class="page-link" href="">{{ page_obj.number |to_hindi }} </a>
                 </li>
                 {% endif %}
 
@@ -161,14 +169,14 @@
                     <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">آخرین</a>
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages|to_hindi }}">آخرین</a>
                 </li>
                 {% endif %}
             </ul>
         </nav>
         {% endif %}
     </div>
-</div>
+</div>{% endcomment %}
 {% endblock %}
 
 {% block extra_js %}

@@ -21,25 +21,23 @@ def is_admin(user):
     return user.is_staff
 
 # ==================== Home Page ====================
-import random
-
-
 def index(request):
     websites = Website.objects.filter(status='approved')
     categories = Category.objects.annotate(website_count=Count('website_set'))
-
-    # Use taggit's tag model for annotations
     all_tags = Tag.objects.annotate(website_count=Count('websites_tagged')).order_by(
         '-website_count'
     )[:10]
-    category_slug = request.GET.get('category')
 
+    category_slug = request.GET.get('category')
+    selected_category = None
     if category_slug:
+        selected_category = get_object_or_404(Category, slug=category_slug)
         websites = websites.filter(category__slug=category_slug)
-        selected_category = Category.objects.get(slug=category_slug)
 
     tag_slug = request.GET.get('tag')
+    selected_tag = None
     if tag_slug:
+        selected_tag = get_object_or_404(Tag, slug=tag_slug)  # ✅ Fixed: use slug=tag_slug
         websites = websites.filter(tags__slug=tag_slug)
 
     search = request.GET.get('search')
@@ -65,7 +63,8 @@ def index(request):
         'featured_websites': featured_websites,
         'category_slug': category_slug,
         'selected_category': selected_category,
-        'tag_slug': tag_slug,  # Add this to context for index.html
+        'tag_slug': tag_slug,
+        'selected_tag': selected_tag,  # ✅ Now properly contains the Tag object
     }
     return render(request, 'directory/index.html', context)
 
