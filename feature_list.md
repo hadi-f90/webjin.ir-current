@@ -2,29 +2,30 @@
 
 - home/main page
 
-* [] [BUG] Change the name of the website
-* [] [BUG] fix pagination (add more page numbers,)
+* [d] [BUG] Change the name of the website
+* [d] [FEATURE] [BUG] fix pagination (add more page numbers,)
 * [] [FEATURE] change webstite suggesting policy in main page. for now it is random, \
    needs to be: - most visited - recently added - most viewed by others - advertized
 
 - category page list
-  [] - [FEATURE]Add category icon before title
-  [] - [BUG]replace slug with category name for each category page
-  [] - [BUG]fix pagination so that one can navigate through it better (now it doesn't)
+  [d] - [FEATURE] Add category icon before title
+  [d] - [BUG] replace slug with category name for each category page
+  [d] - [BUG] fix pagination so that one can navigate through it better (now it doesn't)
 
 - websitecards:
-[] - [imporvements]make the name/title shorter
-[] -
-[] - [BUG] make description longer
+[] - [imporvements] make the name/title shorter
+[] - ad
+[d] - [BUG] make description longer
 [] - [imporvements] Add thumbnail of site icon/screenshot of its homepage
 
 - website detail page
-[] - [FEATURE] Add these buttons
-    - [FEATURE] edit button for staff and the adder one
-    - [FEATURE]share button for every one
+[] - [FEATURE] Add these buttons:
+    - [FEATURE] edit button for staff and the one who added the website
+    - [FEATURE] share button for every one
+    - [FEATURE] staff and admin be able to edit any website
 
 [] - [FEATURE] view counts
-[] - [FEATURE] icon and screenshot of website
+[icon added] - [FEATURE] icon and screenshot of website
 [] - [FEATURE] flag of website
 [] - [FEATURE] ping (whether it is reachable now from iran or not)
 [] - [FEATURE] if no name was there for site holder
@@ -32,11 +33,11 @@
 [] - [improvement] move go to button next to the logo and make it smaller
 [] - [improvement] make comments accardion-like
 
-navbar
+- navbar
 [] - [BUG] not ot be transprant after scrolling
 [] - [FEATURE] must have light/dark mode
 
-management panel
+- management panel
 [] - [BUG] modal buttons do not work
 [] - [FEATURE] Add view count statistics
 [] - [IMPROVMENT] Add more columns to site/category/tag list
@@ -45,11 +46,17 @@ management panel
         - csv files
         - firefox html/json bookmark file
 
-other pages
+- other pages
 [] - about page
 [] - faq page
 [] - policy page
 [] - contact page (response to contact page)
+[] - footer
 
-backend
+- backend
 [] - [FEATURE] add list of web sites by django shell command
+
+* footer
+[d] - name of the site
+[] - Adding ads
+
