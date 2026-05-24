@@ -218,41 +218,89 @@ def report_website(request, slug):
 #     else:
 #         form = WebsiteSubmitForm()
 
+def submit_website(request):
+    if request.method == 'POST':
+        form = QuickSubmitForm(request.POST)
+        if form.is_valid():
+            website = form.save(commit=False)
+            website.status = 'pending'
+            if request.user.is_authenticated:
+                website.created_by = request.user
+            else:
+                new_website = Website(
+                    title=form.cleaned_data['title'],
+                    url=form.cleaned_data['url'],
+                    description=description if description else "ثبت شده توسط کاربر",
+                    status='pending',
+                    owner_name="ناشناس",
+                    owner_email="",
+                    category=Category.objects.filter(pk=cat_id).first() if cat_id else None,
+                )
+
+            website.save()
+            # taggit handles the many-to-many saving in form.save() if commit=True,
+            # but since we did commit=False, we need to save the tags manually if they were modified.
+            # However, WebsiteSubmitForm.save() handles it.
+            # Note: In the form save, we called website.tags.set(). This requires the website to be saved first.
+            # So the form logic should be:
+            # 1. save instance
+            # 2. set tags
+            # Let's adjust form.save() slightly to ensure tags are saved.
+
+            messages.success(request, 'وب‌سایت شما با موفقیت ثبت شد!')
+            return redirect('success')
+    else:
+        form = WebsiteSubmitForm()
+
+    categories = Category.objects.all()
+    return render(request, 'directory/submit_quick.html', {
+        'form': form,
+        'categories': categories
+    })
+
 #     categories = Category.objects.all()
 #     return render(request, 'directory/submit.html', {
 #         'form': form,
 #         'categories': categories
 #     })
 
-def submit_website(request):
-    if request.method == 'POST':
-        form = QuickSubmitForm(request.POST)  # <--- Use QuickSubmitForm
+# def submit_website(request):
+#     submitted_data = {}
+#     if request.method == 'POST':
+#         form = QuickSubmitForm(request.POST)
+#         if form.is_valid():
+#             # استفاده از .get برای فیلدهای دستی (چون در فرم نیستند)
+#             cat_id = request.POST.get('category')
+#             description = request.POST.get('description', "").strip()
 
-        if form.is_valid():
-            # Create website
-            new_website = Website(
-                title=form.cleaned_data['title'],
-                url=form.cleaned_data['url'],
-                description="ثبت شده توسط کاربر",  # Default description
-                status='pending',
-                owner_name="ناشناس",
-                owner_email="",
-                category=None,  # Or a default category
-            )
+#             new_website = Website(
+#                 title=form.cleaned_data['title'],
+#                 url=form.cleaned_data['url'],
+#                 description=description if description else "ثبت شده توسط کاربر",
+#                 status='pending',
+#                 owner_name="ناشناس",
+#                 owner_email="",
+#                 category=Category.objects.filter(pk=cat_id).first() if cat_id else None,
+#             )
+#             # ... باقی کدهای شما (احراز هویت و ذخیره)
+#             new_website.save()
+#             messages.success(request, "وب‌سایت شما با موفقیت ثبت شد!")
+#             return redirect('success')
 
-            if request.user.is_authenticated:
-                new_website.created_by = request.user
-                new_website.owner_name = request.user.get_full_name() or request.user.username
-                new_website.owner_email = request.user.email
+#         submitted_data = request.POST
+#         messages.error(request, "لطفا اطلاعات را به درستی وارد کنید.")
 
-            new_website.save()
-            messages.success(request, "وب‌سایت شما با موفقیت ثبت شد!")
-            return redirect('success')
-            messages.error(request, "لطفا اطلاعات را به درستی وارد کنید.")
-    else:
-        form = QuickSubmitForm()
+#     else:
+#         form = QuickSubmitForm()
 
-    return render(request, 'directory/submit_quick.html', {'form': form})
+#     categories = Category.objects.all()
+#     return render(request,
+#                   'directory/submit_quick.html',
+#                   {
+#                             'form': form,
+#                             'categories': categories,
+#                             'submitted_data': submitted_data # ارسال داده‌ها به تمپلیت
+#                             })
 
 # ==================== Edit Website ====================
 @login_required

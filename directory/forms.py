@@ -137,7 +137,7 @@ class QuickSubmitForm(forms.ModelForm):
             'placeholder': 'مثال: فروشگاه آنلاین دیجی‌کالا'
         })
     )
-    url = forms.URLField(
+    url = forms.CharField(
         label='آدرس وب‌سایت',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
