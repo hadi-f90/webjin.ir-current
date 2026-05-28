@@ -5,13 +5,14 @@ import uuid
 from taggit.managers import TaggableManager
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
-    description = models.TextField(blank=True)
+    name = models.CharField(max_length=100, verbose_name='نام')
+    slug = models.SlugField(unique=True, verbose_name='اسلاگ')
+    description = models.TextField(blank=True, verbose_name='توضیحات')
     icon = models.CharField(max_length=50, default='bi-folder', blank=True)  # Bootstrap icon
 
     class Meta:
-        verbose_name_plural = "Categories"
+        verbose_name = "دسته‌بندی"
+        verbose_name_plural = 'دسته‌بندی‌ها'
         ordering = ['name']
 
     def __str__(self):
@@ -26,17 +27,17 @@ class Website(models.Model):
         ('approved', "تأیید شده"),
         ('rejected', "رد شده"),
     ]
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=220, unique=True, blank=True)
-    url = models.URLField()
-    description = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=200, verbose_name = 'عنوان')
+    slug = models.SlugField(max_length=220, unique=True, blank=True, verbose_name = 'اسلاگ')
+    url = models.URLField(verbose_name = 'آدرس')
+    description = models.TextField(blank=True, null=True, verbose_name = 'توضیحات')
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='website_set'
+        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='website_set', verbose_name = 'دسته‌بندی'
     )
 
     # Use taggit's TaggableManager
     # Note: related_name='websites_tagged' is fine, but ensure it doesn't clash with other reverse relations
-    tags = TaggableManager(blank=True, related_name='websites_tagged')
+    tags = TaggableManager(blank=True, related_name='websites_tagged', verbose_name='برچسب‌ها')
 
     # Owner info
     owner_name = models.CharField(max_length=100, blank=True, null=True)

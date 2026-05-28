@@ -12,10 +12,15 @@ from django_ratelimit.decorators import ratelimit
 import json
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ValidationError
+
 from .models import Website, Category, Rating, Review, Report
 from .forms import WebsiteSubmitForm, RatingForm, ReviewForm, ReportForm, QuickSubmitForm
 from taggit.models import Tag
 import random
+
 
 def is_admin(user):
     return user.is_staff
@@ -195,6 +200,7 @@ def report_website(request, slug):
     return redirect('website_detail', slug=slug)
 
 # ==================== Submit Website ====================
+# working \/
 # def submit_website(request):
 #     if request.method == 'POST':
 #         form = WebsiteSubmitForm(request.POST)
@@ -217,53 +223,126 @@ def report_website(request, slug):
 #             return redirect('success')
 #     else:
 #         form = WebsiteSubmitForm()
-
 def submit_website(request):
+    """
+    Handle website submission via both regular POST and AJAX.
+    - Logged-in users are automatically set as suggester
+    - Anonymous users get 'ناشناس' as suggester
+    - Optional fields are handled gracefully
+    """
     if request.method == 'POST':
-        form = QuickSubmitForm(request.POST)
+        form = WebsiteSubmitForm(request.POST)
+
         if form.is_valid():
+            # Create website instance without saving
             website = form.save(commit=False)
             website.status = 'pending'
+
+            # Handle suggester based on authentication
             if request.user.is_authenticated:
                 website.created_by = request.user
+                website.suggester = request.user.username
             else:
-                new_website = Website(
-                    title=form.cleaned_data['title'],
-                    url=form.cleaned_data['url'],
-                    description=description if description else "ثبت شده توسط کاربر",
-                    status='pending',
-                    owner_name="ناشناس",
-                    owner_email="",
-                    category=Category.objects.filter(pk=cat_id).first() if cat_id else None,
-                )
+                website.suggester = 'ناشناس'
 
+            # Save the website first (required for taggit M2M)
             website.save()
-            # taggit handles the many-to-many saving in form.save() if commit=True,
-            # but since we did commit=False, we need to save the tags manually if they were modified.
-            # However, WebsiteSubmitForm.save() handles it.
-            # Note: In the form save, we called website.tags.set(). This requires the website to be saved first.
-            # So the form logic should be:
-            # 1. save instance
-            # 2. set tags
-            # Let's adjust form.save() slightly to ensure tags are saved.
 
-            messages.success(request, 'وب‌سایت شما با موفقیت ثبت شد!')
-            return redirect('success')
+            # Handle tags (taggit requires saved instance)
+            tags_input = form.cleaned_data.get('tags_input', '')
+            if tags_input:
+                tag_names = [t.strip() for t in tags_input.split(',') if t.strip()]
+                for tag_name in tag_names:
+                    website.tags.add(tag_name)
+
+            # Handle AJAX response
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': "وب‌سایت شما با موفقیت ثبت شد!",
+                    'redirect_url': '/success/',  # Adjust to your success URL
+                })
+
+            messages.success(request, "وب‌سایت شما با موفقیت ثبت شد!")
+            return redirect('submit_success')  # Adjust URL name
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            errors = {}
+            for field, error_list in form.errors.items():
+                errors[field] = [str(e) for e in error_list]
+
+            return JsonResponse(
+                {'success': False, 'message': "لطفاً خطاهای فرم را برطرف کنید.", "errors": errors},
+                status=400,
+            )
+
+            # Non-AJAX: form with errors will be re-rendered (preserving data)
+
     else:
+        # GET request - create empty form
         form = WebsiteSubmitForm()
 
-    categories = Category.objects.all()
-    return render(request, 'directory/submit_quick.html', {
-        'form': form,
-        'categories': categories
-    })
+    return render(request, 'directory/submit_website.html', {'form': form})
+
+
+def submit_success(request):
+    """Success page after website submission."""
+    return render(request, 'directory/submit_success.html')
+
+
+@require_http_methods(["GET"])
+def tag_suggestions(request):
+    """Return tag suggestions based on query."""
+    query = request.GET.get('q', '')
+
+    if len(query) < 1:
+        return JsonResponse({'tags': []})
+
+    tags = Tag.objects.filter(name__icontains=query)[:10]
+
+    return JsonResponse({'tags': [{'id': t.id, 'name': t.name, 'slug': t.slug} for t in tags]})
+
+# def submit_website(request):
+#     if request.method == 'POST':
+#         form = QuickSubmitForm(request.POST)
+#         if form.is_valid():
+#             website = form.save(commit=False)
+#             website.status = 'pending'
+#             if request.user.is_authenticated:
+#                 website.created_by = request.user
+#             else:
+#                 new_website = Website(
+#                     title=form.cleaned_data['title'],
+#                     url=form.cleaned_data['url'],
+#                     description=description if description else "ثبت شده توسط کاربر",
+#                     status='pending',
+#                     owner_name="ناشناس",
+#                     owner_email="",
+#                     category=Category.objects.filter(pk=cat_id).first() if cat_id else None,
+#                 )
+
+#             website.save()
+#             # taggit handles the many-to-many saving in form.save() if commit=True,
+#             # but since we did commit=False, we need to save the tags manually if they were modified.
+#             # However, WebsiteSubmitForm.save() handles it.
+#             # Note: In the form save, we called website.tags.set(). This requires the website to be saved first.
+#             # So the form logic should be:
+#             # 1. save instance
+#             # 2. set tags
+#             # Let's adjust form.save() slightly to ensure tags are saved.
+
+#             messages.success(request, 'وب‌سایت شما با موفقیت ثبت شد!')
+#             return redirect('success')
+#     else:
+#         form = WebsiteSubmitForm()
 
 #     categories = Category.objects.all()
-#     return render(request, 'directory/submit.html', {
+#     return render(request, 'directory/submit_quick.html', {
 #         'form': form,
 #         'categories': categories
 #     })
 
+# === end of working====
 # def submit_website(request):
 #     submitted_data = {}
 #     if request.method == 'POST':

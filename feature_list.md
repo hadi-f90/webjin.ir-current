@@ -60,3 +60,6 @@
 [d] - name of the site
 [] - Adding ads
 
+*quick website submit
+[] - [BUG] doesn't work anymore (submitting)
+[d] - [BUG] categories do not load
