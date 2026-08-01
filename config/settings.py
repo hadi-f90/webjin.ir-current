@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import locale
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,6 +42,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     "django_check_seo",# seo apps
     "captcha",
+    "taggit",
+    "whitenoise",
     # "jalali_date",
 ]
 
@@ -196,7 +199,7 @@ TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_TZ = True
 LANGUAGES = [
-    ('fa', _('Persian'or 'Farsi')),
+    ('fa', _('Persian or Farsi')),
     ('en', _('English')),
 ]
 
