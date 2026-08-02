@@ -1,0 +1,164 @@
+{% extends '_base.html' %}
+
+{% block title %}ثبت وب‌سایت - راهنمای وب ایران{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> ثبت وب‌سایت جدید</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" id="websiteForm">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">عنوان وب‌سایت *</label>
+                        {{ form.title }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">آدرس وب‌سایت *</label>
+                        {{ form.url }}
+                        <small class="text-muted">می‌توانید بدون http:// وارد کنید</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">اسلاگ سفارشی</label>
+                        {{ form.custom_slug }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">دسته‌بندی</label>
+                        {{ form.category }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">برچسب‌ها</label>
+                        <div class="position-relative">
+                            <input type="text" id="tagInput" class="form-control" placeholder="برچسب را تایپ کنید..."
+                                autocomplete="off">
+                            <div id="tagSuggestions" class="tag-suggestions"></div>
+                        </div>
+                        <div id="tagChips" class="tag-chips"></div>
+                        <input type="hidden" name="tags_input" id="tagsInput">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">توضیحات *</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">نام شما *</label>
+                            {{ form.owner_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">ایمیلتان *</label>
+                            {{ form.owner_email }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form.hide_owner_info }}
+                        <label class="form-check-label" for="{{ form.hide_owner_info.id_for_label }}">
+                            پنهان کردن اطلاعات تماستان از کاربران
+                        </label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-send"></i> ثبت وب‌سایت
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted">
+                <small>وب‌سایت شما پس از بررسی منتشر خواهد شد.</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let selectedTags = [];
+
+    const tagInput = document.getElementById('tagInput');
+    const tagSuggestions = document.getElementById('tagSuggestions');
+    const tagChips = document.getElementById('tagChips');
+    const tagsInput = document.getElementById('tagsInput');
+
+    tagInput.addEventListener('input', function () {
+        const query = this.value;
+
+        if (query.length < 1) {
+            tagSuggestions.classList.remove('show');
+            return;
+        }
+
+        fetch('/tags/suggestions/?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+                if (data.tags.length > 0) {
+                    let html = '';
+                    data.tags.forEach(tag => {
+                        if (!selectedTags.includes(tag.name)) {
+                            html += `<div class="tag-suggestion-item" onclick="addTag('${tag.name}')">${tag.name}</div>`;
+                        }
+                    });
+                    tagSuggestions.innerHTML = html;
+                    tagSuggestions.classList.add('show');
+                } else {
+                    if (!selectedTags.includes(query)) {
+                        html = `<div class="tag-suggestion-item" onclick="addTag('${query}')">+ افزودن "${query}"</div>`;
+                        tagSuggestions.innerHTML = html;
+                        tagSuggestions.classList.add('show');
+                    } else {
+                        tagSuggestions.classList.remove('show');
+                    }
+                }
+            });
+    });
+
+    function addTag(tagName) {
+        if (!selectedTags.includes(tagName)) {
+            selectedTags.push(tagName);
+            renderChips();
+            updateTagsInput();
+        }
+        tagInput.value = '';
+        tagSuggestions.classList.remove('show');
+    }
+
+    function removeTag(tagName) {
+        selectedTags = selectedTags.filter(t => t !== tagName);
+        renderChips();
+        updateTagsInput();
+    }
+
+    function renderChips() {
+        let html = '';
+        selectedTags.forEach(tag => {
+            html += `<span class="tag-chip" data-tag="${tag}">
+            ${tag}
+            <span class="remove-tag" onclick="removeTag('${tag}')">×</span>
+        </span>`;
+        });
+        tagChips.innerHTML = html;
+    }
+
+    function updateTagsInput() {
+        tagsInput.value = selectedTags.join(',');
+    }
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.position-relative')) {
+            tagSuggestions.classList.remove('show');
+        }
+    });
+</script>
+{% endblock %}

@@ -22,13 +22,14 @@ from django.urls import include, path, re_path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r"^contact(_?(us|me))?/", include("contact.urls"), name="contact_page"),
     path("captcha/", include("captcha.urls")),
-    path('', include('directory.urls'), name='directory'),
+    re_path(r"^contact(_?(us|me))?/", include("contact.urls"), name="contact_page"),
+    re_path(r"^comments/", include("django_comments.urls")),
+    path("django-check-seo/", include("django_check_seo.urls")),
+    path('', include('directory.urls')),
 ]
 
 # Serve static and media files in development
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-else:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

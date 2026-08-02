@@ -6,16 +6,15 @@
     <div class="col-md-8 col-lg-6">
         <div class="card shadow-lg border-0">
             <!-- Header -->
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> ثبت وب‌سایت جدید</h4>
-                <small class="opacity-75">اطلاعات ضروری را وارد کنید</small>
-            </div>
+            <!-- <div class="card-header bg-gradient text-white py-3"> -->
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-plus-circle"></i> ثبت وب‌سایت جدید</h4>
+                    <small class="opacity-75">اطلاعات ضروری را وارد کنید</small>
+                </div>
+
 
             <div class="card-body p-4">
-                <!-- Success Message Container -->
-                <div id="formMessage" class="alert d-none mb-3" role="alert"></div>
-
-                <form method="post" id="websiteForm" novalidate>
+                <form method="post" id="websiteForm">
                     {% csrf_token %}
 
                     <!-- ✅ Section 1: Always Visible Fields -->
@@ -30,7 +29,6 @@
                             {% if form.title.errors %}
                             <div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>
                             {% endif %}
-                            <div class="invalid-feedback" id="title-error"></div>
                         </div>
 
                         <!-- Website URL -->
@@ -44,7 +42,6 @@
                             {% if form.url.errors %}
                             <div class="text-danger small mt-1">{{ form.url.errors.0 }}</div>
                             {% endif %}
-                            <div class="invalid-feedback" id="url-error"></div>
                         </div>
                     </div>
 
@@ -119,7 +116,6 @@
                                     {% if form.owner_name.errors %}
                                     <div class="text-danger small mt-1">{{ form.owner_name.errors.0 }}</div>
                                     {% endif %}
-                                    <div class="invalid-feedback" id="owner_name-error"></div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">
@@ -130,7 +126,6 @@
                                     {% if form.owner_email.errors %}
                                     <div class="text-danger small mt-1">{{ form.owner_email.errors.0 }}</div>
                                     {% endif %}
-                                    <div class="invalid-feedback" id="owner_email-error"></div>
                                 </div>
                             </div>
 
@@ -157,12 +152,11 @@
                         {% if form.captcha.errors %}
                         <div class="text-danger small mt-1">{{ form.captcha.errors.0 }}</div>
                         {% endif %}
-                        <div class="invalid-feedback" id="captcha-error"></div>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                        <button type="submit" class="btn btn-primary btn-lg">
                             <i class="bi bi-send me-2"></i> ثبت وب‌سایت
                         </button>
                     </div>
@@ -337,19 +331,6 @@
         box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
     }
 
-    /* Alert Messages */
-    .alert-success {
-        background-color: #d1e7dd;
-        border-color: #badbcc;
-        color: #0f5132;
-    }
-
-    .alert-danger {
-        background-color: #f8d7da;
-        border-color: #f5c2c7;
-        color: #842029;
-    }
-
     /* Responsive */
     @media (max-width: 576px) {
         .card-body {
@@ -380,7 +361,7 @@
     });
 
     // ==========================================
-    // Tag Suggestion Functionality
+    // Tag Suggestion Functionality (Preserved)
     // ==========================================
     let selectedTags = [];
     const tagInput = document.getElementById('tagInput');
@@ -483,113 +464,18 @@
     });
 
     // ==========================================
-    // AJAX Form Submission
+    // Form Validation Enhancement
     // ==========================================
     const form = document.getElementById('websiteForm');
-    const formMessage = document.getElementById('formMessage');
-    const submitBtn = document.getElementById('submitBtn');
-
-    // Clear previous error states
-    function clearErrors() {
-        document.querySelectorAll('.form-control, .form-select').forEach(el => {
-            el.classList.remove('is-invalid');
-        });
-        document.querySelectorAll('.invalid-feedback').forEach(el => {
-            el.textContent = '';
-        });
-        formMessage.classList.add('d-none');
-        formMessage.classList.remove('alert-success', 'alert-danger');
-    }
-
-    // Show error for a specific field
-    function showFieldError(fieldName, message) {
-        const field = document.querySelector(`[name="${fieldName}"]`);
-        const errorDiv = document.getElementById(`${fieldName}-error`);
-
-        if (field) {
-            field.classList.add('is-invalid');
-        }
-        if (errorDiv) {
-            errorDiv.textContent = message;
-        }
-    }
-
-    // Show form message
-    function showMessage(message, isSuccess) {
-        formMessage.textContent = message;
-        formMessage.classList.remove('d-none', 'alert-success', 'alert-danger');
-        formMessage.classList.add(isSuccess ? 'alert-success' : 'alert-danger');
-
-        // Scroll to message
-        formMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
 
     form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        // Clear previous errors
-        clearErrors();
-
-        // Update tags input before submit
+        // Ensure tags are updated before submit
         updateTagsInput();
 
-        // Show loading state
-        submitBtn.disabled = true;
+        // Basic validation feedback
+        const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> در حال ارسال...';
-
-        // Prepare form data
-        const formData = new FormData(form);
-
-        // Send AJAX request
-        fetch(form.action || window.location.href, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Success!
-                    showMessage(data.message || 'وب‌سایت شما با موفقیت ثبت شد!', true);
-
-                    // Reset form
-                    form.reset();
-                    selectedTags = [];
-                    renderChips();
-
-                    // Redirect after short delay
-                    if (data.redirect_url) {
-                        setTimeout(() => {
-                            window.location.href = data.redirect_url;
-                        }, 1500);
-                    }
-                } else {
-                    // Validation errors
-                    showMessage(data.message || 'لطفاً خطاهای فرم را برطرف کنید.', false);
-
-                    // Show field-specific errors
-                    if (data.errors) {
-                        Object.keys(data.errors).forEach(field => {
-                            const messages = data.errors[field];
-                            if (messages.length > 0) {
-                                showFieldError(field, messages[0]);
-                            }
-                        });
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('خطایی در ارتباط با سرور رخ داده است. لطفاً دوباره تلاش کنید.', false);
-            })
-            .finally(() => {
-                // Reset button state
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="bi bi-send me-2"></i> ثبت وب‌سایت';
-            });
+        submitBtn.disabled = true;
     });
 </script>
 {% endblock %}

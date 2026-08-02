@@ -1,7 +1,7 @@
-{% extends '_base.html' %}
+{% extends 'directory/base.html' %}
 {% load farsi_tags %}
-{% load static %}
-{% block title %}دایرکتوری وب‌سایت{% endblock %}
+{% load website_tags %}
+{% block title %}راهنمای وب ایران{% endblock %}
 
 {% block content %}
 <!-- Big Search Bar -->
@@ -11,7 +11,7 @@
             <input type="text" name="search" class="form-control" placeholder="جستجو در وب‌سایت‌ها..."
                 value="{{ request.GET.search|default:'' }}" id="searchInput" autocomplete="off">
             <button class="btn btn-primary" type="submit">
-                <img src="{% static 'icons/search.svg' %}" width="18" height="18" class="me-1">
+                <i class="bi bi-search"></i>
             </button>
         </div>
         <!-- Search Suggestions -->
@@ -46,8 +46,7 @@
         <div class="card mb-4">
             <div class="card-header bg-secondary text-white">
                 <h6 class="mb-0" data-bs-toggle="collapse" data-bs-target="#tagsCollapse" style="cursor: pointer;">
-                    <img src="{% static 'icons/tags.svg' %}" alt="Tags Icon" width="20" height="20">
-                     برچسب‌های محبوب <i class="bi bi-chevron-down float-end"></i>
+                    <i class="bi bi-tags"></i> برچسب‌های محبوب <i class="bi bi-chevron-down float-end"></i>
                 </h6>
             </div>
             <div id="tagsCollapse" class="collapse show">
@@ -120,12 +119,11 @@
                         </h5>
                         <p class="card-text text-muted small">{{ website.description|truncate_persian:75 }}</p>
                         {% if website.category %}
-                        <a href="?category={{ website.category.slug }}"
-                            class="badge bg-primary">{{ website.category.name }}</a>
+                        <a href="?category={{ website.category.slug }}" class="badge bg-primary">{{ website.category.name }}</a>
                         {% endif %}
                         {% if website.total_ratings > 0 %}
                         <span class="badge bg-warning text-dark">
-                            ⭐ {{ website.average_rating|floatformat:1|to_farsi }}
+                            ⭐ {{ website.average_rating|floatformat:1|to_hindi }}
                         </span>
                         {% endif %}
                     </div>
@@ -148,44 +146,44 @@
 
         <!-- Pagination -->
         {% include 'directory/paginator.html' %}
-        {% endblock %}
+{% endblock %}
 
-        {% block extra_js %}
-        <script>
-            document.getElementById('searchInput').addEventListener('input', function () {
-                const query = this.value;
-                const resultsDiv = document.getElementById('searchResults');
+{% block extra_js %}
+<script>
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const query = this.value;
+        const resultsDiv = document.getElementById('searchResults');
 
-                if (query.length < 2) {
-                    resultsDiv.classList.add('d-none');
-                    return;
-                }
+        if (query.length < 2) {
+            resultsDiv.classList.add('d-none');
+            return;
+        }
 
-                fetch('/search/suggestions/?q=' + encodeURIComponent(query))
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.suggestions.length > 0) {
-                            let html = '<div class="card">';
-                            data.suggestions.forEach(item => {
-                                html += `<a href="${item.url}" class="list-group-item list-group-item-action">
+        fetch('/search/suggestions/?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+                if (data.suggestions.length > 0) {
+                    let html = '<div class="card">';
+                    data.suggestions.forEach(item => {
+                        html += `<a href="${item.url}" class="list-group-item list-group-item-action">
                         <i class="${item.icon}"></i> ${item.title}
                         <small class="text-muted float-end">${item.type}</small>
                     </a>`;
-                            });
-                            html += '</div>';
-                            resultsDiv.innerHTML = html;
-                            resultsDiv.classList.remove('d-none');
-                        } else {
-                            resultsDiv.classList.add('d-none');
-                        }
                     });
-            });
-
-            // Hide suggestions when clicking outside
-            document.addEventListener('click', function (e) {
-                if (!e.target.closest('.search-box')) {
-                    document.getElementById('searchResults').classList.add('d-none');
+                    html += '</div>';
+                    resultsDiv.innerHTML = html;
+                    resultsDiv.classList.remove('d-none');
+                } else {
+                    resultsDiv.classList.add('d-none');
                 }
             });
-        </script>
-        {% endblock %}
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.search-box')) {
+            document.getElementById('searchResults').classList.add('d-none');
+        }
+    });
+</script>
+{% endblock %}
