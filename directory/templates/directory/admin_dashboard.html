@@ -1,6 +1,6 @@
-{% extends '_base.html' %}
-{% load jalali_filters %}
+{% extends 'directory/base.html' %}
 {% load farsi_tags %}
+{% block title %}پنل مدیریت - راهنمای وب ایران{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -58,48 +58,131 @@
 <!-- Hidden CSRF Token -->
 <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 
-<div class="row">
-    <!-- Pending Websites -->
-    <div class="col-md-12 mb-4">
-        <div class="card border-warning">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> در انتظار بررسی ({{ pending.count }})</h5>
-            </div>
-            <div class="card-body">
-                {% if pending %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>عنوان</th>
-                                <th>آدرس</th>
-                                <th>دسته‌بندی</th>
-                                <th>ثبت‌کننده</th>
-                                <th>تاریخ</th>
-                                <th>عملیات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for website in pending %}
-                            <tr>
-                                <td>{{ website.title }}</td>
-                                <td><a href="{{ website.url }}" target="_blank">{{ website.url|truncatechars:30 }}</a>
-                                </td>
-                                <td>{{ website.category.name|default:"-" }}</td>
-                                <td>{{ website.owner_name }}</td>
-                                <td>{{ website.created_at|to_jalali:"%H:%M %Y-%m-%d"|to_farsi }}</td>
-                                <td>
-                                    <a href="{% url 'approve_website' website.pk %}" class="btn btn-sm btn-success">
-                                        <i class="bi bi-check-circle"></i> تأیید
-                                    </a>
-                                    <a href="{% url 'reject_website' website.pk %}" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-x-circle"></i> رد
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar p-3">
+            <h5 class="mb-4 text-primary"><i class="bi bi-speedometer2"></i> پنل مدیریت</h5>
+            <ul class="nav flex-column" id="adminSidebar">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#dashboard-overview" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-house-door"></i> نمای کلی
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#manage-sites" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-globe2"></i> وب‌سایت‌ها
+                        {% if pending_count > 0 %}
+                        <span class="badge bg-warning badge-notification">{{ pending_count|to_hindi }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#manage-reports" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-flag-fill"></i> گزارش‌ها
+                        {% if report_count > 0 %}
+                        <span class="badge bg-danger badge-notification">{{ report_count|to_hindi }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#manage-users" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-people"></i> کاربران
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#manage-content" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-journal-text"></i> محتوا و نظرات
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#manage-categories" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-folder"></i> دسته‌بندی‌ها
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#manage-tags" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-tags"></i> برچسب‌ها
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 content-area">
+            <div class="tab-content" id="adminTabContent">
+
+                <!-- 1. Dashboard Overview -->
+                <div class="tab-pane fade show active" id="dashboard-overview" role="tabpanel">
+                    <h3 class="mb-4">نمای کلی سیستم</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card bg-primary">
+                                <h5>کل وب‌سایت‌ها</h5>
+                                <h2>{{ approved.count|add:rejected.count|add:pending.count|to_hindi }}</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card bg-success">
+                                <h5>تأیید شده</h5>
+                                <h2>{{ approved.count|to_hindi }}</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card bg-warning text-dark">
+                                <h5>در انتظار بررسی</h5>
+                                <h2>{{ pending.count|to_hindi }}</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card bg-danger">
+                                <h5>گزارش‌های باز</h5>
+                                <h2>{{ reports.count|to_hindi }}</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">آخرین کاربران ثبت‌نامی</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% for user in users|slice:":5" %}
+                                    <div
+                                        class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                                        <div>
+                                            <strong>{{ user.username }}</strong>
+                                            <br><small class="text-muted">{{ user.date_joined|date:"Y/m/d" }}</small>
+                                        </div>
+                                        <span class="badge bg-secondary">{{ user.website_count }} سایت</span>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-muted">کاربری ثبت نشده است.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="mb-0">آخرین نظرات</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% for review in recent_reviews %}
+                                    <div class="mb-2 border-bottom pb-2">
+                                        <small><strong>{{ review.user.username }}</strong> روی <a
+                                                href="{{ review.website.get_absolute_url }}">{{ review.website.title }}</a></small>
+                                        <p class="mb-0 text-truncate">{{ review.content }}</p>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-muted">نظری ثبت نشده است.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 2. Manage Websites -->

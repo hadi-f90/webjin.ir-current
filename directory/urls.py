@@ -55,8 +55,4 @@ urlpatterns = [
     path('ajax/delete-tag/<int:pk>/', views.delete_tag_ajax, name='delete_tag_ajax'),
     path('add-tag/', views.add_tag_ajax, name='add_tag'),
     path('tags/suggestions/', tag_suggestions, name='tag_suggestions'),
-
-    # Category & Tag Pages (SEO-friendly)
-    # path('category/<slug:slug>/', views.category_detail, name='category_detail'),
-    # path('tag/<slug:slug>/', views.tag_detail, name='tag_detail'),
 ]

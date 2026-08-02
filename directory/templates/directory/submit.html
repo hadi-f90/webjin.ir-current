@@ -1,4 +1,4 @@
-{% extends '_base.html' %}
+{% extends 'directory/base.html' %}
 
 {% block title %}ثبت وب‌سایت - راهنمای وب ایران{% endblock %}
 
@@ -56,7 +56,7 @@
                             {{ form.owner_name }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">ایمیلتان *</label>
+                            <label class="form-label">ایمیل شما *</label>
                             {{ form.owner_email }}
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                     <div class="mb-3 form-check">
                         {{ form.hide_owner_info }}
                         <label class="form-check-label" for="{{ form.hide_owner_info.id_for_label }}">
-                            پنهان کردن اطلاعات تماستان از کاربران
+                            پنهان کردن اطلاعات تماستان از کاربران دیگر
                         </label>
                     </div>
 

@@ -1,107 +1,29 @@
 {% load static %}
-
-<footer class="bg-white py-4 mt-5 border-top">
+<!-- Footer-->
+<footer class="bg-white py-4 mt-5 border-top footer-theme">
     <div class="container">
-
-        <div class="row gy-4">
-
-            <!-- Brand + description -->
-            <div class="col-md-4 text-md-start text-center">
-                <h5 class="text-primary fw-bold">راهنمای وب ایران</h5>
-                <p class="text-muted small mb-0">
-                    راهنمای جامع وب‌سایت‌های فارسی
-                </p>
+        <div class="row">
+            <div class="col-md-4">
+                <h5 class="text-primary fw-bold">وب‌جین</h5>
+                <p class="text-muted small">
+                    راهنمای وب ایران</p>
             </div>
-
-            <!-- Useful links -->
-            <div class="col-md-4 text-md-start text-center">
-                <h6 class="fw-bold">پیوندهای مفید</h6>
-                <ul class="list-unstyled small mb-0">
-                    <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">دربارهٔ ما</a></li>
+            <div class="col-md-4">
+                <h6>لینک‌های مفید</h6>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'about' %}" class="text-decoration-none text-muted">درباره ما</a></li>
                     <li><a href="{% url 'terms' %}" class="text-decoration-none text-muted">قوانین و مقررات</a></li>
                     <li><a href="{% url 'contact_page' %}" class="text-decoration-none text-muted">تماس با ما</a></li>
                 </ul>
             </div>
-
-            <!-- Contact -->
-            <!-- <div class="col-md-4 text-md-start text-center">
-                <h6 class="fw-bold">ارتباط با ما</h6>
-                <p class="text-muted small mb-1">info@linkyab.ir</p>
-
-                Future social icons if needed
-                <div class="d-flex gap-3 justify-content-md-start justify-content-center">
-                    <a href="#" class="text-muted fs-5"><i class="bi bi-telegram"></i></a>
-                    <a href="#" class="text-muted fs-5"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="text-muted fs-5"><i class="bi bi-github"></i></a>
-                </div>
-
-            </div> -->
-
         </div>
-
-        <p class="text-center text-muted small mb-0">
-            © ۱۴۰۵ — تمامی حقوق محفوظ است | راهنمای وب ایران
-        </p>
-
+        <hr>
+        <p class="text-center text-muted small mb-0">© ۱۴۰۵ - تمامی حقوق محفوظ است | وب‌جین</p>
     </div>
 </footer>
-<script>
-    // Theme Management
-    function getTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) return savedTheme;
 
-        // Check system preference
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 'dark';
-        }
-        return 'light';
-    }
+<!-- Django Jalali Datepicker -->
+{#- <script src="{% static 'admin/js/django_jalali.min.js' %}"></script> #}
 
-    function setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-
-        const icon = document.getElementById('themeIcon');
-        if (theme === 'dark') {
-            icon.className = 'fas fa-sun';
-        } else {
-            icon.className = 'fas fa-moon';
-        }
-    }
-
-    function toggleTheme() {
-        const currentTheme = getTheme();
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-    }
-
-    // Initialize theme on page load
-    document.addEventListener('DOMContentLoaded', function () {
-        setTheme(getTheme());
-
-        // Listen for system theme changes
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
-            if (!localStorage.getItem('theme')) {
-                setTheme(e.matches ? 'dark' : 'light');
-            }
-        });
-    });
-
-    // User Dropdown Toggle
-    function toggleUserMenu(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const menu = document.getElementById('userMenu');
-        menu.classList.toggle('show');
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function (e) {
-        const menu = document.getElementById('userMenu');
-        if (menu && !e.target.closest('.user-dropdown')) {
-            menu.classList.remove('show');
-        }
-    });
-</script>
-<script src="{% static 'admin/js/django_jalali.min.js' %}"></script>
+<!-- Core theme JS-->
+<script src="{% static '/js/scripts.js' %}"></script>

@@ -3,131 +3,85 @@ from django import forms
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from .models import Website
 from taggit.models import Tag  # Import from taggit, not local
 from captcha.fields import CaptchaField  # <--- 1. Import this
-from django.utils.text import slugify
-import uuid
-from .models import Website
-
 
 class WebsiteSubmitForm(forms.ModelForm):
-    """
-    Form for submitting new websites.
-    - Required fields: title, url, owner_name, owner_email, captcha
-    - Optional fields: custom_slug, category, description, tags
-    """
-
-    # Custom slug field (optional)
     custom_slug = forms.SlugField(
         required=False,
-        label="اسلاگ سفارشی",
-        help_text="برای URL شخصی‌سازی شده (اختیاری)",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'my-website'}),
+        label='اسلاگ سفارشی',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'my-website'})
+    )
+    tags_input = forms.CharField(
+        required=False,
+        label='برچسب‌ها',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'برچسب را تایپ کنید... (با کاما جدا کنید)',
+            'id': 'tagInput',
+            'autocomplete': 'off'
+        })
     )
 
-    # Tags input (handled via JavaScript)
-    tags_input = forms.CharField(
-        required=False, label="برچسب‌ها", widget=forms.HiddenInput(attrs={"id": "tagsInput"})
-    )
+    class Meta:
+        model = Website
+        fields = ['title', 'custom_slug', 'url', 'description', 'category', 'owner_name', 'owner_email', 'hide_owner_info']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Make optional fields truly optional
-        self.fields['description'].required = False
-        self.fields['category'].required = False
-        self.fields['custom_slug'].required = False
-
-        # Add placeholder for category (empty option)
-
-        category_choices = [('', "انتخاب کنید...")] + [
-            (cat.pk, cat.name) for cat in self.fields['category'].queryset
-        ]
-
-        self.fields['category'].widget.choices = category_choices
+        self.fields['title'].widget.attrs.update({'class': 'form-control', 'placeholder': 'عنوان وب‌سایت'})
+        self.fields['url'].widget.attrs.update({'class': 'form-control', 'placeholder': 'example.com'})
+        self.fields['description'].widget.attrs.update({'class': 'form-control', 'rows': 4, 'placeholder': 'توضیحات...'})
+        self.fields['category'].widget.attrs.update({'class': 'form-control'})
+        self.fields['owner_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'نام شما'})
+        self.fields['owner_email'].widget.attrs.update({'class': 'form-control', 'placeholder': 'ایمیل شما'})
+        self.fields['hide_owner_info'].widget.attrs.update({'class': 'form-check-input mt-2'})
 
     def clean_url(self):
-        """Validate and normalize URL."""
         url = self.cleaned_data.get('url', '').strip()
-
         if not url:
-            raise ValidationError("آدرس وب‌سایت الزامی است.")
-
-        # Add https:// if missing
+            raise ValidationError('آدرس وب‌سایت الزامی است.')
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
-
-        # Validate URL
         try:
             validator = URLValidator(schemes=['http', 'https'])
             validator(url)
         except ValidationError:
-            raise ValidationError("آدرس وب‌سایت معتبر نیست.")
-
+            raise ValidationError('آدرس وب‌سایت معتبر نیست.')
         return url
 
     def clean_custom_slug(self):
-        """Validate and normalize custom slug."""
         slug = self.cleaned_data.get('custom_slug', '').strip()
-
-        if not slug:
-            return ''
-
-        # Slugify the custom slug
-        slug = slugify(slug)
-
-        # Check for uniqueness
-        if (
-            Website.objects.exclude(pk=self.instance.pk if self.instance else None)
-            .filter(slug=slug)
-            .exists()
-        ):
-            # Generate unique slug by appending random suffix
-
-            slug = f"{slug}-{uuid.uuid4().hex[:8]}"
-
+        if slug:
+            from django.utils.text import slugify
+            slug = slugify(slug)
+            if Website.objects.filter(slug=slug).exclude(pk=self.instance.pk if self.instance else None).exists():
+                raise ValidationError('این اسلاگ قبلاً استفاده شده است.')
         return slug
 
-    def clean_description(self):
-        """Clean description - make it optional."""
-        description = self.cleaned_data.get('description', '').strip()
-        return description if description else ''
-
-    def clean_owner_name(self):
-        """Validate owner name."""
-        name = self.cleaned_data.get('owner_name', '').strip()
-        if not name:
-            raise ValidationError("نام شما الزامی است.")
-        return name
-
-    def clean_owner_email(self):
-        """Validate owner email."""
-        email = self.cleaned_data.get('owner_email', '').strip()
-        if not email:
-            raise ValidationError("ایمیل شما الزامی است.")
-        return email
-
     def save(self, commit=True):
-        """Save the website instance."""
         website = super().save(commit=False)
 
         # Handle custom slug
-        custom_slug = self.cleaned_data.get('custom_slug', '')
+        custom_slug = self.cleaned_data.get('custom_slug')
         if custom_slug:
-            website.slug = custom_slug
-        else:
-            # Auto-generate slug from title
-            website.slug = slugify(self.cleaned_data.get('title', ''))
-
-            # Ensure uniqueness
+            from django.utils.text import slugify
+            website.slug = slugify(custom_slug)
             base_slug = website.slug
-            counter = 1
-            while Website.objects.exclude(pk=website.pk).filter(slug=website.slug).exists():
-                website.slug = f"{base_slug}-{counter}"
-                counter += 1
+            if Website.objects.exclude(pk=website.pk).filter(slug=base_slug).exists():
+                import uuid
+                website.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"
+
+        # Handle tags from taggit
+        tags_input = self.cleaned_data.get('tags_input', '')
+        if tags_input:
+            # taggit expects a string of comma-separated tags
+            website.tags.set(tags_input.split(','))
 
         if commit:
             website.save()
+            # taggit handles the many-to-many table automatically
 
         return website
 

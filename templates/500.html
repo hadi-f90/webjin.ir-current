@@ -1,51 +1,41 @@
-<!DOCTYPE html>
-<html lang="fa">
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>خطای ۵۰۰ - SB Admin</title>
-        <link href="css/styles.css" rel="stylesheet" />
-        <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
-    </head>
-    <body>
-        <div id="layoutError">
-            <div id="layoutError_content">
-                <main>
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-6">
-                                <div class="text-center mt-4">
-                                    <h1 class="display-1">۵۰۰</h1>
-                                    <p class="lead">خطای داخلی گارگزار</p>
-                                    <a href="index.html">
-                                        <i class="fas fa-arrow-right me-1"></i>
-                                        بازگشیت به پیش‌خوان
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-            </div>
-            <div id="layoutError_footer">
-                <footer class="py-4 bg-light mt-auto fixed-bottom">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">حق نشر &copy; وبگاه شما ۱۴۰۱</div>
-                            <div>
-                                <a href="#">سیاست حفظ اسرار</a>
-                                &middot;
-                                <a href="#">مفاد و شرایط استفاده</a>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
-            </div>
+{% extends '_base.html' %}
+
+{% block meta_title %}خطای سرور{% endblock %}
+{% block meta_description %}خطای سرور رخ داده است{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5">
+    <div class="error-page">
+        <div class="error-icon mb-4">
+            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 6rem;"></i>
         </div>
-        {% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script> {% endcomment %}
-        {% comment %} <script src="js/scripts.js"></script> {% endcomment %}
-    </body>
-</html>
+
+        <h1 class="display-1 fw-bold text-danger mb-2">۵۰۰</h1>
+        <h2 class="mb-3">خطای سرور!</h2>
+
+        <p class="lead text-muted mb-4">
+            متأسفانه مشکلی در سرور رخ داده است. لطفاً لحظاتی دیگر دوباره تلاش کنید.
+        </p>
+
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+            <button onclick="location.reload()" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-arrow-clockwise me-2"></i>
+                {% csrf_token %}
+                تلاش مجدد
+            </button>
+            <a href="{% url 'websites:home' %}" class="btn btn-outline-primary btn-lg px-4">
+                <i class="bi bi-house-door me-2"></i>
+                {% csrf_token %}
+                بازگشت به خانه
+            </a>
+        </div>
+
+        <div class="alert alert-warning mx-auto" style="max-width: 500px;">
+            <i class="bi bi-info-circle me-2"></i>
+            اگر مشکل ادامه دارد، لطفاً از طریق
+            <a href="{% url 'pages:contact' %}">صفحه تماس</a>
+            ما را مطلع کنید.
+        </div>
+    </div>
+</div>
+{% endblock %}

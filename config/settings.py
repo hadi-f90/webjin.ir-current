@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
-import locale
+from dotenv import load_dotenv  # Add this import
+
+from django.utils.translation import gettext_lazy as _
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,16 +14,10 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     raise ValueError("No DJANGO_SECRET_KEY set in environment variables!")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    'dirweb.ir',
-    '127.0.0.1',
-]
+DEBUG = True# os.environ.get('DEBUG', 'False') == 'True'
 
 # Only allow these hosts in production
-ALLOWED_HOSTS = ['dirweb.ir','www.dirweb.ir','webjin.ir','www.webjin.ir','127.0.0.1','localhost']#os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['dirweb.ir','www.dirweb.ir','webjin.ir','www.webjin.ir', '127.0.0.1']#os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -30,18 +27,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # My apps
-    'directory',
-    'contact',
-    # my filters
-    "FarsiSaz",
-    # installed addons
-    'django_cleanup',  # Optional: for cleaning up uploaded files
+    'csp',  # CSP Middleware
+    'django.contrib.humanize',
+    'django.contrib.sites',
+    'django_cleanup',
+    'captcha',
+    'django_check_seo',
     'crispy_forms',
     'crispy_bootstrap5',
-    "django_check_seo",# seo apps
-    "captcha",
-    # "jalali_date",
+    # 'django_ratelimit',
+    'admin_persian',
+    'directory',
+    'contact',
+    'farsi',
+    'taggit',
+    'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
@@ -60,22 +60,15 @@ ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [
-        str(BASE_DIR.joinpath("templates/"))
-    ],
+    'DIRS': [BASE_DIR / 'templates'],
     'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
-            "django.template.context_processors.debug",
+            'django.template.context_processors.debug',
             'django.template.context_processors.request',
-            "django.template.context_processors.media",
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
-            "django.template.context_processors.csrf",
-            "django.template.context_processors.tz",
-            "django.template.context_processors.static",
-            "django.template.context_processors.i18n",
-        ],},},]
+],},}]
 
 
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -101,10 +94,10 @@ if not DEBUG:
     }}
 else:
     DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-        }}
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+    }}
 
 # --- Security Settings ---
 # Basic Security Headers
@@ -196,53 +189,31 @@ TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_TZ = True
 LANGUAGES = [
-    ('fa', _('Persian'or 'Farsi')),
+    ('fa', _('Persian')),
     ('en', _('English')),
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Default primary key field type
+if not DEBUG:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
 
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# --- Crispy Forms ---
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # production directory
-
-# Additional directories to look for static files
-STATICFILES_DIRS = [
-    BASE_DIR / "static/",
-]
-
-# Media files
-
-MEDIA_URL = 'media/'
-MEDIA_ROOT = Path(BASE_DIR, "media/")
-
-
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-
-SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
-
-# Django Seo check
-
-DJANGO_CHECK_SEO_SETTINGS = {
-    "content_words_number": [300, 600],
-    "internal_links": 25,  # 1 if using default settings
-    "external_links": 1,
-    "meta_title_length": [15, 30],  # [30, 60] if using default settings
-    "meta_description_length": [50, 160],
-    "keywords_in_first_words": 50,
-    "max_link_depth": 3,
-    "max_url_length": 70,
-}
-
-DJANGO_CHECK_SEO_EXCLUDE_CONTENT = "tag, .class, #id, tag > .child_class"
+CAPTCHA_FONT_SIZE = 30
+CAPTCHA_LETTER_ROTATION = (-35, 35)
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'

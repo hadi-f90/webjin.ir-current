@@ -1,13 +1,13 @@
-{% extends 'directory/base.html' %}
+{% extends '_base.html' %}
 
-{% block title %}ویرایش وب‌سایت - راهنمای وب ایران{% endblock %}
+{% block title %}ثبت وب‌سایت - راهنمای وب ایران{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="bi bi-pencil"></i> ویرایش وب‌سایت</h4>
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> ثبت وب‌سایت جدید</h4>
             </div>
             <div class="card-body">
                 <form method="post" id="websiteForm">
@@ -19,7 +19,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">نشانی وب‌سایت *</label>
+                        <label class="form-label">آدرس وب‌سایت *</label>
                         {{ form.url }}
                         <small class="text-muted">می‌توانید بدون http:// وارد کنید</small>
                     </div>
@@ -41,15 +41,8 @@
                                 autocomplete="off">
                             <div id="tagSuggestions" class="tag-suggestions"></div>
                         </div>
-                        <div id="tagChips" class="tag-chips">
-                            {% for tag in website.tags.all %}
-                            <span class="tag-chip" data-tag="{{ tag.name }}">
-                                {{ tag.name }}
-                                <span class="remove-tag" onclick="removeTag('{{ tag.name }}')">×</span>
-                            </span>
-                            {% endfor %}
-                        </div>
-                        <input type="hidden" name="tags_input" id="tagsInput" value="{{ current_tags }}">
+                        <div id="tagChips" class="tag-chips"></div>
+                        <input type="hidden" name="tags_input" id="tagsInput">
                     </div>
 
                     <div class="mb-3">
@@ -63,7 +56,7 @@
                             {{ form.owner_name }}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">ایمیل شما *</label>
+                            <label class="form-label">ایمیلتان *</label>
                             {{ form.owner_email }}
                         </div>
                     </div>
@@ -71,16 +64,19 @@
                     <div class="mb-3 form-check">
                         {{ form.hide_owner_info }}
                         <label class="form-check-label" for="{{ form.hide_owner_info.id_for_label }}">
-                            مخفی کردن اطلاعات تماس
+                            پنهان کردن اطلاعات تماستان از کاربران
                         </label>
                     </div>
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-check-circle"></i> ذخیره تغییرات
+                            <i class="bi bi-send"></i> ثبت وب‌سایت
                         </button>
                     </div>
                 </form>
+            </div>
+            <div class="card-footer text-muted">
+                <small>وب‌سایت شما پس از بررسی منتشر خواهد شد.</small>
             </div>
         </div>
     </div>
@@ -90,15 +86,6 @@
 {% block extra_js %}
 <script>
     let selectedTags = [];
-
-    {% for tag in website.tags.all %}
-    selectedTags.push('{{ tag.name }}');
-    {% endfor %}
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function () {
-        updateTagsInput();
-    });
 
     const tagInput = document.getElementById('tagInput');
     const tagSuggestions = document.getElementById('tagSuggestions');
@@ -120,13 +107,12 @@
                     let html = '';
                     data.tags.forEach(tag => {
                         if (!selectedTags.includes(tag.name)) {
-                            html += `<div class="tag-suggestion-item" onclick="addTag('${safeTagName}')">${safeTagName  }</div>`;
+                            html += `<div class="tag-suggestion-item" onclick="addTag('${tag.name}')">${tag.name}</div>`;
                         }
                     });
                     tagSuggestions.innerHTML = html;
                     tagSuggestions.classList.add('show');
                 } else {
-                    // Allow adding new tag
                     if (!selectedTags.includes(query)) {
                         html = `<div class="tag-suggestion-item" onclick="addTag('${query}')">+ افزودن "${query}"</div>`;
                         tagSuggestions.innerHTML = html;
@@ -137,15 +123,6 @@
                 }
             });
     });
-
-    function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
 
     function addTag(tagName) {
         if (!selectedTags.includes(tagName)) {
@@ -178,7 +155,6 @@
         tagsInput.value = selectedTags.join(',');
     }
 
-    // Hide suggestions when clicking outside
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.position-relative')) {
             tagSuggestions.classList.remove('show');
