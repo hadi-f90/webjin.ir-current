@@ -567,11 +567,16 @@ def delete_tag_ajax(request, pk):
     tag = get_object_or_404(Tag, pk=pk)
 
     # Check if tag is in use
-    if tag.websites_tagged.exists():
+    # taggit: no reverse manager on Tag; query through Website.tags
+    if Website.objects.filter(tags=tag).exists():
+        count = Website.objects.filter(tags=tag).count()
         return JsonResponse(
             {
                 'status': 'error',
-                'message': f"این برچسب شامل {tag.websites_tagged.count()} وب‌سایت است. لطفاً ابتدا وب‌سایت‌ها را تغییر دهید.",
+                'message': (
+                    f"این برچسب شامل {count} وب‌سایت است. "
+                    "لطفاً ابتدا وب‌سایت‌ها را تغییر دهید."
+                ),
             },
             status=400,
         )

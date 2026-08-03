@@ -1781,7 +1781,7 @@ class ErrorHandlingTests(TestCase):
         """Test invalid category filter returns empty."""
         response = self.client.get(reverse('index') + '?category=nonexistent')
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'Website')  # No websites should match
+        self.assertEqual(len(response.context['page_obj']), 0)  # empty page, not English string
 
 
 # =============================================================================
@@ -1956,7 +1956,7 @@ class PerformanceTests(TestCase):
                 category=self.category
             )
 
-        with self.assertNumQueries(8):  # categories, tags, page, count, featured (optimized)
+        with self.assertNumQueries(5):  # featured, count, categories, tags, page
             response = self.client.get(reverse('index'))
 
         self.assertEqual(response.status_code, 200)
@@ -1970,7 +1970,7 @@ class PerformanceTests(TestCase):
             category=self.category
         )
 
-        with self.assertNumQueries(6):  # website+category, tags, reviews, related
+        with self.assertNumQueries(4):  # website+category, tags, reviews, related
             response = self.client.get(reverse('website_detail', kwargs={'slug': website.slug}))
 
         self.assertEqual(response.status_code, 200)
