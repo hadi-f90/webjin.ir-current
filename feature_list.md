@@ -65,3 +65,13 @@ Full phased detail: `.ai_files/roadmap.md` (restored open items from pre–Phase
 
 Popular tags 10 · search suggestions 5+5 · featured 6 · detail reviews 10.  
 No app-level max tags per website.
+
+---
+
+## Agent skills (profitability)
+
+**Now:** business-model, growth, analytics-metrics, conversion-monetization, seo  
+**Phase 2:** ad-ops-publisher, competitive-intel  
+**Phase 3:** partnerships-bd, lifecycle-crm  
+
+See `.ai_files/roadmap.md` § Agent skills — profitability track.

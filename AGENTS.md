@@ -204,3 +204,16 @@ bash scripts/clean_junk.sh                 # remove dump/tmp junk
 ---
 
 *Generated for multi-agent use. Keep this file short, accurate, and free of secrets.*
+
+
+## Profitability-related agents
+
+| Agent | When to use | Output |
+|-------|-------------|--------|
+| `business-model-agent` | Strategy: what to sell | `business-model-report.md` |
+| `growth-agent` | Traffic + listing supply | `growth-plan.md` |
+| `analytics-metrics-agent` | KPIs + instrumentation map | `metrics-framework.md` |
+| `conversion-monetization-agent` | Paid UX + disclosure | `conversion-spec.md` |
+| `seo-agent` | Organic acquisition | `seo-report.md` |
+
+**Later phases (skills not required yet):** partnerships-bd, ad-ops-publisher, competitive-intel, lifecycle-crm — scheduled in `.ai_files/roadmap.md`.
