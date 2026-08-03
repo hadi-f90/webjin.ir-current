@@ -18,14 +18,12 @@
         </p>
 
         <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
-            <button onclick="location.reload()" class="btn btn-primary btn-lg px-4">
+            <button type="button" onclick="location.reload()" class="btn btn-primary btn-lg px-4">
                 <i class="bi bi-arrow-clockwise me-2"></i>
-                {% csrf_token %}
                 تلاش مجدد
             </button>
-            <a href="{% url 'websites:home' %}" class="btn btn-outline-primary btn-lg px-4">
+            <a href="{% url 'index' %}" class="btn btn-outline-primary btn-lg px-4">
                 <i class="bi bi-house-door me-2"></i>
-                {% csrf_token %}
                 بازگشت به خانه
             </a>
         </div>
@@ -33,7 +31,7 @@
         <div class="alert alert-warning mx-auto" style="max-width: 500px;">
             <i class="bi bi-info-circle me-2"></i>
             اگر مشکل ادامه دارد، لطفاً از طریق
-            <a href="{% url 'pages:contact' %}">صفحه تماس</a>
+            <a href="{% url 'contact_page' %}">صفحه تماس</a>
             ما را مطلع کنید.
         </div>
     </div>
