@@ -1,113 +1,67 @@
-# Improvements and Bug Fixes - راهنمای وب ایران
+# Feature list & bug tracker — WebJin (وب‌جین)
 
-**Current Branch**: `Debug-and-feature-add` (under feature-work)
+**Updated:** 2026-08-03  
+**Phase 0:** complete  
+**Current focus:** Phase 1 — MWS polish  
 
-**Status**: Solidification Phase (Bug Fixing First)
-
----
-
-## Known Bugs & Issues (Updated Assessment)
-
-### Home / Main Page
-- [x] [BUG] Change the name of the website (partially done in templates)
-- [ ] [FEATURE] [BUG] Fix pagination (add more page numbers, better navigation)
-- [ ] [FEATURE] Change website suggesting policy (currently random → most visited, recently added, most viewed, advertised)
-
-### Category Page
-- [x] [FEATURE] Add category icon before title
-- [x] [BUG] Replace slug with category name in page title/URL
-- [x] [BUG] Fix pagination navigation (currently broken/limited)
-
-### Website Cards
-- [x] [Improvement] Make name/title shorter with proper truncation
-- [] [Improvement] Add  favicon of homepage
-- [ ] [Improvement] Add thumbnail / favicon / screenshot of homepage
-- [x] [BUG] Make description longer (currently too short)
-- [ ] [Improvement] Add advertisement slot in cards
-
-### Website Detail Page
-- [ ] [FEATURE] Edit button for owner + staff/admin
-- [ ] [FEATURE] Share buttons (social + copy link)
-- [ ] [FEATURE] View counts (visits)
-- [x] [FEATURE] Icon + screenshot of website (icon done)
-- [ ] [FEATURE] Flag/report button (exists but needs UX polish)
-- [ ] [FEATURE] Ping / reachability check (from Iran)
-- [ ] [FEATURE] Handle case when no owner name/email
-- [ ] [FEATURE] Make similar sites suggestion use **tags** for better relevance
-- [ ] [Improvement] Move "Go to website" button next to logo + make smaller
-- [ ] [Improvement] Make comments accordion-style
-
-### Navbar
-- [ ] [BUG] Navbar becomes transparent after scrolling (should stay solid)
-- [ ] [FEATURE] Light / Dark mode toggle
-
-### Management Panel (Admin Dashboard)
-- [ ] [BUG] Many modal buttons do not work (edit, delete, status change)
-- [ ] [FEATURE] Add view count / statistics columns
-- [ ] [Improvement] Add more columns to site/category/tag lists
-- [ ] [BUG] Count of websites in category and tag lists doesn't update correctly
-- [ ] [FEATURE] Bulk import from:
-    - CSV files
-    - Firefox HTML/JSON bookmark export
-    - Chromium-based browsers HTML/JSON bookmark export
-
-### Other Pages
-- [ ] About page (basic version exists)
-- [ ] FAQ page
-- [ ] Policy / Terms page (basic exists)
-- [ ] Contact page + response handling
-- [ ] Footer (needs completion + ads)
-
-### Backend / Quick Submit
-- [ ] [BUG] Quick website submit doesn't work reliably (form submission fails)
-- [x] [BUG] Categories do not load in submit form (fixed in some templates)
-- [ ] [FEATURE] Management command to import list of websites via Django shell
-
-### General / Cross-Cutting
-- [ ] Hardcoded DB credentials in settings.py
-- [ ] Duplicate urls.py files
-- [ ] Inconsistent CSRF in admin AJAX
-- [ ] Rate limiting not active
-- [ ] SEO improvements (meta tags, sitemap)
-- [ ] Ads integration (yektanet script present but placement needed)
+Full phased detail: `.ai_files/roadmap.md` (restored open items from pre–Phase-0 roadmap).
 
 ---
 
-## Roadmap (Merged & Prioritized)
+## Phase 0 — closed
 
-### Phase 1: Solid State (Now - Critical)
-- Fix all **Critical bugs** above (submit form, admin modals, pagination, CSRF)
-- Unify submission forms (`WebsiteSubmitForm` + robust AJAX)
-- Secure settings (`DJANGO_SECRET_KEY`, DB via `.env`)
-- Make admin dashboard fully functional
-- Test complete flow: submit → approve → detail page
-
-### Phase 2: UX & Core Features
-- Improved pagination + suggested websites logic
-- View counters + smart suggestions using tags
-- Dark mode + better navbar
-- Edit buttons + ownership checks
-- Bulk import commands
-
-### Phase 3: Growth & Polish
-- Full SEO + sitemap
-- Ads placement
-- Statistics dashboard
-- Reachability ping
-- Advanced search & filtering
+- [x] Env secrets / forms Meta / farsi_tags on card
+- [x] Management commands + tag delete + error URL names
+- [x] Index select_related / soft filters / rating+cache
+- [x] Directory tests green
 
 ---
 
-**Next Actions I Propose**:
-1. Fix **Quick Submit** bug (highest user impact)
-2. Fix **Admin Dashboard modals** (JS issues)
-3. Improve **Pagination** + **Suggested websites**
-4. Secure settings + clean URLs
+## Phase 1 — open (from roadmap + legacy feature list)
+
+### Submit
+- [ ] Unify submit templates + success redirect
+- [ ] Tag chips + suggestions on live submit form
+- [ ] Categories always load on active submit form
+- [ ] Optional staff email on pending
+
+### Dashboard
+- [ ] Modal/ID mismatches (edit/delete/status)
+- [ ] Resolve-report AJAX in UI
+- [ ] Correct pending/report/category/tag counts
+- [ ] CSRF on all staff AJAX
+- [ ] Rejected reason or soft-delete policy decision
+
+### Discovery / UX
+- [ ] Navbar solid after scroll
+- [ ] Featured only when no filters (confirm)
+- [ ] Related sites by **tags**
+- [ ] Pagination UX on large sets
+- [ ] Suggest policy beyond random
+- [ ] Missing owner name/email safe on detail
+- [ ] Rate/review/report UX polish; comments accordion if needed
+- [ ] Owner/staff edit control on detail
+
+### Hygiene
+- [ ] Remove broken `farsi/templatetags/farsi.py` if present
+- [ ] Junk files + `custome.css` typo
+- [ ] WhiteNoise single registration
+- [ ] Branch tip alignment / optional rename Developement
 
 ---
 
-Would you like me to **start fixing** the top priority items now?
+## Phase 2+ (summary — see roadmap)
 
-Reply with your order (e.g., "Fix quick submit first" or "Start with admin dashboard") and I will produce the exact code changes + push to the branch.
+- SEO, sitemap, OG, structured data, check-seo
+- Favicon/thumbnail proxy; share buttons; dark mode
+- Product rate limits; approval emails; bulk admin tools
+- Ads placement (Yektanet); About/FAQ/Terms/footer
+- Claim site; bookmarks; view counts; link checker; tag merge
+- CI, staging, Sentry, backups, Passenger docs
 
-I'm ready. Let's make this rock solid.
+---
+
+## Display limits
+
+Popular tags 10 · search suggestions 5+5 · featured 6 · detail reviews 10.  
+No app-level max tags per website.
