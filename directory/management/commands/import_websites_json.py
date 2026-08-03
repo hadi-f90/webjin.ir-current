@@ -1,23 +1,21 @@
+"""Import websites from a nested JSON file into directory.Website."""
+
 import json
 from pathlib import Path
 
-from django.core.management.base import BaseCommand
-from django.utils.text import slugify
-from django.db import transaction
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.utils.text import slugify
 
-from your_app.models import WebsiteResource, Category
+from directory.models import Category, Website
 
 
 class Command(BaseCommand):
     help = "Import websites from a JSON file"
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "file_path",
-            type=str,
-            help="Path to the JSON file",
-        )
+        parser.add_argument("file_path", type=str, help="Path to the JSON file")
         parser.add_argument(
             "--created-by",
             type=str,
@@ -38,15 +36,13 @@ class Command(BaseCommand):
         )
 
     def get_unique_slug(self, title):
-        base_slug = slugify(title)[:45] or "item"
+        base_slug = (slugify(title) or "item")[:45]
         slug = base_slug
         counter = 1
-
-        while WebsiteResource.objects.filter(slug=slug).exists():
+        while Website.objects.filter(slug=slug).exists():
             suffix = f"-{counter}"
-            slug = f"{base_slug[:50-len(suffix)]}{suffix}"
+            slug = f"{base_slug[: 50 - len(suffix)]}{suffix}"
             counter += 1
-
         return slug
 
     def get_user(self, username):
@@ -57,7 +53,9 @@ class Command(BaseCommand):
             return User.objects.get(username=username)
         except User.DoesNotExist:
             self.stdout.write(
-                self.style.WARNING(f"User '{username}' not found. created_by will be empty.")
+                self.style.WARNING(
+                    f"User '{username}' not found. created_by will be empty."
+                )
             )
             return None
 
@@ -65,11 +63,23 @@ class Command(BaseCommand):
         name = (name or "").strip()
         if not name:
             return None
-        category, _ = Category.objects.get_or_create(name=name)
+        slug = slugify(name) or "category"
+        base = slug
+        n = 1
+        while Category.objects.filter(slug=slug).exclude(name=name).exists():
+            slug = f"{base}-{n}"
+            n += 1
+        category, _ = Category.objects.get_or_create(
+            name=name,
+            defaults={"slug": slug},
+        )
+        if not category.slug:
+            category.slug = slug
+            category.save(update_fields=["slug"])
         return category
 
     def import_item(self, item, category_obj, created_by, default_status):
-        name = (item.get("name") or "").strip()
+        name = (item.get("name") or item.get("title") or "").strip()
         url = (item.get("url") or "").strip()
         description = (item.get("description") or "").strip()
         tags = item.get("tags") or []
@@ -77,10 +87,13 @@ class Command(BaseCommand):
         if not name or not url:
             return "skipped", "missing name/url"
 
-        if WebsiteResource.objects.filter(url=url).exists():
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
+
+        if Website.objects.filter(url=url).exists():
             return "skipped", "duplicate url"
 
-        website = WebsiteResource.objects.create(
+        website = Website.objects.create(
             title=name,
             slug=self.get_unique_slug(name),
             url=url,
@@ -93,11 +106,10 @@ class Command(BaseCommand):
             hide_owner_info=True,
         )
 
-        # If using django-taggit or similar
-        if hasattr(website, "tags") and tags:
-            cleaned_tags = [str(t).strip() for t in tags if str(t).strip()]
-            if cleaned_tags:
-                website.tags.add(*cleaned_tags)
+        if tags:
+            cleaned = [str(t).strip() for t in tags if str(t).strip()]
+            if cleaned:
+                website.tags.add(*cleaned)
 
         return "created", website.title
 
@@ -125,48 +137,93 @@ class Command(BaseCommand):
 
         created_count = 0
         skipped_count = 0
-
         default_category = self.get_or_create_category(default_category_name)
 
         with transaction.atomic():
-            # Expected structure:
-            # {
-            #   "ai_tools": {
-            #       "chat_text": [ {...}, {...} ],
-            #       "image_tools": [ {...} ]
-            #   }
-            # }
-
-            for top_key, top_value in data.items():
-                if not isinstance(top_value, dict):
-                    continue
-
-                for sub_key, items in top_value.items():
-                    if not isinstance(items, list):
+            # Nested structure:
+            # { "group": { "subgroup": [ {name, url, description?, tags?}, ... ] } }
+            if isinstance(data, list):
+                for item in data:
+                    if not isinstance(item, dict):
+                        skipped_count += 1
                         continue
-
-                    # infer category from sub_key or top_key
-                    category_name = sub_key.replace("_", " ").title() if sub_key else default_category_name
-                    category_obj = self.get_or_create_category(category_name) or default_category
-
-                    for item in items:
-                        if not isinstance(item, dict):
-                            skipped_count += 1
+                    result, message = self.import_item(
+                        item, default_category, created_by, default_status
+                    )
+                    if result == "created":
+                        created_count += 1
+                        self.stdout.write(self.style.SUCCESS(f"Created: {message}"))
+                    else:
+                        skipped_count += 1
+                        self.stdout.write(self.style.WARNING(f"Skipped: {message}"))
+            elif isinstance(data, dict):
+                for top_key, top_value in data.items():
+                    if isinstance(top_value, list):
+                        for item in top_value:
+                            if not isinstance(item, dict):
+                                skipped_count += 1
+                                continue
+                            cat = (
+                                self.get_or_create_category(
+                                    str(top_key).replace("_", " ").title()
+                                )
+                                or default_category
+                            )
+                            result, message = self.import_item(
+                                item, cat, created_by, default_status
+                            )
+                            if result == "created":
+                                created_count += 1
+                                self.stdout.write(
+                                    self.style.SUCCESS(f"Created: {message}")
+                                )
+                            else:
+                                skipped_count += 1
+                                self.stdout.write(
+                                    self.style.WARNING(f"Skipped: {message}")
+                                )
+                        continue
+                    if not isinstance(top_value, dict):
+                        continue
+                    for sub_key, items in top_value.items():
+                        if not isinstance(items, list):
                             continue
-
-                        result, message = self.import_item(
-                            item=item,
-                            category_obj=category_obj,
-                            created_by=created_by,
-                            default_status=default_status,
+                        category_name = (
+                            sub_key.replace("_", " ").title()
+                            if sub_key
+                            else default_category_name
                         )
-
-                        if result == "created":
-                            created_count += 1
-                            self.stdout.write(self.style.SUCCESS(f"Created: {message}"))
-                        else:
-                            skipped_count += 1
-                            self.stdout.write(self.style.WARNING(f"Skipped: {message}"))
+                        category_obj = (
+                            self.get_or_create_category(category_name)
+                            or default_category
+                        )
+                        for item in items:
+                            if not isinstance(item, dict):
+                                skipped_count += 1
+                                continue
+                            result, message = self.import_item(
+                                item=item,
+                                category_obj=category_obj,
+                                created_by=created_by,
+                                default_status=default_status,
+                            )
+                            if result == "created":
+                                created_count += 1
+                                self.stdout.write(
+                                    self.style.SUCCESS(f"Created: {message}")
+                                )
+                            else:
+                                skipped_count += 1
+                                self.stdout.write(
+                                    self.style.WARNING(f"Skipped: {message}")
+                                )
+            else:
+                self.stdout.write(self.style.ERROR("JSON root must be object or array"))
+                return
 
         self.stdout.write("")
-        self.stdout.write(self.style.SUCCESS(f"Done. Created: {created_count}, Skipped: {skipped_count}"))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Done. Created: {created_count}, Skipped: {skipped_count}"
+            )
+        )
