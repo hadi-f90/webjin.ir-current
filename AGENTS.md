@@ -40,6 +40,8 @@ Under `.claude/agents/*/SKILL.md`:
 5. `security-agent` → CSP, CSRF, secrets, permissions
 6. `testing-qa-agent` → tests and acceptance checks
 7. `documentation-agent` → docs and changelog
+8. `seo-agent` → SEO research / seo-report.md (Phase 2+)
+9. `business-model-agent` → monetization & business-model-report.md
 
 Use them when the tool supports custom agents; otherwise stay inside this file +
 the two `.ai_files` docs.
