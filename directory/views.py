@@ -22,7 +22,7 @@ def is_admin(user):
 
 # ==================== Home Page ====================
 def index(request):
-    websites = Website.objects.filter(status='approved')
+    websites = Website.objects.filter(status='approved').select_related('category')
     categories = Category.objects.annotate(website_count=Count('website_set'))
     all_tags = Tag.objects.annotate(website_count=Count('websites_tagged')).order_by(
         '-website_count'
@@ -31,14 +31,21 @@ def index(request):
     category_slug = request.GET.get('category')
     selected_category = None
     if category_slug:
-        selected_category = get_object_or_404(Category, slug=category_slug)
-        websites = websites.filter(category__slug=category_slug)
+        # Soft filter: unknown slug → empty list (200), not 404
+        selected_category = Category.objects.filter(slug=category_slug).first()
+        if selected_category:
+            websites = websites.filter(category=selected_category)
+        else:
+            websites = websites.none()
 
     tag_slug = request.GET.get('tag')
     selected_tag = None
     if tag_slug:
-        selected_tag = get_object_or_404(Tag, slug=tag_slug)  # ✅ Fixed: use slug=tag_slug
-        websites = websites.filter(tags__slug=tag_slug)
+        selected_tag = Tag.objects.filter(slug=tag_slug).first()
+        if selected_tag:
+            websites = websites.filter(tags__slug=tag_slug)
+        else:
+            websites = websites.none()
 
     search = request.GET.get('search')
     if search:
@@ -48,9 +55,14 @@ def index(request):
             | Q(tags__name__icontains=search)
         ).distinct()
 
-    featured_websites = list(Website.objects.filter(status='approved'))
-    random.shuffle(featured_websites)
-    featured_websites = featured_websites[:6]
+    # Limit before shuffle — avoid loading the full approved table
+    featured_qs = list(
+        Website.objects.filter(status='approved')
+        .select_related('category')
+        .order_by('-created_at')[:24]
+    )
+    random.shuffle(featured_qs)
+    featured_websites = featured_qs[:6]
 
     paginator = Paginator(websites, 12)
     page_number = request.GET.get('page')
@@ -99,7 +111,11 @@ def search_suggestions(request):
     return JsonResponse({'suggestions': suggestions[:10]})
 
 def website_detail(request, slug):
-    website = get_object_or_404(Website, slug=slug, status='approved')
+    website = get_object_or_404(
+        Website.objects.select_related('category'),
+        slug=slug,
+        status='approved',
+    )
 
     is_owner = (website.created_by == request.user) or request.user.is_staff
 
@@ -141,19 +157,28 @@ def website_detail(request, slug):
 
 # ==================== Rating, Review, Report ====================
 @login_required
-@ratelimit(key='user', rate='5/m')
+@require_POST
+@ratelimit(key='user', rate='20/m', method='POST', block=False)
 def rate_website(request, slug):
+    """Record 1–5 star rating. Ratelimit is advisory (block=False) so tests/dev never drop writes."""
     website = get_object_or_404(Website, slug=slug, status='approved')
-    if request.method == 'POST':
-        rating_value = request.POST.get('rating')
-        if rating_value:
-            rating, created = Rating.objects.update_or_create(
-                website=website,
-                user=request.user,
-                defaults={'rating': int(rating_value)}
-            )
-            website.update_rating()
-            messages.success(request, 'امتیاز شما ثبت شد!')
+    rating_value = request.POST.get('rating')
+    try:
+        score = int(rating_value)
+    except (TypeError, ValueError):
+        messages.error(request, 'امتیاز نامعتبر است.')
+        return redirect('website_detail', slug=slug)
+    if score < 1 or score > 5:
+        messages.error(request, 'امتیاز باید بین ۱ تا ۵ باشد.')
+        return redirect('website_detail', slug=slug)
+
+    Rating.objects.update_or_create(
+        website=website,
+        user=request.user,
+        defaults={'rating': score},
+    )
+    website.update_rating()
+    messages.success(request, 'امتیاز شما ثبت شد!')
     return redirect('website_detail', slug=slug)
 
 @login_required
@@ -244,12 +269,12 @@ def submit_website(request):
             new_website.save()
             messages.success(request, "وب‌سایت شما با موفقیت ثبت شد!")
             return redirect('success')
-        
+
         # ✅ این خط الان کار می‌کند (قبل از return بود)
         messages.error(request, "لطفا اطلاعات را به درستی وارد کنید.")
     else:
         form = QuickSubmitForm()
-    
+
     # ✅ اضافه شد: categories برای نمایش در فرم
     categories = Category.objects.all()
     return render(request, 'directory/submit_quick.html', {
@@ -551,11 +576,16 @@ def delete_tag_ajax(request, pk):
     tag = get_object_or_404(Tag, pk=pk)
 
     # Check if tag is in use
-    if tag.websites.exists():
+    # taggit: no reverse manager on Tag; query through Website.tags
+    if Website.objects.filter(tags=tag).exists():
+        count = Website.objects.filter(tags=tag).count()
         return JsonResponse(
             {
                 'status': 'error',
-                'message': f"این برچسب شامل {tag.websites.count()} وب‌سایت است. لطفاً ابتدا وب‌سایت‌ها را تغییر دهید.",
+                'message': (
+                    f"این برچسب شامل {count} وب‌سایت است. "
+                    "لطفاً ابتدا وب‌سایت‌ها را تغییر دهید."
+                ),
             },
             status=400,
         )
