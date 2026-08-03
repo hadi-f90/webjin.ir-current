@@ -26,7 +26,8 @@ class WebsiteSubmitForm(forms.ModelForm):
 
     class Meta:
         model = Website
-        fields = ['title', 'custom_slug', 'url', 'description', 'category', 'owner_name', 'owner_email', 'hide_owner_info']
+        fields = ['title', 'url'] #  only model fields not ['title', 'custom_slug', 'url', 'description', 'category', 'owner_name', 'owner_email', 'hide_owner_info']
+        # # captcha stays as an extra form field with its own label= on CaptchaField(...)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
