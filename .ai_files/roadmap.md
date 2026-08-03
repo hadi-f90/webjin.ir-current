@@ -1,14 +1,14 @@
 # WebJin (dirweb.ir / webjin.ir) Development Roadmap
 
-Persian web directory for discovering and submitting Iranian/Farsi websites.  
+Persian web directory for discovering and submitting Iranian/Farsi websites.
 Stack assumptions: Django 6, Bootstrap 5 RTL, taggit, django-simple-captcha,
 django-csp, Vazirmatn, Jalali display helpers (`farsi` app only — FarsiSaz removed).
 
-See `.ai_files/technical-conventions.md` for locked decisions this roadmap assumes.  
-See `feature_list.md` for the living day-to-day checklist.  
+See `.ai_files/technical-conventions.md` for locked decisions this roadmap assumes.
+See `feature_list.md` for the living day-to-day checklist.
 See `AGENTS.md` for agent onboarding.
 
-**Last decision-matrix merge:** 2026-08-02 (main ≡ Developement @ `11bd146`)
+**Last decision-matrix merge:** 2026-08-02 (main ≡ developement @ `11bd146`)
 
 ---
 
@@ -98,10 +98,10 @@ custom admin dashboard. Authenticated users can rate, review, and report.
 - [ ] Edit own pending/approved site returns to pending after save (already
       intended) — confirm messaging and status reset rule
 
-**Success criteria (MWS):**  
+**Success criteria (MWS):**
 Anonymous user submits a site → appears in pending → staff approves from
 custom dashboard → site shows on index with category/tag → logged-in user rates
-and reviews → report appears for staff.  
+and reviews → report appears for staff.
 **Plus:** no secrets in git history of active settings; `DEBUG=False` + HTTPS
 headers active on host; junk files gone.
 
