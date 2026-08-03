@@ -1837,13 +1837,19 @@ class WebsiteLifecycleTests(TestCase):
         )
 
         # Login and rate
-        self.client.login(username='testuser', password='pass123')
+        self.assertTrue(self.client.login(username='testuser', password='pass123'))
+        self.assertTrue(bool(website.slug), 'website slug must be set')
 
-        self.client.post(
+        response = self.client.post(
             reverse('rate_website', kwargs={'slug': website.slug}),
-            {'rating': '5'}
+            {'rating': '5'},
         )
-        self.assertTrue(Rating.objects.filter(user=self.user, website=website).exists())
+        # require_POST + login → redirect to detail on success
+        self.assertIn(response.status_code, (302, 200))
+        self.assertTrue(
+            Rating.objects.filter(user=self.user, website=website).exists(),
+            'Rating was not created — check rate_website / ratelimit / cache',
+        )
 
         # Add review
         self.client.post(

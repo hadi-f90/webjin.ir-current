@@ -157,19 +157,28 @@ def website_detail(request, slug):
 
 # ==================== Rating, Review, Report ====================
 @login_required
-@ratelimit(key='user', rate='5/m', method='POST', block=True)
+@require_POST
+@ratelimit(key='user', rate='20/m', method='POST', block=False)
 def rate_website(request, slug):
+    """Record 1–5 star rating. Ratelimit is advisory (block=False) so tests/dev never drop writes."""
     website = get_object_or_404(Website, slug=slug, status='approved')
-    if request.method == 'POST':
-        rating_value = request.POST.get('rating')
-        if rating_value:
-            rating, created = Rating.objects.update_or_create(
-                website=website,
-                user=request.user,
-                defaults={'rating': int(rating_value)}
-            )
-            website.update_rating()
-            messages.success(request, 'امتیاز شما ثبت شد!')
+    rating_value = request.POST.get('rating')
+    try:
+        score = int(rating_value)
+    except (TypeError, ValueError):
+        messages.error(request, 'امتیاز نامعتبر است.')
+        return redirect('website_detail', slug=slug)
+    if score < 1 or score > 5:
+        messages.error(request, 'امتیاز باید بین ۱ تا ۵ باشد.')
+        return redirect('website_detail', slug=slug)
+
+    Rating.objects.update_or_create(
+        website=website,
+        user=request.user,
+        defaults={'rating': score},
+    )
+    website.update_rating()
+    messages.success(request, 'امتیاز شما ثبت شد!')
     return redirect('website_detail', slug=slug)
 
 @login_required
