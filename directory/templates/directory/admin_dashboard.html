@@ -754,7 +754,7 @@
     </div>
 </div>
 <!-- Edit Website Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="editWebsiteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
@@ -763,20 +763,20 @@
             </div>
             <div class="modal-body">
                 <form id="editForm">
-                    <input type="hidden" id="editActionUrl">
+                    <input type="hidden" id="editWebsiteActionUrl">
                     <input type="hidden" id="editWebsiteId">
 
                     <div class="mb-3">
                         <label class="form-label">عنوان</label>
-                        <input type="text" id="editTitle" class="form-control" required>
+                        <input type="text" id="editWebsiteTitle" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">آدرس وب‌سایت</label>
-                        <input type="url" id="editUrl" class="form-control" required>
+                        <input type="url" id="editWebsiteUrl" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">دسته‌بندی</label>
-                        <select id="editCategory" class="form-select">
+                        <select id="editWebsiteCategory" class="form-select">
                             <option value="">بدون دسته</option>
                             {% for cat in categories %}
                             <option value="{{ cat.pk }}">{{ cat.name }}</option>
@@ -785,13 +785,13 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">توضیحات</label>
-                        <textarea id="editDescription" class="form-control" rows="3" required></textarea>
+                        <textarea id="editWebsiteDesc" class="form-control" rows="3" required></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                <button type="button" class="btn btn-primary" id="saveEditBtn">ذخیره تغییرات</button>
+                <button type="button" class="btn btn-primary" id="saveEditWebsiteBtn">ذخیره تغییرات</button>
             </div>
         </div>
     </div>
