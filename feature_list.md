@@ -1,113 +1,109 @@
-# Improvements and Bug Fixes - راهنمای وب ایران
+# Feature list & bug tracker — WebJin (وب‌جین)
 
-**Current Branch**: `Debug-and-feature-add` (under feature-work)
+**Updated:** 2026-08-03  
+**Phase 0:** complete (foundation + directory tests green)  
+**Current focus:** Phase 1 — MWS polish  
 
-**Status**: Solidification Phase (Bug Fixing First)
-
----
-
-## Known Bugs & Issues (Updated Assessment)
-
-### Home / Main Page
-- [x] [BUG] Change the name of the website (partially done in templates)
-- [ ] [FEATURE] [BUG] Fix pagination (add more page numbers, better navigation)
-- [ ] [FEATURE] Change website suggesting policy (currently random → most visited, recently added, most viewed, advertised)
-
-### Category Page
-- [x] [FEATURE] Add category icon before title
-- [x] [BUG] Replace slug with category name in page title/URL
-- [x] [BUG] Fix pagination navigation (currently broken/limited)
-
-### Website Cards
-- [x] [Improvement] Make name/title shorter with proper truncation
-- [] [Improvement] Add  favicon of homepage
-- [ ] [Improvement] Add thumbnail / favicon / screenshot of homepage
-- [x] [BUG] Make description longer (currently too short)
-- [ ] [Improvement] Add advertisement slot in cards
-
-### Website Detail Page
-- [ ] [FEATURE] Edit button for owner + staff/admin
-- [ ] [FEATURE] Share buttons (social + copy link)
-- [ ] [FEATURE] View counts (visits)
-- [x] [FEATURE] Icon + screenshot of website (icon done)
-- [ ] [FEATURE] Flag/report button (exists but needs UX polish)
-- [ ] [FEATURE] Ping / reachability check (from Iran)
-- [ ] [FEATURE] Handle case when no owner name/email
-- [ ] [FEATURE] Make similar sites suggestion use **tags** for better relevance
-- [ ] [Improvement] Move "Go to website" button next to logo + make smaller
-- [ ] [Improvement] Make comments accordion-style
-
-### Navbar
-- [ ] [BUG] Navbar becomes transparent after scrolling (should stay solid)
-- [ ] [FEATURE] Light / Dark mode toggle
-
-### Management Panel (Admin Dashboard)
-- [ ] [BUG] Many modal buttons do not work (edit, delete, status change)
-- [ ] [FEATURE] Add view count / statistics columns
-- [ ] [Improvement] Add more columns to site/category/tag lists
-- [ ] [BUG] Count of websites in category and tag lists doesn't update correctly
-- [ ] [FEATURE] Bulk import from:
-    - CSV files
-    - Firefox HTML/JSON bookmark export
-    - Chromium-based browsers HTML/JSON bookmark export
-
-### Other Pages
-- [ ] About page (basic version exists)
-- [ ] FAQ page
-- [ ] Policy / Terms page (basic exists)
-- [ ] Contact page + response handling
-- [ ] Footer (needs completion + ads)
-
-### Backend / Quick Submit
-- [ ] [BUG] Quick website submit doesn't work reliably (form submission fails)
-- [x] [BUG] Categories do not load in submit form (fixed in some templates)
-- [ ] [FEATURE] Management command to import list of websites via Django shell
-
-### General / Cross-Cutting
-- [ ] Hardcoded DB credentials in settings.py
-- [ ] Duplicate urls.py files
-- [ ] Inconsistent CSRF in admin AJAX
-- [ ] Rate limiting not active
-- [ ] SEO improvements (meta tags, sitemap)
-- [ ] Ads integration (yektanet script present but placement needed)
+See also: `.ai_files/roadmap.md`, `AGENTS.md`.
 
 ---
 
-## Roadmap (Merged & Prioritized)
+## Phase 0 — closed (reference)
 
-### Phase 1: Solid State (Now - Critical)
-- Fix all **Critical bugs** above (submit form, admin modals, pagination, CSRF)
-- Unify submission forms (`WebsiteSubmitForm` + robust AJAX)
-- Secure settings (`DJANGO_SECRET_KEY`, DB via `.env`)
-- Make admin dashboard fully functional
-- Test complete flow: submit → approve → detail page
-
-### Phase 2: UX & Core Features
-- Improved pagination + suggested websites logic
-- View counters + smart suggestions using tags
-- Dark mode + better navbar
-- Edit buttons + ownership checks
-- Bulk import commands
-
-### Phase 3: Growth & Polish
-- Full SEO + sitemap
-- Ads placement
-- Statistics dashboard
-- Reachability ping
-- Advanced search & filtering
+- [x] Env-based secrets / no plaintext DB password on tip
+- [x] `WebsiteSubmitForm` + `QuickSubmitForm` Meta
+- [x] `website_card` loads `farsi_tags`
+- [x] Management commands (`directory.models`, empty commands `__init__`)
+- [x] Tag delete via `Website.objects.filter(tags=tag)`
+- [x] Error pages use real URL names (`index`, `contact_page`, …)
+- [x] Index query optimization (`select_related`, limited featured)
+- [x] Soft invalid category/tag filter (empty results, not 404)
+- [x] Rating endpoint reliable with cache + ratelimit `block=False`
+- [x] Directory test suite green
 
 ---
 
-**Next Actions I Propose**:
-1. Fix **Quick Submit** bug (highest user impact)
-2. Fix **Admin Dashboard modals** (JS issues)
-3. Improve **Pagination** + **Suggested websites**
-4. Secure settings + clean URLs
+## Phase 1 — open
+
+### Submission
+
+- [ ] Unify public submit templates (one path, one success redirect)
+- [ ] Tag chips + live suggestions on the active submit template
+- [ ] Staff email on new pending (optional)
+
+### Home / discovery
+
+- [ ] Pagination UX (more page links / clearer nav on large sets)
+- [ ] Featured / suggest policy: not only random (e.g. recent, higher rated)
+- [ ] Related sites on detail: prefer shared **tags**
+
+### Cards / detail
+
+- [ ] Favicon or thumbnail on cards (best-effort)
+- [ ] Share buttons (copy link + social)
+- [ ] View counts (optional, privacy-aware)
+- [ ] Report / rate / review UX polish (accordion, placement)
+- [ ] Owner/staff edit control visible when allowed
+
+### Navbar / chrome
+
+- [ ] Navbar remains solid after scroll
+- [ ] Dark mode toggle (can slip to Phase 2 if large)
+
+### Admin dashboard
+
+- [ ] Modal / button ID mismatches (edit / delete / status)
+- [ ] Resolve-report AJAX end-to-end in UI
+- [ ] Accurate pending / report / per-category counts
+- [ ] CSRF on all staff AJAX calls verified
+
+### Permissions
+
+- [ ] Non-owner edit: consistent UX (message + redirect or 403)
+- [ ] Owner edit of approved site → back to `pending` + clear message
 
 ---
 
-Would you like me to **start fixing** the top priority items now?
+## Phase 2+ (backlog)
 
-Reply with your order (e.g., "Fix quick submit first" or "Start with admin dashboard") and I will produce the exact code changes + push to the branch.
+### SEO & trust
 
-I'm ready. Let's make this rock solid.
+- [ ] Meta / Open Graph / sitemap / structured data
+- [ ] django-check-seo staff workflow
+- [ ] Rate limits enforced product-wide on write endpoints
+
+### Content & growth
+
+- [ ] Bulk import UX (CSV / browser bookmarks) documented in UI
+- [ ] Broken-link checker command
+- [ ] Claim ownership
+- [ ] Bookmarks / favorites
+
+### Site pages
+
+- [ ] About / FAQ / Terms polish
+- [ ] Contact response handling
+- [ ] Footer + ads placement (Yektanet already allowed in CSP)
+
+---
+
+## Display limits (by design)
+
+| Surface | Limit |
+|---------|-------|
+| Popular tags (sidebar) | 10 |
+| Search suggestion sites | 5 |
+| Search suggestion tags | 5 |
+| Combined suggestions | 10 |
+| Featured block | 6 |
+| Reviews on detail | 10 |
+
+Tag **count per website** is not limited by the app.
+
+---
+
+## Won’t do / deferred decisions
+
+- Nested category trees (tags replace subcategories)
+- Storing Jalali strings in the database
+- Reintroducing a second Persian app (`FarsiSaz`)
