@@ -20,8 +20,8 @@ Full phased detail: `.ai_files/roadmap.md` (restored open items from pre–Phase
 ## Phase 1 — open (from roadmap + legacy feature list)
 
 ### Submit
-- [ ] Unify submit templates + success redirect
-- [ ] Tag chips + suggestions on live submit form
+- [x] Unify submit templates + AJAX progressive enhancement (`submit.html`)
+- [x] Tag chips + suggestions on live submit form (endpoint `/tags/suggestions/`)
 - [ ] Categories always load on active submit form
 - [ ] Optional staff email on pending
 

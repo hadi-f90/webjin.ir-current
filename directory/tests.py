@@ -959,7 +959,7 @@ class WebsiteDetailViewTests(TestCase):
 class SubmitWebsiteViewTests(TestCase):
     """Tests for website submission views.
 
-    Note: The submit view uses QuickSubmitForm which requires captcha.
+    Note: The submit view uses PublicWebsiteSubmitForm (captcha + optional details) which requires captcha.
     """
 
     def test_submit_view_get(self):
@@ -1316,7 +1316,9 @@ class AdminDashboardViewTests(TestCase):
     def test_admin_dashboard_shows_pending(self):
         """Test pending websites are shown."""
         self.client.login(username='admin', password='pass123')
-        response = self.client
+        response = self.client.get(reverse('admin_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Pending Site')
 
 
 # =============================================================================

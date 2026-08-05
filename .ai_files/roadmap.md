@@ -42,7 +42,7 @@ See `AGENTS.md` for agent onboarding.
 | P1 | Duplicate WhiteNoise registration when `DEBUG=False` | 1 hygiene | Verify / dedupe |
 | P1 | Admin modal ID mismatches | 1 dashboard | Open |
 | P1 | CSRF consistency on staff AJAX | 1 dashboard | Open |
-| P2 | Multiple submit templates → one public path | 1 submit | Open |
+| P2 | Multiple submit templates → one public path | 1 submit | **Done** |
 | P2 | `custom.css` vs `custome.css` | 1 hygiene | Open |
 | P2 | `to_jalali` optional `fmt` argument | 2 / farsi polish | Open |
 | P3 | Rename branch `Developement` → `development` | 1 hygiene | Optional |
@@ -56,9 +56,9 @@ See `AGENTS.md` for agent onboarding.
 
 ### 1.1 Submission UX
 
-- [ ] Single public submit path (collapse `submit.html` / `submit_quick.html` / `submit_website.html`)
-- [ ] Consistent URL name + success redirect + messaging
-- [ ] Tag chips + suggestions fully wired on the live submit template
+- [x] Single public submit path (`submit.html` + `PublicWebsiteSubmitForm`, AJAX + POST fallback)
+- [x] Consistent URL name + success redirect + messaging
+- [x] Tag chips + suggestions on live submit (`/tags/suggestions/`)
 - [ ] Categories reliably available on the active submit form
 - [ ] Optional: email staff on new pending submission
 
