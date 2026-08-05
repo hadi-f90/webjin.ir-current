@@ -49,6 +49,11 @@
     color: #e0e0e0;
 }
 
+[data-theme="dark"] body {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+
 [data-theme="dark"] .navbar {
     background-color: #16213e !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -92,6 +97,107 @@
 
 [data-theme="dark"] .btn-close {
     filter: invert(1);
+}
+
+/* Dark Theme - All Pages */
+[data-theme="dark"] .container {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #a0a0a0 !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: #e0e0e0 !important;
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: #16213e !important;
+}
+
+[data-theme="dark"] .bg-primary {
+    background-color: #1a5276 !important;
+}
+
+[data-theme="dark"] .card-body {
+    background-color: #16213e;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .accordion-item {
+    background-color: #16213e;
+    border-color: #2a2a4a;
+}
+
+[data-theme="dark"] .accordion-button {
+    background-color: #16213e;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .accordion-button:not(.collapsed) {
+    background-color: #1a5276;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .table {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .alert {
+    background-color: #16213e;
+    border-color: #2a2a4a;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .list-group-item {
+    background-color: #16213e;
+    border-color: #2a2a4a;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .breadcrumb {
+    background-color: #16213e;
+}
+
+[data-theme="dark"] .page-link {
+    background-color: #16213e;
+    border-color: #2a2a4a;
+    color: #4dabf7;
+}
+
+[data-theme="dark"] .page-item.active .page-link {
+    background-color: #1a5276;
+    border-color: #1a5276;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: #16213e;
+    border-color: #2a2a4a;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #1a5276;
+    color: #ffffff;
 }
 
 
