@@ -119,13 +119,21 @@
 .navbar.sticky-top {
     background-color: #ffffff !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    /* No size changes - only color */
 }
 .navbar.navbar-theme.scrolled,
 .navbar.sticky-top.scrolled {
     background-color: #ffffff !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    /* No size changes - only color */
 }
 [data-theme="dark"] .navbar.navbar-theme,
 [data-theme="dark"] .navbar.sticky-top {
     background-color: #16213e !important;
+    /* Dark mode - only color */
+}
+[data-theme="dark"] .navbar.navbar-theme.scrolled,
+[data-theme="dark"] .navbar.sticky-top.scrolled {
+    background-color: #16213e !important;
+    /* Dark mode scrolled - only color */
 }
