@@ -120,13 +120,13 @@ def search_suggestions(request):
 
 def website_detail(request, slug):
     website = get_object_or_404(
-        Website.objects.select_related('category'),
+        Website.objects.select_related('category').prefetch_related('tags'),
         slug=slug,
         status='approved',
     )
 
-    # Prefer shared tags; fall back to same category
-    tag_ids = list(website.tags.values_list('id', flat=True))
+    # Prefer shared tags (prefetch avoids extra tag-id query); fill with category
+    tag_ids = [t.id for t in website.tags.all()]
     related_list = []
     if tag_ids:
         related_list = list(
@@ -138,12 +138,15 @@ def website_detail(request, slug):
     if len(related_list) < 4 and website.category_id:
         need = 4 - len(related_list)
         exclude_ids = [website.id] + [w.id for w in related_list]
-        extra = list(
-            Website.objects.filter(status='approved', category_id=website.category_id)
-            .exclude(id__in=exclude_ids)
-            .select_related('category')[:need]
+        related_list.extend(
+            list(
+                Website.objects.filter(
+                    status='approved', category_id=website.category_id
+                )
+                .exclude(id__in=exclude_ids)
+                .select_related('category')[:need]
+            )
         )
-        related_list.extend(extra)
     related_websites = related_list
 
     reviews = website.reviews.filter(is_approved=True)[:10]
@@ -158,6 +161,7 @@ def website_detail(request, slug):
         user_review = website.reviews.filter(user=request.user).first()
         user_report = website.reports.filter(user=request.user).first()
         is_owner = (website.created_by_id == request.user.id) or request.user.is_staff
+
 
     rating_form = RatingForm()
     review_form = ReviewForm()
@@ -461,13 +465,12 @@ def admin_dashboard(request):
     approved_websites = Website.objects.select_related('category').filter(status='approved')
     rejected_websites = Website.objects.select_related('category').filter(status='rejected')
     reports = Report.objects.select_related('website', 'user').filter(is_resolved=False)
-    categories = Category.objects.annotate(
-        website_count=Count('website_set')
-    ).order_by('name')
-    tags = Tag.objects.annotate(
-        website_count=Count('websites_tagged')
-    ).order_by('name')
+    categories = Category.objects.all()
+    # Tags are now managed by taggit, but we can still list them
+    tags = Tag.objects.all()
 
+    # For the dashboard, we might want to count websites per tag
+    # taggit handles this, but we can annotate if needed
     context = {
         'pending': pending_websites,
         'approved': approved_websites,
@@ -475,8 +478,6 @@ def admin_dashboard(request):
         'reports': reports,
         'categories': categories,
         'tags': tags,
-        'pending_count': pending_websites.count(),
-        'report_count': reports.count(),
     }
     return render(request, 'directory/admin_dashboard.html', context)
 
