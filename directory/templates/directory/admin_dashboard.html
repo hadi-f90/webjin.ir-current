@@ -807,6 +807,8 @@
             </div>
             <div class="modal-body">
                 <p id="statusModalMessage">آیا مطمئن هستید؟</p>
+                <input type="hidden" id="currentStatusActionUrl" value="">
+                <input type="hidden" id="currentStatusValue" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
@@ -826,6 +828,7 @@
             </div>
             <div class="modal-body">
                 <p id="deleteModalMessage">آیا مطمئن هستید؟</p>
+                <input type="hidden" id="currentDeleteActionUrl" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
@@ -1323,16 +1326,8 @@
         });
     }
 
-    // --- Resolve Report ---
-    const resolveReportBtn = document.getElementById('resolveReportBtn'); // You need to add this button in the modal logic or use the existing one
-    // Assuming you have a generic resolve button in the report modal
-    if (resolveReportBtn) {
-        // This logic assumes you have a modal for resolving reports similar to delete/status
-        // If you use the same confirmStatusModal for reports, ensure data-status is 'resolved'
-        // But since resolve_report_ajax is separate, let's assume a specific flow or reuse status modal with 'resolved' status
-        // For simplicity, if you use the status modal for reports:
-        // Ensure data-action points to resolve_report_ajax and data-status="resolved"
-    }
+    // Resolve report: uses #confirmStatusModal with data-action=resolve_report_ajax
+    // and data-status="resolved" (see report row buttons). Handled by confirmStatusBtn above.
 
 </script>
 {% endblock %}

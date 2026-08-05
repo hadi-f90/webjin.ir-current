@@ -120,15 +120,34 @@ def search_suggestions(request):
 
 def website_detail(request, slug):
     website = get_object_or_404(
-        Website.objects.select_related('category'),
+        Website.objects.select_related('category').prefetch_related('tags'),
         slug=slug,
         status='approved',
     )
 
-    related_websites = Website.objects.filter(
-        category=website.category,
-        status='approved',
-    ).exclude(id=website.id)[:4]
+    # Prefer shared tags (prefetch avoids extra tag-id query); fill with category
+    tag_ids = [t.id for t in website.tags.all()]
+    related_list = []
+    if tag_ids:
+        related_list = list(
+            Website.objects.filter(status='approved', tags__id__in=tag_ids)
+            .exclude(id=website.id)
+            .distinct()
+            .select_related('category')[:4]
+        )
+    if len(related_list) < 4 and website.category_id:
+        need = 4 - len(related_list)
+        exclude_ids = [website.id] + [w.id for w in related_list]
+        related_list.extend(
+            list(
+                Website.objects.filter(
+                    status='approved', category_id=website.category_id
+                )
+                .exclude(id__in=exclude_ids)
+                .select_related('category')[:need]
+            )
+        )
+    related_websites = related_list
 
     reviews = website.reviews.filter(is_approved=True)[:10]
 
@@ -142,6 +161,7 @@ def website_detail(request, slug):
         user_review = website.reviews.filter(user=request.user).first()
         user_report = website.reports.filter(user=request.user).first()
         is_owner = (website.created_by_id == request.user.id) or request.user.is_staff
+
 
     rating_form = RatingForm()
     review_form = ReviewForm()

@@ -1978,7 +1978,7 @@ class PerformanceTests(TestCase):
             category=self.category
         )
 
-        with self.assertNumQueries(4):  # website+category, tags, reviews, related
+        with self.assertNumQueries(4):  # website+category, tags prefetch, related, reviews
             response = self.client.get(reverse('website_detail', kwargs={'slug': website.slug}))
 
         self.assertEqual(response.status_code, 200)
