@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.db.models.manager import BaseManager
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -13,7 +14,14 @@ import json
 from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Website, Category, Rating, Review, Report
-from .forms import WebsiteSubmitForm, RatingForm, ReviewForm, ReportForm, QuickSubmitForm
+from .forms import (
+    WebsiteSubmitForm,
+    PublicWebsiteSubmitForm,
+    RatingForm,
+    ReviewForm,
+    ReportForm,
+    QuickSubmitForm,
+)
 from taggit.models import Tag
 import random
 
@@ -117,11 +125,9 @@ def website_detail(request, slug):
         status='approved',
     )
 
-    is_owner = (website.created_by == request.user) or request.user.is_staff
-
     related_websites = Website.objects.filter(
         category=website.category,
-        status='approved'
+        status='approved',
     ).exclude(id=website.id)[:4]
 
     reviews = website.reviews.filter(is_approved=True)[:10]
@@ -135,7 +141,7 @@ def website_detail(request, slug):
         user_rating = website.ratings.filter(user=request.user).first()
         user_review = website.reviews.filter(user=request.user).first()
         user_report = website.reports.filter(user=request.user).first()
-        is_owner = website.created_by == request.user
+        is_owner = (website.created_by_id == request.user.id) or request.user.is_staff
 
     rating_form = RatingForm()
     review_form = ReviewForm()
@@ -219,74 +225,89 @@ def report_website(request, slug):
             messages.success(request, 'گزارش شما ثبت شد. متشکریم!')
     return redirect('website_detail', slug=slug)
 
-# ==================== Submit Website ====================
-# def submit_website(request):
-#     if request.method == 'POST':
-#         form = WebsiteSubmitForm(request.POST)
-#         if form.is_valid():
-#             website = form.save(commit=False)
-#             website.status = 'pending'
-#             if request.user.is_authenticated:
-#                 website.created_by = request.user
-#             website.save()
-#             # taggit handles the many-to-many saving in form.save() if commit=True,
-#             # but since we did commit=False, we need to save the tags manually if they were modified.
-#             # However, WebsiteSubmitForm.save() handles it.
-#             # Note: In the form save, we called website.tags.set(). This requires the website to be saved first.
-#             # So the form logic should be:
-#             # 1. save instance
-#             # 2. set tags
-#             # Let's adjust form.save() slightly to ensure tags are saved.
+def _wants_json(request):
+    """True for AJAX / fetch clients."""
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return True
+    accept = request.headers.get('Accept', '')
+    return 'application/json' in accept and 'text/html' not in accept.split(',')[0]
 
-#             messages.success(request, 'وب‌سایت شما با موفقیت ثبت شد!')
-#             return redirect('success')
-#     else:
-#         form = WebsiteSubmitForm()
-
-#     categories = Category.objects.all()
-#     return render(request, 'directory/submit.html', {
-#         'form': form,
-#         'categories': categories
-#     })
 
 def submit_website(request):
+    """
+    Public website submission.
+    - Progressive enhancement: classic POST works without JS.
+    - AJAX (fetch + X-Requested-With / Accept JSON): returns JSON.
+    Uses PublicWebsiteSubmitForm (full fields + django-simple-captcha).
+    """
+    categories = Category.objects.all()
+
     if request.method == 'POST':
-        form = QuickSubmitForm(request.POST)
+        form = PublicWebsiteSubmitForm(request.POST)
         if form.is_valid():
-            new_website = Website(
-                title=form.cleaned_data['title'],
-                url=form.cleaned_data['url'],
-                description="ثبت شده توسط کاربر",
-                status='pending',
-                owner_name="ناشناس",
-                owner_email="",
-                category=None,
-            )
+            website = form.save(commit=False)
+            website.status = 'pending'
+            if not website.description:
+                website.description = 'ثبت شده توسط کاربر'
             if request.user.is_authenticated:
-                new_website.created_by = request.user
-                new_website.owner_name = request.user.get_full_name() or request.user.username
-                new_website.owner_email = request.user.email
-            new_website.save()
-            messages.success(request, "وب‌سایت شما با موفقیت ثبت شد!")
+                website.created_by = request.user
+                if not website.owner_name:
+                    website.owner_name = (
+                        request.user.get_full_name() or request.user.username
+                    )
+                if not website.owner_email:
+                    website.owner_email = request.user.email or ''
+            else:
+                if not website.owner_name:
+                    website.owner_name = 'ناشناس'
+            website.save()
+            # Apply tags from form helper fields
+            tags_input = form.cleaned_data.get('tags_input', '') or ''
+            tag_names = [t.strip() for t in tags_input.split(',') if t.strip()]
+            if tag_names:
+                website.tags.set(tag_names)
+
+            if _wants_json(request):
+                return JsonResponse(
+                    {
+                        'status': 'success',
+                        'message': 'وب‌سایت شما با موفقیت ثبت شد و در انتظار تأیید است.',
+                        'redirect': reverse('success'),
+                    }
+                )
+            messages.success(
+                request, 'وب‌سایت شما با موفقیت ثبت شد و در انتظار تأیید است.'
+            )
             return redirect('success')
 
-        # ✅ این خط الان کار می‌کند (قبل از return بود)
-        messages.error(request, "لطفا اطلاعات را به درستی وارد کنید.")
+        if _wants_json(request):
+            return JsonResponse(
+                {
+                    'status': 'error',
+                    'message': 'لطفاً اطلاعات را به درستی وارد کنید.',
+                    'errors': {
+                        f: [str(e) for e in errs] for f, errs in form.errors.items()
+                    },
+                },
+                status=400,
+            )
+        messages.error(request, 'لطفا اطلاعات را به درستی وارد کنید.')
     else:
-        form = QuickSubmitForm()
+        form = PublicWebsiteSubmitForm()
 
-    # ✅ اضافه شد: categories برای نمایش در فرم
-    categories = Category.objects.all()
-    return render(request, 'directory/submit_quick.html', {
-        'form': form,
-        'categories': categories
-    })
+    return render(
+        request,
+        'directory/submit.html',
+        {'form': form, 'categories': categories},
+    )
+
+
+# ==================== Edit Website ====================
 
 # ==================== Edit Website ====================
 @login_required
 def edit_website(request, slug):
     website = get_object_or_404(Website, slug=slug)
-    # Only owner or admin can edit
     if website.created_by != request.user and not request.user.is_staff:
         messages.error(request, 'شما اجازه ویرایش این وب‌سایت را ندارید.')
         return redirect('website_detail', slug=slug)
@@ -294,22 +315,57 @@ def edit_website(request, slug):
     if request.method == 'POST':
         form = WebsiteSubmitForm(request.POST, instance=website)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'وب‌سایت با موفقیت ویرایش شد و در انتظار تأیید مجدد است.')
+            prior_status = website.status
+            prior_url = website.url
+            prior_title = website.title
+            prior_desc = website.description or ''
+            prior_cat = website.category_id
+
+            updated = form.save(commit=False)
+            # Major change: URL always; otherwise title/description/category change
+            url_changed = (updated.url or '') != (prior_url or '')
+            major = url_changed or (
+                (updated.title or '') != (prior_title or '')
+                or (updated.description or '') != prior_desc
+                or updated.category_id != prior_cat
+            )
+            if prior_status == 'approved' and major:
+                updated.status = 'pending'
+                msg = (
+                    'وب‌سایت با موفقیت ویرایش شد و به‌خاطر تغییرات مهم '
+                    'دوباره در انتظار تأیید قرار گرفت.'
+                )
+            elif prior_status == 'approved' and not major:
+                # Minor / no material field change — keep approved; staff may still review reports
+                msg = 'وب‌سایت با موفقیت ویرایش شد.'
+            else:
+                updated.status = 'pending'
+                msg = 'وب‌سایت با موفقیت ویرایش شد و در انتظار تأیید است.'
+
+            updated.save()
+            tags_input = form.cleaned_data.get('tags_input', '') or ''
+            tag_names = [t.strip() for t in tags_input.split(',') if t.strip()]
+            if tag_names:
+                updated.tags.set(tag_names)
+
+            messages.success(request, msg)
             return redirect('user_dashboard')
     else:
         form = WebsiteSubmitForm(instance=website)
 
     categories = Category.objects.all()
-    # Pre-fill tags for the UI (comma separated)
     current_tags = ', '.join([tag.name for tag in website.tags.all()])
 
-    return render(request, 'directory/edit_website.html', {
-        'form': form,
-        'categories': categories,
-        'website': website,
-        'current_tags': current_tags
-    })
+    return render(
+        request,
+        'directory/edit_website.html',
+        {
+            'form': form,
+            'categories': categories,
+            'website': website,
+            'current_tags': current_tags,
+        },
+    )
 
 def success(request):
     return render(request, 'directory/success.html')

@@ -245,3 +245,27 @@ class QuickSubmitForm(forms.ModelForm):
         if not title:
             raise ValidationError('عنوان وب‌سایت الزامی است.')
         return title
+
+
+class PublicWebsiteSubmitForm(WebsiteSubmitForm):
+    """Public submit: full optional details + captcha (AJAX or classic POST)."""
+
+    captcha = CaptchaField(
+        label='کد امنیتی',
+        error_messages={
+            'invalid': 'کد امنیتی نادرست است.',
+            'required': 'کد امنیتی الزامی است.',
+        },
+    )
+
+    class Meta(WebsiteSubmitForm.Meta):
+        fields = [
+            'title',
+            'url',
+            'description',
+            'category',
+            'owner_name',
+            'owner_email',
+            'hide_owner_info',
+        ]
+
