@@ -65,8 +65,8 @@ See `AGENTS.md` for agent onboarding.
 ### 1.2 Staff / admin dashboard
 
 - [ ] Fix modal / ID mismatches (`editWebsiteModal` vs `editModal`, missing hidden fields for status/delete URLs)
-- [ ] Resolve-report AJAX fully wired in UI
-- [ ] Counts in context: `pending_count`, report count, category/tag website counts (lists stay correct)
+- [x] Resolve-report AJAX wired via confirmStatusModal + hidden action fields
+- [x] Counts in context: `pending_count`, report count, category/tag website counts (lists stay correct)
 - [ ] CSRF on all staff AJAX endpoints verified
 - [ ] More useful columns on site/category/tag tables (optional within Phase 1)
 - [ ] Soft-delete **or** “rejected reason” field (product decision; defer hard-delete policy)
@@ -79,10 +79,10 @@ See `AGENTS.md` for agent onboarding.
 
 ### 1.4 Public discovery & UX
 
-- [ ] Navbar stays **solid** after scroll (no unwanted transparency)
+- [x] Navbar stays **solid** after scroll (no unwanted transparency)
 - [ ] Empty states aligned with directory chrome
 - [ ] Featured/random block only when no category/tag/search filters (confirm behavior)
-- [ ] Related sites prefer **shared tags** (not only same category / random)
+- [x] Related sites prefer **shared tags** (not only same category / random)
 - [ ] Pagination UX: more page numbers / clearer nav on large result sets
 - [ ] Suggest policy beyond pure random (recent, higher rated — product pick)
 - [ ] Handle missing owner name/email on detail without broken layout
