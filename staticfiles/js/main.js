@@ -19,3 +19,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Keep navbar solid and mark scroll state for shadow emphasis
+document.addEventListener('DOMContentLoaded', function () {
+    var nav = document.querySelector('.navbar.sticky-top, .navbar.navbar-theme');
+    if (!nav) return;
+    function onScroll() {
+        if (window.scrollY > 8) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+});
