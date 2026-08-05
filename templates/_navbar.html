@@ -86,8 +86,8 @@
 
                 <!-- Theme Toggle -->
                 <li class="nav-item ms-2">
-                    <button class="theme-toggle nav-link d-flex align-items-center" id="themeToggle" title="تغییر تم">
-                        <i class="bi bi-moon-fill" id="themeIcon"></i>
+                    <button class="nav-link text-primary d-flex align-items-center" id="themeToggle" title="تغییر تم" style="cursor: pointer; background: none; border: none;">
+                        <i class="bi bi-moon-fill" id="themeIcon" style="font-size: 1.1rem;"></i>
                     </button>
                 </li>
             </ul>
@@ -97,16 +97,13 @@
 <!-- Theme Toggle Script -->
 <script>
     (function () {
-        // Get saved theme or default to light
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
 
-        // Theme toggle click handler
         document.getElementById('themeToggle').addEventListener('click', function () {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateThemeIcon(newTheme);
