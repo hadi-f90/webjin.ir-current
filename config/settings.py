@@ -248,3 +248,12 @@ CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'
 #         'LOCATION': 'webjin-cache',
 #     }
 # }
+
+
+# Cache (required for django-ratelimit; LocMem is fine for single-process/dev/tests)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'webjin-default',
+    }
+}

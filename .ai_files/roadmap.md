@@ -1,181 +1,225 @@
 # WebJin (dirweb.ir / webjin.ir) Development Roadmap
 
 Persian web directory for discovering and submitting Iranian/Farsi websites.  
-Stack assumptions: Django 6, Bootstrap 5 RTL, taggit, django-simple-captcha,
-django-csp, Vazirmatn, Jalali display helpers (`farsi` app only — FarsiSaz removed).
+Stack: Django 6, Bootstrap 5 RTL, taggit, django-simple-captcha, django-csp,
+Vazirmatn, Jalali via `farsi` app only (FarsiSaz removed).
 
-See `.ai_files/technical-conventions.md` for locked decisions this roadmap assumes.  
-See `feature_list.md` for the living day-to-day checklist.  
+See `.ai_files/technical-conventions.md` for locked decisions.  
+See `feature_list.md` for the day-to-day checklist.  
 See `AGENTS.md` for agent onboarding.
 
-**Last decision-matrix merge:** 2026-08-02 (main ≡ Developement @ `11bd146`)
+**Phase 0 closed:** 2026-08-03 (forms, settings, tags, commands, error URL names, tests green).  
+**Current focus:** Phase 1 — MWS polish.
 
 ---
 
-## Decision matrix (P0 → P3) — merged 2026-08-02
+## Phase 0 — Foundation (DONE)
 
-| Priority | Item | Owner agent | Status / action |
-|----------|------|-------------|-----------------|
-| **P0** | Hardcoded MySQL password + `DEBUG = True` in `config/settings.py` | security + django-backend | **Secrets must leave the repo.** Use env vars only. See settings section below. |
-| **P0** | `QuickSubmitForm.Meta` broken (`exclude = ()`, labels on non-model `captcha`) | django-backend | Fix: explicit `fields = ['title', 'url']`; captcha stays as form field only |
-| **P0** | `website_card.html` uses `to_hindi` / `truncate_persian` without `{% load farsi_tags %}` | ui-ux | Add load (latent until include is used) |
-| **P1** | Broken legacy `farsi/templatetags/farsi.py` (imports non-existent `core.utils`) | django-backend | Delete or quarantine |
-| **P1** | Junk files in tree (concatenated dumps, hermes tmp, `custome.css` typo) | documentation | Run `scripts/clean_junk.sh` |
-| **P1** | Stale `AGENTS.md` still mentions FarsiSaz | documentation | Replaced by rewritten AGENTS.md |
-| **P1** | Duplicate WhiteNoise middleware registration | django-backend | Keep one path only |
-| **P2** | Multiple submit templates (`submit.html`, `submit_quick.html`, `submit_website.html`) | product + backend + ui-ux | Collapse to one public path |
-| **P2** | `custom.css` vs `custome.css` | ui-ux | Keep `custom.css`, delete typo |
-| **P2** | `to_jalali` lacks optional `fmt` argument | farsi | Optional API improvement |
-| **P2** | Admin dashboard modal/ID mismatches (`editWebsiteModal` vs `editModal`) | ui-ux + backend | Fix JS + hidden fields |
-| **P3** | Branch name `Developement` (typo) | ops | Rename → `development` when convenient |
-| Keep | `main` ≡ `Developement` | — | Already identical; preserve until rename |
+| Item | Result |
+|------|--------|
+| Env-driven settings (`SECRET_KEY`, `DEBUG`, `MYSQL_*`); no plaintext password on tip | Done |
+| `WebsiteSubmitForm` full Meta + `QuickSubmitForm` `fields=['title','url']` + captcha | Done |
+| `website_card.html` `{% load farsi_tags %}` | Done |
+| Management commands: empty `__init__`, `directory.models` (not `websites` / `your_app`) | Done |
+| Tag delete: `Website.objects.filter(tags=tag)` (taggit has no `tag.websites` manager) | Done |
+| Error templates (401/403/404/500): real URL names (`index`, `contact_page`, …) | Done |
+| Index: `select_related('category')`, limited featured, soft invalid category/tag filter | Done |
+| Rating path + LocMem `CACHES` for django-ratelimit (`block=False` on rate) | Done |
+| Directory test suite green | Done |
+| `.env.example` / README env table | Done |
 
----
-
-## Minimum Working State (MWS) — Phase 1
-
-**Goal:** A public visitor can browse approved sites, filter by category/tag,
-search, submit a site (with captcha), and an admin can approve/reject via the
-custom admin dashboard. Authenticated users can rate, review, and report.
-
-### 1. Foundation (shared)
-
-- [x] Django project layout (`config`, `directory`, `contact`, `farsi`)
-- [x] RTL Bootstrap + Vazirmatn + Bootstrap Icons
-- [x] CSP middleware + basic security headers
-- [x] Auth (register / login / logout) + staff flag for admin dashboard
-- [x] `Category` + `Website` (status: pending/approved/rejected) + taggit tags
-- [x] Media/static via WhiteNoise in production
-- [ ] **Secrets out of repo** — `DJANGO_SECRET_KEY`, DB password, `DEBUG`, `ALLOWED_HOSTS` from env only
-- [ ] Single source of truth for template names (`submit_website.html` vs
-      `submit_quick.html` / `submit.html`) — pick one public submit path
-- [ ] Consistent URL names and success redirect after submit
-- [ ] Production MySQL + dev SQLite documented; no secrets in repo
-- [ ] Remove junk files (concat dumps, hermes tmp, typo CSS)
-- [ ] Fix / remove broken `farsi/templatetags/farsi.py`
-- [ ] Deduplicate WhiteNoise middleware registration
-
-### 2. Public discovery (MWS)
-
-- [x] Index: list approved sites, category sidebar, popular tags, pagination
-- [x] Search query + live suggestions endpoint
-- [x] Website detail: description, tags, category, related sites, favicon helper
-- [x] Rating (1–5, one per user) + reviews + report accordion
-- [ ] Featured/random block only when no filters (already mostly done)
-- [ ] Empty states and 404/403 pages aligned with `directory/base.html`
-      (current error templates still reference other app URL names)
-- [ ] `website_card.html` self-loads `farsi_tags` (defensive)
-
-### 3. Submission flow (MWS)
-
-- [x] Submit form (title, URL normalize to https, optional category/tags/desc,
-      owner name/email, captcha)
-- [x] AJAX-capable submit returning JSON errors/success
-- [x] Pending status by default; staff must approve
-- [x] `WebsiteSubmitForm.Meta.model = Website` present
-- [ ] **Fix QuickSubmitForm.Meta** (broken exclude/labels)
-- [ ] Unify Quick vs full form; one template + one form class for public path
-- [ ] Tag chips + suggestions fully wired on the live template
-- [ ] Email notification to staff on new pending (optional MWS stretch)
-
-### 4. Moderation / custom admin dashboard (MWS)
-
-- [x] Staff-only `admin_dashboard` with tabs: overview, sites, reports, users,
-      content, categories, tags
-- [x] AJAX approve / reject / delete / status update / edit website
-- [x] Category & tag CRUD via AJAX
-- [ ] Fix modal/ID mismatches in `admin_dashboard.html` JS
-      (`editWebsiteModal` vs `editModal`, missing hidden fields for status/delete URLs)
-- [ ] Resolve report AJAX fully wired in UI
-- [ ] Counts (`pending_count`, `report_count`, user `website_count`) passed in
-      context and annotated correctly
-- [ ] Soft-delete or “rejected reason” field (defer hard delete policy decision)
-
-### 5. User account area (MWS)
-
-- [x] User dashboard: my websites + my reviews
-- [x] Delete own website / own review
-- [ ] Edit own pending/approved site returns to pending after save (already
-      intended) — confirm messaging and status reset rule
-
-**Success criteria (MWS):**  
-Anonymous user submits a site → appears in pending → staff approves from
-custom dashboard → site shows on index with category/tag → logged-in user rates
-and reviews → report appears for staff.  
-**Plus:** no secrets in git history of active settings; `DEBUG=False` + HTTPS
-headers active on host; junk files gone.
+**Ops (not blocked on code):** rotate any MySQL password that appeared in old git history; secrets only in host env.
 
 ---
 
-## Known bugs / debt (from feature_list + 2026-08-02 audit)
+## Decision matrix — residual items (from 2026-08-02 audit)
 
-### Critical
-- [ ] Hardcoded DB credentials in `settings.py` (must rotate password after move to env)
-- [ ] `DEBUG = True` hardcoded (must be env-driven)
-- [ ] QuickSubmitForm Meta invalid
-- [ ] Admin dashboard modal ID mismatches / incomplete hidden fields
+| Priority | Item | Phase | Status |
+|----------|------|-------|--------|
+| P0 | Secrets / forms / card load / commands / tag delete / error URLs | 0 | **Done** |
+| P1 | Broken legacy `farsi/templatetags/farsi.py` (`core.utils` import) | 1 hygiene | Open if file still present |
+| P1 | Junk files (`concatenated_output.txt`, `.hermes-tmp.*`, `custome.css`) | 1 hygiene | Open — use `scripts/clean_junk.sh` |
+| P1 | Duplicate WhiteNoise registration when `DEBUG=False` | 1 hygiene | Verify / dedupe |
+| P1 | Admin modal ID mismatches | 1 dashboard | Open |
+| P1 | CSRF consistency on staff AJAX | 1 dashboard | Open |
+| P2 | Multiple submit templates → one public path | 1 submit | **Done** |
+| P2 | `custom.css` vs `custome.css` | 1 hygiene | Open |
+| P2 | `to_jalali` optional `fmt` argument | 2 / farsi polish | Open |
+| P3 | Rename branch `Developement` → `development` | 1 hygiene | Optional |
+| Keep | `main` ≡ development tip after merges | continuous | Ongoing |
 
-### High
-- [ ] Latent `website_card.html` missing `{% load farsi_tags %}`
-- [ ] Broken `farsi.py` templatetag module
-- [ ] Multiple public submit templates / form classes
-- [ ] Rate limiting present in requirements but commented out in settings
-- [ ] Inconsistent CSRF handling in some admin AJAX paths
+---
 
-### Medium
-- [ ] Empty / error pages not fully aligned with directory base
-- [ ] Pagination + suggested-sites edge cases
-- [ ] Duplicate CSS (`custom.css` / `custome.css`)
-- [ ] WhiteNoise registered twice when `DEBUG=False`
+## Phase 1 — MWS completion (current)
 
-### Cleanup
-- [ ] `directory/concatenated_output.txt`, `farsi/concatenated_output.txt`
-- [ ] `.hermes-tmp.*`
-- [ ] `tmp/restart.txt`
-- [ ] Stale FarsiSaz references in docs
+**Goal:** Moderated submission → public discovery loop is polished and safe for daily use.
+
+### 1.1 Submission UX
+
+- [x] Single public submit path (`submit.html` + `PublicWebsiteSubmitForm`, AJAX + POST fallback)
+- [x] Consistent URL name + success redirect + messaging
+- [x] Tag chips + suggestions on live submit (`/tags/suggestions/`)
+- [ ] Categories reliably available on the active submit form
+- [ ] Optional: email staff on new pending submission
+
+### 1.2 Staff / admin dashboard
+
+- [ ] Fix modal / ID mismatches (`editWebsiteModal` vs `editModal`, missing hidden fields for status/delete URLs)
+- [x] Resolve-report AJAX wired via confirmStatusModal + hidden action fields
+- [x] Counts in context: `pending_count`, report count, category/tag website counts (lists stay correct)
+- [ ] CSRF on all staff AJAX endpoints verified
+- [ ] More useful columns on site/category/tag tables (optional within Phase 1)
+- [ ] Soft-delete **or** “rejected reason” field (product decision; defer hard-delete policy)
+
+### 1.3 Permissions & lifecycle messaging
+
+- [ ] Document and align **302 vs 403** for non-owner edit and non-staff AJAX
+- [ ] Owner edit of approved site resets to `pending` with clear user-facing message
+- [ ] Edit button visible for owner + staff on detail when allowed
+
+### 1.4 Public discovery & UX
+
+- [x] Navbar stays **solid** after scroll (no unwanted transparency)
+- [ ] Empty states aligned with directory chrome
+- [ ] Featured/random block only when no category/tag/search filters (confirm behavior)
+- [x] Related sites prefer **shared tags** (not only same category / random)
+- [ ] Pagination UX: more page numbers / clearer nav on large result sets
+- [ ] Suggest policy beyond pure random (recent, higher rated — product pick)
+- [ ] Handle missing owner name/email on detail without broken layout
+- [ ] Report / rate / review UX polish (placement, accordion for comments if needed)
+
+### 1.5 Hygiene & repo
+
+- [ ] Remove or quarantine broken `farsi/templatetags/farsi.py` if still present
+- [ ] Run junk cleanup (`concatenated_output.txt`, hermes temps, `custome.css` typo)
+- [ ] Dedupe WhiteNoise middleware registration
+- [ ] Resolve `custom.css` vs `custome.css` (keep one)
+- [ ] Audit duplicate / stale `urls.py` copies if any remain outside `config` + apps
+- [ ] Align `main` ↔ development tips after each merge
+- [ ] Optional: rename `Developement` → `development`
+- [ ] CI smoke on PR: `migrate` + `test directory` + `check`
+- [ ] Production MySQL + dev SQLite documented in README (keep current)
+
+**Instrumentation (optional in Phase 1):** baseline metrics with `analytics-metrics-agent` so Phase 2 growth is not blind.
+
+**Phase 1 success criteria:**  
+Anonymous submit → pending → staff approve from dashboard (modals work) → site on index with category/tags → user rates/reviews/reports → staff sees report. Navbar and submit path feel finished; no known P0 crashers.
 
 ---
 
 ## Phase 2 — Polish & trust
 
-- SEO: per-page meta, Open Graph, sitemap (django-sitemaps already in deps),
-  structured data for website listings
-- django-check-seo integration for staff previews
-- Image/favicon cache or proxy (avoid broken external favicon.ico)
-- Rate limiting restored (`django-ratelimit`) on submit, rate, review, report
-- Email: approval/rejection mail to `owner_email`; contact form → admin inbox
-- Admin dashboard: filters, search, bulk approve/reject
-- Review moderation queue (`is_approved` workflow used consistently)
-- Accessibility pass (RTL forms, focus, contrast)
-- Error pages (401/403/404/500) rewritten to extend `directory/base.html`
-- Caching for index category counts / popular tags (Redis optional)
+- [ ] SEO: per-page meta, Open Graph, sitemap (`django-sitemaps` in deps), structured data for listings
+- [ ] django-check-seo integration for staff previews
+- [ ] Image/favicon cache or proxy (avoid broken external favicon.ico on cards)
+- [ ] Favicon / thumbnail / optional screenshot on cards
+- [ ] Share buttons (copy link + social)
+- [ ] Rate limiting restored product-wide on submit, rate, review, report
+- [ ] Email: approval/rejection to `owner_email`; contact form → admin inbox
+- [ ] Admin dashboard: filters, search, bulk approve/reject
+- [ ] Review moderation queue (`is_approved` used consistently)
+- [ ] Accessibility pass (RTL forms, focus, contrast)
+- [ ] Dark mode toggle
+- [ ] Error pages fully extend shared directory/base chrome (beyond URL-name fix)
+- [ ] Caching for index category counts / popular tags (LocMem done; Redis optional)
+- [ ] `to_jalali` optional format argument (farsi API polish)
+- [ ] Ad placement (Yektanet allowed in CSP; card/footer slots without harming CLS)
+- [ ] About / FAQ / Terms / contact response handling / footer completion
+- [ ] Admin view-count or simple statistics columns (if product wants)
+
+Use **seo-agent**, **business-model-agent**, **growth-agent**, **analytics-metrics-agent**, and **conversion-monetization-agent** as listed in *Agent skills — profitability track*. Add **ad-ops** and **competitive-intel** skills when ads/competitors become active work.
 
 ---
 
 ## Phase 3 — Engagement & quality
 
-- Bookmarks / favorites for logged-in users
-- “Claim this website” ownership verification (DNS or email domain)
-- Broken-link checker management command (periodic)
-- Tag synonyms / merge UI for staff
-- Public user profiles (optional, privacy-first)
-- Analytics: views per site (privacy-respecting, no third-party required)
+- [ ] Bookmarks / favorites for logged-in users
+- [ ] “Claim this website” ownership verification (DNS or email domain)
+- [ ] View counts per site (privacy-respecting, no required third-party analytics)
+- [ ] Broken-link / reachability checker management command (periodic; “from Iran” is an ops constraint)
+- [ ] Tag synonyms / merge UI for staff
+- [ ] Public user profiles (optional, privacy-first)
+- [ ] Bulk import UX documented (CSV + optional Firefox/Chromium bookmark export)
+- [ ] Ping / reachability status surfaced on detail (if checker exists)
 
 ---
 
 ## Phase 4 — Ops & hardening
 
-- CI: migrate + test + `check --deploy` on every PR
-- Staging environment with production-like env vars
-- Log aggregation / error reporting (Sentry or equivalent)
-- Backup + restore drill for MySQL
-- Document Passenger / WSGI deployment path used on host
+- [ ] CI: migrate + test + `check --deploy` on every PR
+- [ ] Staging environment with production-like env vars
+- [ ] Log aggregation / error reporting (Sentry or equivalent)
+- [ ] Backup + restore drill for MySQL
+- [ ] Document Passenger / WSGI deployment path used on host
+- [ ] History hygiene: old secret-tipped branches deleted or rewritten after password rotation
 
 ---
 
-## Branch policy (current)
+## Website lifecycle (locked)
 
-- `main` and `Developement` point to the **same commit** — keep them identical
-  until the typo rename is done.
-- Feature work: short-lived branches → PR into `main`.
-- Do not commit secrets, concatenated dumps, or editor temp files.
+```
+submit → pending → approved | rejected
+```
+
+- Public index/detail: `status='approved'` only  
+- Tags via taggit; categories are flat (no nested trees)  
+- Dates: Gregorian in DB; Jalali only in templates  
+
+## AJAX contract (locked)
+
+- Staff: `require_POST` + `staff_member_required`  
+- JSON: `{"status": "success"|"error", "message": "...", ...}`  
+- CSRF: cookie / meta + `X-CSRFToken`  
+- Progressive enhancement preferred  
+
+## Display limits (by design)
+
+| Surface | Limit |
+|---------|-------|
+| Popular tags sidebar | 10 |
+| Search suggestion sites / tags | 5 each |
+| Combined suggestions | 10 |
+| Featured block | 6 |
+| Reviews on detail | 10 |
+
+Tag count per website is unlimited.
+
+
+## Agent skills — profitability track
+
+### Available now (essential)
+
+| Skill | Use for |
+|-------|---------|
+| `business-model-agent` | Revenue model choice and sequencing |
+| `growth-agent` | Visitor + listing acquisition plans |
+| `analytics-metrics-agent` | KPIs, funnels, event dictionary |
+| `conversion-monetization-agent` | Featured/priority/claim UX + disclosure |
+| `seo-agent` | Organic traffic research and specs |
+
+Typical order when money is in scope:
+
+```
+business-model → analytics-metrics + growth
+        → conversion-monetization → product-requirements
+        → ui-ux + django-backend → security + testing-qa
+        → seo (ongoing) → documentation
+```
+
+### Scheduled for later phases (do not create until needed)
+
+| Phase | Planned skill | Purpose |
+|-------|---------------|---------|
+| **Phase 2** | `ad-ops-publisher-agent` | Ad slot map, density, CLS, network policy (e.g. Yektanet) |
+| **Phase 2** | `competitive-intel-agent` | Periodic landscape of other directories / pricing |
+| **Phase 3** | `partnerships-bd-agent` | Co-branded niches, hoster/agency packages, outreach kits |
+| **Phase 3** | `lifecycle-crm-agent` | Owner emails: approved, featured offer, claim reminders |
+
+Phase 4 remains ops (CI, staging, Sentry, backups) — no new revenue agent required by default.
+
+
+## Branch policy
+
+- Keep `main` and development branch tips aligned after merges  
+- Feature work: short-lived branches → PR into `main`  
+- Do not commit secrets, concatenated dumps, or editor temp files  

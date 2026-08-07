@@ -40,6 +40,8 @@ Under `.claude/agents/*/SKILL.md`:
 5. `security-agent` → CSP, CSRF, secrets, permissions
 6. `testing-qa-agent` → tests and acceptance checks
 7. `documentation-agent` → docs and changelog
+8. `seo-agent` → SEO research / seo-report.md (Phase 2+)
+9. `business-model-agent` → monetization & business-model-report.md
 
 Use them when the tool supports custom agents; otherwise stay inside this file +
 the two `.ai_files` docs.
@@ -202,3 +204,16 @@ bash scripts/clean_junk.sh                 # remove dump/tmp junk
 ---
 
 *Generated for multi-agent use. Keep this file short, accurate, and free of secrets.*
+
+
+## Profitability-related agents
+
+| Agent | When to use | Output |
+|-------|-------------|--------|
+| `business-model-agent` | Strategy: what to sell | `business-model-report.md` |
+| `growth-agent` | Traffic + listing supply | `growth-plan.md` |
+| `analytics-metrics-agent` | KPIs + instrumentation map | `metrics-framework.md` |
+| `conversion-monetization-agent` | Paid UX + disclosure | `conversion-spec.md` |
+| `seo-agent` | Organic acquisition | `seo-report.md` |
+
+**Later phases (skills not required yet):** partnerships-bd, ad-ops-publisher, competitive-intel, lifecycle-crm — scheduled in `.ai_files/roadmap.md`.

@@ -754,7 +754,7 @@
     </div>
 </div>
 <!-- Edit Website Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="editWebsiteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
@@ -763,20 +763,20 @@
             </div>
             <div class="modal-body">
                 <form id="editForm">
-                    <input type="hidden" id="editActionUrl">
+                    <input type="hidden" id="editWebsiteActionUrl">
                     <input type="hidden" id="editWebsiteId">
 
                     <div class="mb-3">
                         <label class="form-label">عنوان</label>
-                        <input type="text" id="editTitle" class="form-control" required>
+                        <input type="text" id="editWebsiteTitle" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">آدرس وب‌سایت</label>
-                        <input type="url" id="editUrl" class="form-control" required>
+                        <input type="url" id="editWebsiteUrl" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">دسته‌بندی</label>
-                        <select id="editCategory" class="form-select">
+                        <select id="editWebsiteCategory" class="form-select">
                             <option value="">بدون دسته</option>
                             {% for cat in categories %}
                             <option value="{{ cat.pk }}">{{ cat.name }}</option>
@@ -785,13 +785,13 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">توضیحات</label>
-                        <textarea id="editDescription" class="form-control" rows="3" required></textarea>
+                        <textarea id="editWebsiteDesc" class="form-control" rows="3" required></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
-                <button type="button" class="btn btn-primary" id="saveEditBtn">ذخیره تغییرات</button>
+                <button type="button" class="btn btn-primary" id="saveEditWebsiteBtn">ذخیره تغییرات</button>
             </div>
         </div>
     </div>
@@ -807,6 +807,8 @@
             </div>
             <div class="modal-body">
                 <p id="statusModalMessage">آیا مطمئن هستید؟</p>
+                <input type="hidden" id="currentStatusActionUrl" value="">
+                <input type="hidden" id="currentStatusValue" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
@@ -826,6 +828,7 @@
             </div>
             <div class="modal-body">
                 <p id="deleteModalMessage">آیا مطمئن هستید؟</p>
+                <input type="hidden" id="currentDeleteActionUrl" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
@@ -1323,16 +1326,8 @@
         });
     }
 
-    // --- Resolve Report ---
-    const resolveReportBtn = document.getElementById('resolveReportBtn'); // You need to add this button in the modal logic or use the existing one
-    // Assuming you have a generic resolve button in the report modal
-    if (resolveReportBtn) {
-        // This logic assumes you have a modal for resolving reports similar to delete/status
-        // If you use the same confirmStatusModal for reports, ensure data-status is 'resolved'
-        // But since resolve_report_ajax is separate, let's assume a specific flow or reuse status modal with 'resolved' status
-        // For simplicity, if you use the status modal for reports:
-        // Ensure data-action points to resolve_report_ajax and data-status="resolved"
-    }
+    // Resolve report: uses #confirmStatusModal with data-action=resolve_report_ajax
+    // and data-status="resolved" (see report row buttons). Handled by confirmStatusBtn above.
 
 </script>
 {% endblock %}
