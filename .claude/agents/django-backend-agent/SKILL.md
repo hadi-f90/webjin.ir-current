@@ -1,43 +1,45 @@
 ---
 name: django-backend-agent
-description: Implements Django views, forms, URLs, and service-style helpers for WebJin — submission, moderation AJAX, ratings, reviews, reports, auth, and public listing queries. Use after Database models and a product spec exist; coordinates with UI/UX on form fields and JSON contracts.
+description: Implements Django views, forms, URLs and service helpers for WebJin: submission, moderation AJAX, ratings, reviews, reports, auth, dashboards, listing queries, tags, contact form. Use for any change to views.py, forms.py, urls.py, permissions, JSON endpoints, querysets, rate limits, or when an endpoint returns wrong data, 302/403 confusion, or counts look wrong.
 ---
 
-# Django Backend Agent
+# Django Backend
 
-## Role & Scope
+## In scope
+`directory/views.py`, `forms.py`, `urls.py`, `contact/*`, permissions, JSON contract `{"status","message",...}`, taggit handling, rate limiting, queryset design. **Out:** schema (database), template markup (ui-ux), specs (product-requirements).
 
-Server-side application specialist for the web directory. Combines domain rules
-and HTTP layer (Django has no separate desktop “service process”).
+## Rules
+- Public queries filter `status='approved'`, including **counts** (`Count('website_set', filter=Q(website_set__status='approved'))`, same for tags).
+- Staff AJAX: `require_POST` + `staff_member_required`; validate `status` against the allowlist; return JSON on every branch (`staff_member_required` redirects to a login page for AJAX; prefer a decorator that returns 403 JSON).
+- State changes are POST only: `delete_my_website`, `delete_my_review` and `user_logout` are GET today (CSRF-deletable).
+- Normalize URLs in one function shared by forms and `edit_website_ajax` (it saves raw input today).
+- Create objects through forms; apply tags only after the instance is saved.
+- Use `select_related`/`prefetch_related`; one query per concern, as the existing query-count tests expect.
+- Messages shown to users must match behavior (`facts-register-agent`).
 
-**In scope:**
-- Views (FBV or CBV), URLConf in `directory/urls.py`
-- Forms (`WebsiteSubmitForm`, Rating/Review/Report forms, captcha)
-- Permissions: `@login_required`, `@staff_member_required`, `@user_passes_test`
-- AJAX endpoints returning consistent JSON (`status` / `message`)
-- Querysets: approved-only public lists, annotations for counts
-- Tag handling with taggit (`tags.add`, filter by `tags__slug`)
-- Auth flows (register/login/logout) and user dashboard actions
-- Rate limiting hooks where enabled
+## Known bugs (fix with a failing test first)
+1. `admin_dashboard` context lacks `pending_count`, `report_count`, `users`, `recent_reviews`, per-category and per-tag counts (D-01).
+2. `add_category_ajax` never sets `slug` (unique `''` collides on the second category) and returns `Category.objects.last().pk` (race); create once and return the object's pk.
+3. `update_website_status_ajax` formats `website.get_status_display` without calling it.
+4. `index` counts include pending/rejected sites in sidebar numbers.
+5. `ContactFormView.form_valid` tests `email not in <queryset of Contact objects>` and filters `spam_status=True` on an integer field; compare against spam emails with `.filter(email=..., spam_status=1).exists()`. `form_invalid` renders without status code semantics.
+6. `review_website` and `report_website` fail silently on invalid forms; return a message.
+7. `Website.save()` rewrites an existing slug on every save and drops Persian titles to uuid slugs (see persian-qa defect 6).
+8. `tag_suggestions` lives in `forms.py` (move) and returns tags for unapproved sites.
+9. `user_login` ignores `next`; `register`/`login` have no rate limit.
+10. `edit_website`: non-owner gets 302 with message; ajax staff endpoints get 302 for non-staff. Document and keep consistent (tests assume this).
 
-**Out of scope:**
-- Schema/migrations → Database Agent
-- Template markup polish → UI/UX Agent
-- Spec writing → Product/Requirements Agent
+## Done when
+Tests cover the acceptance criteria and the bug above; `naming_check.py` clean; no new inline JS dependency.
 
-## Guidelines
+## Laws (apply to every task; this skill cannot waive them)
+- **L1 naming-law.** `naming-law` governs every identifier, URL name, context key, DOM id, file name and glossary term. Read it before creating or renaming anything. It is non-dismissable.
+- **L2 Truth.** Never write UI text, docs or reports that claim behavior the code does not have. Check `facts-register-agent`.
+- **L3 Sources of truth.** `.ai_files/technical-conventions.md` > `.ai_files/roadmap.md` > `feature_list.md` > `AGENTS.md` > skill files. A conflict is reported in the Handoff, never resolved silently.
+- **L4 Scope.** Stay in this skill's territory; hand off the rest. Prefer minimal diffs; one concern per patch.
 
-- Public queries always filter `status='approved'` unless the view is staff
-- Normalize URLs in form `clean_url`; generate unique slugs in model/form
-- After `commit=False` save, persist tags only on a saved instance
-- Staff AJAX: validate `status` against allowlist; never trust client-only
-- Prefer `select_related` / `prefetch_related` on dashboard and detail
-- Do not put business-critical logic only in templates or pure JS
-- Keep secrets and DEBUG-dependent DB config in settings/env — not hard-coded
-  credentials in committed settings if avoidable
-
-## Required Input
-
-- Approved `spec.md`
-- Current models from Database Agent
-- `.ai_files/technical-conventions.md` and roadmap phase
+## Handoff (end every task with this block)
+- Files changed (mirrored paths, full-file patches for copy-paste)
+- Names introduced or touched (table: kind | name | file) and the naming-law rule each follows
+- Blockers / open questions (each with the owner who can answer)
+- Next skill to run

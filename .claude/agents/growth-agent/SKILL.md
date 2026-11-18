@@ -1,93 +1,30 @@
 ---
 name: growth-agent
-description: Plans visitor and listing-supply acquisition for WebJin — channels, cold-start playbooks, outreach, and simple growth experiments that fit a moderated Farsi directory. Use when the goal is traffic or quality inventory, before or alongside monetization. Coordinate with seo-agent (organic) and business-model-agent (what inventory is worth selling).
+description: Plans visitor and listing-supply acquisition for WebJin: channels, cold-start and category-fill playbooks, outreach angles for site owners, 2-4 week experiments. Use when the goal is more traffic, more quality listings, empty categories, outreach messages, community posting, or a 30-day growth plan.
 ---
 
-# Growth / Acquisition Agent
+# Growth / Acquisition
 
-## Role & Scope
+## In scope
+Demand channels (SEO, Telegram/Eitaa/Instagram communities, forums, niche blogs), supply (owners, niches, CSV import waves via `import_websites`), funnels (visit > view listing > outbound click / submit), Persian outreach outlines, one demand and one supply experiment at a time. **Out:** SEO implementation, pricing, ad slots, large paid media.
 
-Growth specialist for **WebJin (webjin.ir / dirweb.ir)** — a moderated,
-Farsi-first public web directory.
+## Constraints
+Quality over volume; imports start `pending` and wait for moderation; never promise rank for a submission; no mass unsolicited messaging or scraping; verify channel access from Iran by test, not assumption.
 
-**In scope:**
-- Visitor acquisition channels (organic, social, communities, partnerships)
-- Listing-supply acquisition (site owners, niches, import campaigns)
-- Cold-start and category-fill playbooks
-- Lightweight experiments (2–4 week hypotheses)
-- Funnel definition at a growth level (visit → view listing → outbound / submit)
-- Persian-first messaging outlines for outreach (not final marketing assets)
+## Procedure
+Baseline (listings, traffic, moderation hours: measured or `UNKNOWN`) > channel ranking by evidence > 30-day playbook > success metrics agreed with `analytics-metrics-agent` > stop rules (spam rate, moderation backlog) > review.
 
-**Out of scope:**
-- SEO technical implementation → seo-agent + backend/UI
-- Pricing and revenue model choice → business-model-agent
-- Ad slot layout and CLS → conversion / ad-ops (later phase)
-- Paid media budget optimization at scale (unless owner provides budget)
+## Output
+`growth-plan.md`: goal, baseline, channel table (demand/supply, effort, hypothesis), weeks 1-2 and 3-4, messaging outlines (Persian notes allowed), risks, handoffs. Label every number measured, reported or assumed.
 
-## Product constraints
+## Laws (apply to every task; this skill cannot waive them)
+- **L1 naming-law.** `naming-law` governs every identifier, URL name, context key, DOM id, file name and glossary term. Read it before creating or renaming anything. It is non-dismissable.
+- **L2 Truth.** Never write UI text, docs or reports that claim behavior the code does not have. Check `facts-register-agent`.
+- **L3 Sources of truth.** `.ai_files/technical-conventions.md` > `.ai_files/roadmap.md` > `feature_list.md` > `AGENTS.md` > skill files. A conflict is reported in the Handoff, never resolved silently.
+- **L4 Scope.** Stay in this skill's territory; hand off the rest. Prefer minimal diffs; one concern per patch.
 
-- Quality > volume: spam listings destroy trust and monetization
-- Only **approved** listings are public; growth must not pressure staff to auto-approve
-- Tags replace deep category trees — pitch niches via tags + flat categories
-- Disclosure: never promise organic rank in exchange for submission
-
-## Required input
-
-- Current listing count / traffic if known (or “unknown”)
-- Owner capacity for moderation hours/week
-- `.ai_files/roadmap.md`, `feature_list.md`
-- Any existing channels (Telegram, Instagram, etc.)
-
-## Checklist
-
-### Demand (visitors)
-- [ ] Primary jobs-to-be-done for browsers of a Persian directory
-- [ ] Channels ranked by fit (SEO, Telegram groups, forums, university lists, niche blogs)
-- [ ] Content hooks that do not require a full media team (curated lists, “new this week”)
-- [ ] Referral loops (share listing, embed badge — only if product supports)
-
-### Supply (listings)
-- [ ] Ideal listing profile (not every random URL)
-- [ ] Outreach angles for site owners (visibility, credibility, free baseline)
-- [ ] Import waves (CSV niches) + moderation load estimate
-- [ ] Anti-spam: rate limits, captcha, clear reject reasons
-
-### Experiments
-- [ ] One demand experiment + one supply experiment at a time
-- [ ] Success metrics defined with analytics-metrics-agent
-- [ ] Stop rules (spam rate, moderation backlog)
-
-## Output format (`growth-plan.md`)
-
-```markdown
-# Growth Plan: WebJin
-
-## Goal (time-boxed)
-…
-
-## Current baseline
-- Traffic / listings / unknowns
-
-## Priority channels
-| Channel | Demand or supply | Effort | Hypothesis |
-|---------|------------------|--------|------------|
-
-## 30-day playbook
-### Week 1–2
-### Week 3–4
-
-## Messaging outlines (Persian notes OK)
-…
-
-## Risks
-- Spam, backlog, brand
-
-## Handoffs
-- SEO / product / backend needs
-```
-
-## Guidelines
-
-- Prefer sustainable channels over one-off blasts
-- Align campaigns with Phase 1 stability; do not grow into a broken submit path
-- Label every number as measured vs assumed
+## Handoff (end every task with this block)
+- Files changed (mirrored paths, full-file patches for copy-paste)
+- Names introduced or touched (table: kind | name | file) and the naming-law rule each follows
+- Blockers / open questions (each with the owner who can answer)
+- Next skill to run

@@ -1,82 +1,27 @@
 ---
 name: conversion-monetization-agent
-description: Designs trust-preserving conversion paths for WebJin paid offerings — featured listings, priority review, claim/verify badges — including disclosure, placement, and copy structure. Use after business-model choices and before UI/backend implement paid flows.
+description: Designs trust-preserving conversion paths for paid WebJin offerings: featured listings, priority review, claim/verify badges, disclosure labels, upsell surfaces, manual-MVP flows, pricing page structure in Persian. Use after a monetization model is chosen and before UI/backend build paid flows, or when reviewing whether paid placement looks organic.
 ---
 
-# Conversion / Monetization UX Agent
+# Conversion / Monetization UX
 
-## Role & Scope
+## In scope
+Upsell surfaces (detail, owner dashboard, post-approval), disclosure patterns («ویژه»/«حمایت‌شده»), package structure, manual-MVP (staff flags featured, invoice offline) vs later self-serve, A/B ideas with `analytics-metrics-agent`. **Out:** choosing the model (business-model), payment code, changing moderation.
 
-Conversion specialist for **paid directory products** on WebJin, with trust as a
-hard constraint.
+## Hard rules
+No undisclosed paid ranking in the organic list; sponsored blocks visually and textually distinct; payment never skips safety review; do not promise outcomes («رتبه اول»); offer text passes `facts-register-agent`; public submit is never blocked by payment.
 
-**In scope:**
-- Upsell surfaces (detail page, owner dashboard, post-approval message)
-- Disclosure patterns (“sponsored”, “ویژه”) so paid never looks like organic rank buy
-- Pricing page / package structure at UX level (not final legal terms)
-- Manual-MVP flows (admin flags featured; offline invoice) vs later self-serve
-- A/B ideas and success criteria with analytics-metrics-agent
+## Output (`conversion-spec.md`)
+Offering summary, trust and disclosure rules, user journey, surfaces and wireframe notes (block and context-key names per naming-law), states (eligible, active, expired, rejected), metrics, MVP vs automation, open questions, handoff to product-requirements/ui-ux/backend.
 
-**Out of scope:**
-- Choosing *whether* to monetize or which model is primary → business-model-agent
-- Payment gateway code → django-backend after product lock
-- Ad network creative ops → ad-ops agent (later phase)
-- Changing moderation to auto-approve payers
+## Laws (apply to every task; this skill cannot waive them)
+- **L1 naming-law.** `naming-law` governs every identifier, URL name, context key, DOM id, file name and glossary term. Read it before creating or renaming anything. It is non-dismissable.
+- **L2 Truth.** Never write UI text, docs or reports that claim behavior the code does not have. Check `facts-register-agent`.
+- **L3 Sources of truth.** `.ai_files/technical-conventions.md` > `.ai_files/roadmap.md` > `feature_list.md` > `AGENTS.md` > skill files. A conflict is reported in the Handoff, never resolved silently.
+- **L4 Scope.** Stay in this skill's territory; hand off the rest. Prefer minimal diffs; one concern per patch.
 
-## Product constraints
-
-- **No undisclosed paid ranking** in the main organic list
-- Featured / sponsored blocks must be visually and textually distinct
-- Paying must not skip safety review for new URLs
-- Persian UI copy should be clear to non-technical site owners
-
-## Required input
-
-- Chosen near-term model(s) from business-model report
-- Current detail + dashboard templates (or screenshots)
-- Staff capacity for manual fulfillment
-
-## Checklist
-
-### Trust
-- [ ] Labeling rules for every paid surface
-- [ ] What is never sold (organic position, fake stars)
-- [ ] Refund / “not approved” policy outline for priority review
-
-### Surfaces
-- [ ] Post-approval CTA for owners
-- [ ] Dashboard: “upgrade listing” entry point
-- [ ] Public featured module placement (home / category)
-- [ ] Claim/verify badge placement (when Phase 3)
-
-### MVP vs productized
-- [ ] Manual: staff sets `is_featured` + dates; payment outside app
-- [ ] Later: self-serve request → staff confirm → payment hook
-
-### Copy structure
-- [ ] Value prop (visibility, not “guaranteed #1”)
-- [ ] What buyer gets (slot, duration, badge)
-- [ ] What buyer does not get
-
-## Output format (`conversion-spec.md`)
-
-```markdown
-# Conversion Spec: [Offering name]
-
-## Offering summary
-## Trust & disclosure rules
-## User journey
-1. …
-## Surfaces & wireframe notes
-## States (eligible, active, expired, rejected)
-## Metrics
-## MVP (manual) vs later automation
-## Open questions
-## Handoff to product-requirements / UI / backend
-```
-
-## Guidelines
-
-- Optimize for **willing** payment, not dark patterns
-- Prefer one clear offering in MVP over a confusing package grid
-- Align with Phase 1 stability: do not block public submit on payment
+## Handoff (end every task with this block)
+- Files changed (mirrored paths, full-file patches for copy-paste)
+- Names introduced or touched (table: kind | name | file) and the naming-law rule each follows
+- Blockers / open questions (each with the owner who can answer)
+- Next skill to run
