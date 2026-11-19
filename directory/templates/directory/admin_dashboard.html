@@ -4,14 +4,36 @@
 
 {% block extra_css %}
 <style>
+    .admin-dashboard {
+        --admin-panel-bg: #fff;
+        --admin-content-bg: #f8fafc;
+        --admin-border-color: #e2e8f0;
+        --admin-nav-text: #64748b;
+        --admin-nav-hover-bg: #f1f5f9;
+        --admin-nav-active-text: #2563eb;
+        --admin-table-head-bg: #f8f9fa;
+        --admin-table-head-text: #212529;
+    }
+
+    [data-theme="dark"] .admin-dashboard {
+        --admin-panel-bg: var(--card-bg, #212529);
+        --admin-content-bg: var(--bg-primary, #1a1d20);
+        --admin-border-color: var(--border-color, #373b3e);
+        --admin-nav-text: var(--text-secondary, #adb5bd);
+        --admin-nav-hover-bg: var(--bg-tertiary, #2b3035);
+        --admin-nav-active-text: var(--link-color, #6ea8fe);
+        --admin-table-head-bg: var(--bg-tertiary, #2b3035);
+        --admin-table-head-text: var(--text-primary, #f8f9fa);
+    }
+
     .sidebar {
         min-height: calc(100vh - 100px);
-        background: #fff;
-        border-left: 1px solid #e2e8f0;
+        background: var(--admin-panel-bg);
+        border-left: 1px solid var(--admin-border-color);
     }
 
     .sidebar .nav-link {
-        color: #64748b;
+        color: var(--admin-nav-text);
         font-weight: 500;
         padding: 10px 15px;
         border-radius: 8px;
@@ -21,8 +43,8 @@
 
     .sidebar .nav-link:hover,
     .sidebar .nav-link.active {
-        background: #f1f5f9;
-        color: #2563eb;
+        background: var(--admin-nav-hover-bg);
+        color: var(--admin-nav-active-text);
     }
 
     .sidebar .nav-link.active {
@@ -35,7 +57,7 @@
     }
 
     .content-area {
-        background: #f8fafc;
+        background: var(--admin-content-bg);
         min-height: calc(100vh - 100px);
         padding: 20px;
         border-radius: 12px;
@@ -51,6 +73,47 @@
         padding: 20px;
         color: white;
     }
+
+    .admin-dashboard .card-header.bg-white {
+        background: var(--admin-panel-bg) !important;
+        border-bottom-color: var(--admin-border-color);
+    }
+
+    .admin-dashboard .table {
+        --bs-table-border-color: var(--admin-border-color);
+    }
+
+    .admin-dashboard .table-light {
+        --bs-table-color: var(--admin-table-head-text);
+        --bs-table-bg: var(--admin-table-head-bg);
+        --bs-table-border-color: var(--admin-border-color);
+    }
+
+    .admin-dashboard .border-bottom {
+        border-color: var(--admin-border-color) !important;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card {
+        background: var(--admin-panel-bg) !important;
+        border: 1px solid var(--admin-border-color);
+        color: var(--text-primary, #f8f9fa) !important;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-primary {
+        border-color: #6ea8fe;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-success {
+        border-color: #75b798;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-warning {
+        border-color: #ffda6a;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-danger {
+        border-color: #ea868f;
+    }
 </style>
 {% endblock %}
 
@@ -58,7 +121,7 @@
 <!-- Hidden CSRF Token -->
 <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 
-<div class="container-fluid">
+<div class="container-fluid admin-dashboard">
     <div class="row">
         <!-- Sidebar -->
         <div class="col-md-2 sidebar p-3">
