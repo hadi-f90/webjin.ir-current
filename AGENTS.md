@@ -31,26 +31,58 @@ If any instruction conflicts, **technical-conventions.md wins**.
 
 ### Sequential specialist agents (Claude Code / compatible tools)
 
-Under `.claude/agents/*/SKILL.md`:
+Under `.claude/skills/<skill-name>/SKILL.md`:
 
-1. `product-requirements-agent` → writes `spec.md`
-2. `ui-ux-agent` → templates / Bootstrap RTL / progressive enhancement
-3. `django-backend-agent` → views, forms, URLs, AJAX
-4. `database-agent` → models, migrations, querysets
-5. `security-agent` → CSP, CSRF, secrets, permissions
-6. `testing-qa-agent` → tests and acceptance checks
-7. `documentation-agent` → docs and changelog
-8. `seo-agent` → SEO research / seo-report.md (Phase 2+)
-9. `business-model-agent` → monetization & business-model-report.md
+Read `naming-law` before creating or changing any name. Route project requests
+through `orchestrator-agent`, which chooses the appropriate chain and decision
+path. A typical feature chain is:
 
-Use them when the tool supports custom agents; otherwise stay inside this file +
-the two `.ai_files` docs.
+1. `product-requirements-agent` → testable `spec.md`
+2. `ui-ux-agent`, `django-backend-agent`, and `database-agent` as needed
+3. `security-agent` and `testing-qa-agent`
+4. `persian-qa-agent` when Persian/RTL content or behavior is involved
+5. `watchdog-agent` → cross-layer audit and findings
+6. `final-gate-agent` → binary release verdict
+7. `documentation-agent` → docs and skill registry
+
+Other skills in the registry below retain their focused scopes. When custom
+skills are unavailable, follow the corresponding skill files manually along
+with the canonical sources of truth above.
+
+Complete skill registry (all existing skills; no new skills):
+
+| Skill | Canonical path |
+|---|---|
+| `analytics-metrics-agent` | `.claude/skills/analytics-metrics-agent/SKILL.md` |
+| `business-model-agent` | `.claude/skills/business-model-agent/SKILL.md` |
+| `conversion-monetization-agent` | `.claude/skills/conversion-monetization-agent/SKILL.md` |
+| `database-agent` | `.claude/skills/database-agent/SKILL.md` |
+| `deployment-agent` | `.claude/skills/deployment-agent/SKILL.md` |
+| `django-backend-agent` | `.claude/skills/django-backend-agent/SKILL.md` |
+| `documentation-agent` | `.claude/skills/documentation-agent/SKILL.md` |
+| `facts-register-agent` | `.claude/skills/facts-register-agent/SKILL.md` |
+| `final-gate-agent` | `.claude/skills/final-gate-agent/SKILL.md` |
+| `growth-agent` | `.claude/skills/growth-agent/SKILL.md` |
+| `naming-law` | `.claude/skills/naming-law/SKILL.md` |
+| `orchestrator-agent` | `.claude/skills/orchestrator-agent/SKILL.md` |
+| `persian-qa-agent` | `.claude/skills/persian-qa-agent/SKILL.md` |
+| `product-requirements-agent` | `.claude/skills/product-requirements-agent/SKILL.md` |
+| `security-agent` | `.claude/skills/security-agent/SKILL.md` |
+| `seo-agent` | `.claude/skills/seo-agent/SKILL.md` |
+| `testing-qa-agent` | `.claude/skills/testing-qa-agent/SKILL.md` |
+| `ui-ux-agent` | `.claude/skills/ui-ux-agent/SKILL.md` |
+| `watchdog-agent` | `.claude/skills/watchdog-agent/SKILL.md` |
+
+`naming-law` is mandatory and non-dismissable across every skill. Task-level
+instructions cannot override it; only an explicitly owner-approved amendment
+may change it. It applies to every identifier, key, route, template, CSS class,
+DOM id, script symbol, file name and project glossary term.
 
 ---
 
 ## 3. Stack (do not invent alternatives)
 
-- **Python 3.11+**, **Django 6.x**
+- **Python >=3.12**, **Django 6.0.3 pinned** in `requirements.txt`
 - Apps: `directory` (core), `contact`, `farsi` (Persian template tags **only** —
   `FarsiSaz` was merged/removed), `config`
 - Frontend: Bootstrap 5 **RTL**, Bootstrap Icons, Vazirmatn (bundled under `static/`)
@@ -101,7 +133,7 @@ templates/        # site-wide base, navbar, footer, error pages
 static/           # source CSS/JS/fonts/img (committed)
 staticfiles/      # collectstatic output (do not hand-edit)
 .ai_files/        # roadmap + technical-conventions
-.claude/agents/   # specialist SKILL.md files
+.claude/skills/   # specialist SKILL.md files
 scripts/          # maintenance scripts (e.g. clean_junk.sh)
 ```
 
