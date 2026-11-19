@@ -6,7 +6,16 @@ For day-to-day coding style, see `.ai_files/coding-conventions.md` when it exist
 
 ## Stack
 
-- **Python 3.11+**, **Django 6.x**
+- **Python >=3.12**; **Django 6.0.3 is pinned** in `requirements.txt`
+- Official Django 6.1 documentation is the stable 6.1 reference for
+  2026-11-18, but this status does not authorize a dependency upgrade:
+  [Python version support](https://docs.djangoproject.com/en/6.1/faq/install/#what-python-version-can-i-use-with-django)
+  and [database support](https://docs.djangoproject.com/en/6.1/ref/databases/).
+- Official 6.1 database guidance specifies MySQL >=8.4 and SQLite >=3.37,
+  recommends MySQL utf8mb4 and InnoDB. Framework guidance is compatibility
+  information, not proof of the configured server version.
+- MySQL utf8mb4 is the production target and SQLite is the development
+  target. Backend-sensitive behavior must be tested on both SQLite and MySQL.
 - Apps: `directory` (core), `contact`, `farsi` (Persian template tags), `config`
 - Frontend: Bootstrap 5 **RTL**, Bootstrap Icons, Vazirmatn (bundled static)
 - Tags: **django-taggit** (+ optional autosuggest)
