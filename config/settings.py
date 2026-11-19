@@ -30,14 +30,16 @@ if not SECRET_KEY:
 # DEBUG must be an explicit env flag. Default False for safety on host.
 DEBUG = os.environ.get('DEBUG', 'False').strip().lower() in ('1', 'true', 'yes', 'on')
 
-ALLOWED_HOSTS = [
-    h.strip()
-    for h in os.environ.get(
-        'DJANGO_ALLOWED_HOSTS',
-        '127.0.0.1,localhost',
-    ).split(',')
-    if h.strip()
-]
+
+if DEBUG:
+    ALLOWED_HOSTS= ['127.0.0.1','localhost']
+else:
+    ALLOWED_HOSTS= []
+    ALLOWED_HOSTS.extend(
+        host.strip()
+        for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+        if host.strip()
+    )
 
 # ---------------------------------------------------------------------------
 # Applications
