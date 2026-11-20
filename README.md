@@ -1,7 +1,7 @@
 # WebJin (وب‌جین) — Persian Web Directory
 
 **Live:** [webjin.ir](https://webjin.ir) / [dirweb.ir](https://dirweb.ir)  
-**Stack:** Django 6 · Bootstrap 5 RTL · Vazirmatn · taggit · django-simple-captcha · django-csp
+**Stack:** Django 6.0.3 pinned · Python >=3.12 · Bootstrap 5 RTL · Vazirmatn · taggit · django-simple-captcha · django-csp
 
 A Farsi-first directory for discovering and submitting Iranian/Persian websites. Visitors browse by category and tags, search, and submit new sites (captcha). Staff moderate submissions from a custom AJAX dashboard. Registered users can rate, review, and report.
 
@@ -83,7 +83,7 @@ farsi/            # Persian templatetags (to_hindi, to_jalali, …)
 templates/        # site-wide base, navbar, footer, 401/403/404/500
 static/           # CSS/JS/fonts (source)
 .ai_files/        # roadmap, technical-conventions
-.claude/agents/   # optional multi-agent SKILL.md pipeline
+.claude/skills/   # canonical multi-agent SKILL.md pipeline
 ```
 
 ### Core models (`directory`)
