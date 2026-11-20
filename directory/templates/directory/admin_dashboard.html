@@ -4,14 +4,36 @@
 
 {% block extra_css %}
 <style>
+    .admin-dashboard {
+        --admin-panel-bg: #fff;
+        --admin-content-bg: #f8fafc;
+        --admin-border-color: #e2e8f0;
+        --admin-nav-text: #64748b;
+        --admin-nav-hover-bg: #f1f5f9;
+        --admin-nav-active-text: #2563eb;
+        --admin-table-head-bg: #f8f9fa;
+        --admin-table-head-text: #212529;
+    }
+
+    [data-theme="dark"] .admin-dashboard {
+        --admin-panel-bg: var(--card-bg, #212529);
+        --admin-content-bg: var(--bg-primary, #1a1d20);
+        --admin-border-color: var(--border-color, #373b3e);
+        --admin-nav-text: var(--text-secondary, #adb5bd);
+        --admin-nav-hover-bg: var(--bg-tertiary, #2b3035);
+        --admin-nav-active-text: var(--link-color, #6ea8fe);
+        --admin-table-head-bg: var(--bg-tertiary, #2b3035);
+        --admin-table-head-text: var(--text-primary, #f8f9fa);
+    }
+
     .sidebar {
         min-height: calc(100vh - 100px);
-        background: #fff;
-        border-left: 1px solid #e2e8f0;
+        background: var(--admin-panel-bg);
+        border-left: 1px solid var(--admin-border-color);
     }
 
     .sidebar .nav-link {
-        color: #64748b;
+        color: var(--admin-nav-text);
         font-weight: 500;
         padding: 10px 15px;
         border-radius: 8px;
@@ -21,8 +43,8 @@
 
     .sidebar .nav-link:hover,
     .sidebar .nav-link.active {
-        background: #f1f5f9;
-        color: #2563eb;
+        background: var(--admin-nav-hover-bg);
+        color: var(--admin-nav-active-text);
     }
 
     .sidebar .nav-link.active {
@@ -35,7 +57,7 @@
     }
 
     .content-area {
-        background: #f8fafc;
+        background: var(--admin-content-bg);
         min-height: calc(100vh - 100px);
         padding: 20px;
         border-radius: 12px;
@@ -51,6 +73,47 @@
         padding: 20px;
         color: white;
     }
+
+    .admin-dashboard .card-header.bg-white {
+        background: var(--admin-panel-bg) !important;
+        border-bottom-color: var(--admin-border-color);
+    }
+
+    .admin-dashboard .table {
+        --bs-table-border-color: var(--admin-border-color);
+    }
+
+    .admin-dashboard .table-light {
+        --bs-table-color: var(--admin-table-head-text);
+        --bs-table-bg: var(--admin-table-head-bg);
+        --bs-table-border-color: var(--admin-border-color);
+    }
+
+    .admin-dashboard .border-bottom {
+        border-color: var(--admin-border-color) !important;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card {
+        background: var(--admin-panel-bg) !important;
+        border: 1px solid var(--admin-border-color);
+        color: var(--text-primary, #f8f9fa) !important;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-primary {
+        border-color: #6ea8fe;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-success {
+        border-color: #75b798;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-warning {
+        border-color: #ffda6a;
+    }
+
+    [data-theme="dark"] .admin-dashboard .stat-card.bg-danger {
+        border-color: #ea868f;
+    }
 </style>
 {% endblock %}
 
@@ -58,7 +121,7 @@
 <!-- Hidden CSRF Token -->
 <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 
-<div class="container-fluid">
+<div class="container-fluid admin-dashboard">
     <div class="row">
         <!-- Sidebar -->
         <div class="col-md-2 sidebar p-3">
@@ -878,10 +941,13 @@
         alertDiv.className = `alert alert-${type} alert-dismissible fade show dynamic-alert position-fixed top-0 start-50 translate-middle-x mt-3`;
         alertDiv.style.zIndex = '9999';
         alertDiv.style.width = '50%';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
+        alertDiv.appendChild(document.createTextNode(message));
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'btn-close';
+        closeButton.setAttribute('data-bs-dismiss', 'alert');
+        closeButton.setAttribute('aria-label', 'Close');
+        alertDiv.appendChild(closeButton);
         document.body.appendChild(alertDiv);
 
         // Auto remove after 3 seconds
@@ -890,6 +956,24 @@
                 alertDiv.remove();
             }
         }, 3000);
+    }
+
+    function reloadDashboardSection(sectionId, message) {
+        sessionStorage.setItem('adminDashboardReturnSection', sectionId);
+        sessionStorage.setItem('adminDashboardReturnMessage', message);
+        location.reload();
+    }
+
+    const returnSection = sessionStorage.getItem('adminDashboardReturnSection');
+    const returnMessage = sessionStorage.getItem('adminDashboardReturnMessage');
+    sessionStorage.removeItem('adminDashboardReturnSection');
+    sessionStorage.removeItem('adminDashboardReturnMessage');
+    if (returnSection === 'manage-categories' || returnSection === 'manage-tags') {
+        const sectionTab = document.querySelector(
+            `#adminSidebar a[href="#${returnSection}"]`
+        );
+        if (sectionTab) bootstrap.Tab.getOrCreateInstance(sectionTab).show();
+        if (returnMessage) showAlert('success', returnMessage);
     }
 
         // Generic AJAX POST Helper
@@ -970,11 +1054,9 @@
                         'description': desc,
                         'icon': icon
                     }, function (data) {
-                        showAlert('success', data.message);
-                        // Close modal and reload
                         const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
                         modal.hide();
-                        location.reload();
+                        reloadDashboardSection('manage-categories', data.message);
                     }, function () {
                         saveAddCategoryBtn.disabled = false;
                         saveAddCategoryBtn.textContent = 'ذخیره';
@@ -1024,7 +1106,11 @@
                         }, function (data) {
                             showAlert('success', data.message);
                             // Update row content dynamically
-                            const row = document.querySelector(`button[data-id="${document.getElementById('editCatId').value}"]`).closest('tr');
+                            const categoryId = document.getElementById('editCatId').value;
+                            const categoryButton = document.querySelector(
+                                `#manage-categories button[data-id="${categoryId}"]`
+                            );
+                            const row = categoryButton?.closest('tr');
                             if (row) {
                                 row.querySelector('td strong').textContent = data.updated_name;
                                 const iconCell = row.querySelector('td i');
@@ -1093,11 +1179,9 @@
                     sendAjaxRequest("{% url 'add_tag_ajax' %}", {
                         'tag_name': tagName
                     }, function (data) {
-                        showAlert('success', data.message);
-                        // Close modal and reload
                         const modal = bootstrap.Modal.getInstance(document.getElementById('addTagModal'));
                         modal.hide();
-                        location.reload();
+                        reloadDashboardSection('manage-tags', data.message);
                     }, function () {
                         saveAddTagBtn.disabled = false;
                         saveAddTagBtn.textContent = 'ذخیره';
@@ -1143,7 +1227,9 @@
 
                                 // Update the row in the table
                                 // Find the row that contains the button with this specific ID
-                                const buttonRow = document.querySelector(`button[data-id="${id}"]`);
+                                const buttonRow = document.querySelector(
+                                    `#manage-tags button[data-id="${id}"]`
+                                );
                                 if (buttonRow) {
                                     const row = buttonRow.closest('tr');
                                     if (row) {

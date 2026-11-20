@@ -1,24 +1,22 @@
 {% load static %}
-{% block head %}
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <meta name="description" content="" />
 <meta name="author" content="" />
-<title>{{ title }}</title>
+<meta name="csrf-token" content="{{ csrf_token }}" />
 <!-- Favicon-->
-<link rel="icon" type="image/x-icon" href="{% static '/images/icon.png' %}" />
+<link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/icon.png' %}?v=1" />
+<script src="{% static 'js/theme.js' %}"></script>
 
 <!-- jQuery (load first) -->
-<script type="text/javascript" src="{% static '/js/jquery.min.js' %}"></script>
-
-<!-- Bootstrap JS -->
-<script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/jquery.min.js' %}"></script>
 
 <!-- Stylesheets -->
-<link rel="stylesheet" href="{% static '/css/all.min.css' %}">
-<link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
-<link rel="stylesheet" href="{% static '/css/jquery-ui.min.css' %}">
-<link href="{% static '/css/styles.css' %}" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'css/Vazirmatn-Variable-font-face.css' %}">
+<link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap.rtl.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom.css' %}?v=2">
 
 <style>
     /* ========================
@@ -68,6 +66,7 @@
     body {
         background-color: var(--bg-primary) !important;
         color: var(--text-primary) !important;
+        font-family: 'Vazirmatn', Tahoma, sans-serif;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
 
@@ -273,13 +272,3 @@
         z-index: 1050 !important;
     }
 </style>
-
-<!-- Initialize Theme (Prevent Flash) -->
-<script>
-    (function () {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    })();
-</script>
-
-{% endblock head %}

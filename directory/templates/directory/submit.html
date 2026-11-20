@@ -1,4 +1,5 @@
 {% extends 'directory/base.html' %}
+{% load static %}
 {% block title %}ثبت وب‌سایت - راهنمای وب ایران{% endblock %}
 
 {% block content %}
@@ -47,17 +48,22 @@
 
                     <!-- ✅ Section 2: Accordion Toggle -->
                     <div class="accordion-details mb-3">
-                        <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light toggle-btn"
-                            id="toggleDetailsBtn">
+                        <button type="button"
+                            class="d-flex align-items-center justify-content-between p-2 rounded bg-light toggle-btn w-100 text-start"
+                            id="toggleDetailsBtn" aria-expanded="{% if form.custom_slug.errors or form.category.errors or form.tags_input.errors or form.description.errors or form.owner_name.errors or form.owner_email.errors %}true{% else %}false{% endif %}"
+                            aria-controls="extraDetails">
                             <span class="text-primary fw-bold">
                                 <i class="bi bi-chevron-double-down me-1"></i>
                                 افزودن جزئیات بیشتر (اختیاری)
                             </span>
-                            <i class="bi bi-chevron-expand text-primary" id="toggleIcon"></i>
-                        </div>
+                            <i class="bi {% if form.custom_slug.errors or form.category.errors or form.tags_input.errors or form.description.errors or form.owner_name.errors or form.owner_email.errors %}bi-chevron-up{% else %}bi-chevron-expand{% endif %} text-primary"
+                                id="toggleIcon" aria-hidden="true"></i>
+                        </button>
 
                         <!-- Hidden Details Section -->
-                        <div id="extraDetails" class="extra-details d-none mt-3">
+                        <div id="extraDetails"
+                            class="extra-details mt-3{% if not form.custom_slug.errors and not form.category.errors and not form.tags_input.errors and not form.description.errors and not form.owner_name.errors and not form.owner_email.errors %} d-none{% endif %}"
+                            {% if not form.custom_slug.errors and not form.category.errors and not form.tags_input.errors and not form.description.errors and not form.owner_name.errors and not form.owner_email.errors %}hidden{% endif %}>
                             <!-- Custom Slug -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold">
@@ -106,6 +112,11 @@
                             </div>
 
                             <!-- Owner Info -->
+                            {% if user.is_authenticated %}
+                            <p class="text-muted small">
+                                مشخصات ثبت‌کننده از حساب کاربری شما ثبت می‌شود.
+                            </p>
+                            {% else %}
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">
@@ -128,6 +139,7 @@
                                     {% endif %}
                                 </div>
                             </div>
+                            {% endif %}
 
                             <!-- Hide Owner Info -->
                             <div class="form-check mb-3">
@@ -341,25 +353,8 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/submit-details.js' %}" defer></script>
 <script>
-    // ==========================================
-    // Accordion Toggle Functionality
-    // ==========================================
-    const toggleBtn = document.getElementById('toggleDetailsBtn');
-    const extraDetails = document.getElementById('extraDetails');
-    const toggleIcon = document.getElementById('toggleIcon');
-
-    toggleBtn.addEventListener('click', function () {
-        extraDetails.classList.toggle('d-none');
-        toggleBtn.classList.toggle('active');
-
-        if (extraDetails.classList.contains('d-none')) {
-            toggleIcon.className = 'bi bi-chevron-expand text-primary';
-        } else {
-            toggleIcon.className = 'bi bi-chevron-up text-primary';
-        }
-    });
-
     // ==========================================
     // Tag Suggestion Functionality (Preserved)
     // ==========================================

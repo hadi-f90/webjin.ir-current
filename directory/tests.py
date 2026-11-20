@@ -5,6 +5,7 @@ from decimal import Decimal
 from django.test import override_settings
 from django.test import TestCase, Client, override_settings
 from django.contrib.auth.models import User, Permission
+from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.conf import settings
 from django.core.management import call_command
@@ -966,6 +967,38 @@ class SubmitWebsiteViewTests(TestCase):
         """Test GET request shows form."""
         response = self.client.get(reverse('submit_website'))
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="id_owner_name"')
+        self.assertContains(response, 'id="id_owner_email"')
+
+    def test_submit_view_hides_owner_fields_for_authenticated_user(self):
+        user = User.objects.create_user(
+            'testuser',
+            'test@test.com',
+            'pass123',
+            first_name='Test',
+            last_name='User',
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('submit_website'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'id="id_owner_name"')
+        self.assertNotContains(response, 'id="id_owner_email"')
+        self.assertContains(response, 'مشخصات ثبت‌کننده از حساب کاربری شما ثبت می‌شود.')
+
+    @patch('captcha.fields.CaptchaField.clean', return_value='PASSED')
+    def test_submit_validation_opens_details_when_optional_field_has_error(self, mock_clean):
+        response = self.client.post(reverse('submit_website'), {
+            'title': 'Invalid Contact Site',
+            'url': 'https://invalid-contact.example',
+            'owner_email': 'not-an-email',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('owner_email', response.context['form'].errors)
+        self.assertContains(response, 'aria-expanded="true"')
+        self.assertNotContains(response, 'id="extraDetails" class="extra-details mt-3 d-none"')
 
     @patch('captcha.fields.CaptchaField.clean')
     def test_submit_view_post_valid(self, mock_clean):
@@ -996,16 +1029,26 @@ class SubmitWebsiteViewTests(TestCase):
     def test_submit_view_associates_user(self, mock_clean):
         """Test logged-in user's website is associated."""
         mock_clean.return_value = 'PASSED'
-        User.objects.create_user('testuser', 'test@test.com', 'pass123')
+        User.objects.create_user(
+            'testuser',
+            'test@test.com',
+            'pass123',
+            first_name='Test',
+            last_name='User',
+        )
         self.client.login(username='testuser', password='pass123')
 
         self.client.post(reverse('submit_website'), {
             'title': 'User Site',
             'url': 'https://usersite.com',
+            'owner_name': 'Forged Name',
+            'owner_email': 'not-an-email',
         })
 
         website = Website.objects.first()
         self.assertEqual(website.created_by.username, 'testuser')
+        self.assertEqual(website.owner_name, 'Test User')
+        self.assertEqual(website.owner_email, 'test@test.com')
 
 
 class EditWebsiteViewTests(TestCase):
@@ -1111,6 +1154,107 @@ class AuthenticationViewTests(TestCase):
 
         response = self.client.get(reverse('logout'))
         self.assertRedirects(response, reverse('index'))
+
+
+class AuthenticationAjaxFeedbackTests(TestCase):
+    """Regression coverage for AJAX auth feedback and regular POST behavior."""
+
+    def test_signup_ajax_success_returns_redirect_and_queues_message(self):
+        response = self.client.post(
+            reverse('register'),
+            {
+                'username': 'ajaxsignup',
+                'password1': 'N3w!Long-Auth-Pass-91',
+                'password2': 'N3w!Long-Auth-Pass-91',
+            },
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        payload = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload['status'], 'success')
+        self.assertEqual(payload['redirect'], reverse('index'))
+        self.assertTrue(payload['message'])
+        self.assertTrue(User.objects.filter(username='ajaxsignup').exists())
+        queued_messages = list(get_messages(response.wsgi_request))
+        self.assertEqual([message.message for message in queued_messages], [payload['message']])
+
+    def test_signup_ajax_validation_errors_use_field_message_lists(self):
+        response = self.client.post(
+            reverse('register'),
+            {
+                'username': 'ajaxsignup',
+                'password1': 'N3w!Long-Auth-Pass-91',
+                'password2': 'Different-Password-91!',
+            },
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        payload = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(payload['status'], 'error')
+        self.assertEqual(payload['message'], 'لطفاً اطلاعات را به درستی وارد کنید.')
+        self.assertIn('password2', payload['errors'])
+        self.assertIsInstance(payload['errors']['password2'], list)
+        self.assertTrue(payload['errors']['password2'])
+        self.assertFalse(User.objects.filter(username='ajaxsignup').exists())
+
+    def test_signup_html_post_rerenders_invalid_form(self):
+        response = self.client.post(
+            reverse('register'),
+            {
+                'username': 'htmlsignup',
+                'password1': 'N3w!Long-Auth-Pass-91',
+                'password2': 'Different-Password-91!',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('password2', response.context['form'].errors)
+        self.assertFalse(User.objects.filter(username='htmlsignup').exists())
+
+    def test_login_ajax_invalid_credentials_returns_non_field_error(self):
+        User.objects.create_user(
+            username='existinguser',
+            password='N3w!Long-Auth-Pass-91',
+        )
+
+        response = self.client.post(
+            reverse('login'),
+            {'username': 'existinguser', 'password': 'wrong-password'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        payload = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(payload['status'], 'error')
+        self.assertIn('__all__', payload['errors'])
+        self.assertIsInstance(payload['errors']['__all__'], list)
+        self.assertTrue(payload['errors']['__all__'])
+
+    def test_login_ajax_missing_credentials_returns_field_errors(self):
+        response = self.client.post(
+            reverse('login'),
+            {},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        payload = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(payload['status'], 'error')
+        self.assertIn('username', payload['errors'])
+        self.assertIn('password', payload['errors'])
+        self.assertIsInstance(payload['errors']['username'], list)
+        self.assertIsInstance(payload['errors']['password'], list)
+
+    def test_login_html_post_invalid_credentials_rerenders_form(self):
+        response = self.client.post(
+            reverse('login'),
+            {'username': 'missing-user', 'password': 'wrong-password'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['form'].non_field_errors())
 
 
 class UserDashboardViewTests(TestCase):
