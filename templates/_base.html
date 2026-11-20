@@ -1,42 +1,36 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <![endif]-->
 {% load static %}
 {% load farsi_tags %}
-
-<html lang="fa">
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
 
 <head>
     {% include "_head.html" %}
+    <title>{% block title %}{{ title|default:"وب‌جین: راهنمای وب ایران" }}{% endblock %}</title>
     {% include "_ads.html" %}
-    {% block head %}
-    {% endblock head %}
+    {% block head %}{% endblock %}
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-    <main class="flex-shrink-0">
-        {% include "_navbar.html" %}
+    {% include "_navbar.html" %}
 
-        {% block content %}
-        {% endblock content %}
+    <main class="flex-shrink-0 {% block main_class %}{% endblock %}">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
 
-        {% include "_ads.html" %}
-
-        {% include "_footer.html" %}
-        <!--[if lt IE 7]>
-                <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-            <![endif]-->
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Initialize Theme on Page Load (Prevent Flash) -->
-    <script>
-        (function () {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        })();
-    </script>
+    {% include "_footer.html" %}
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 
 </html>
