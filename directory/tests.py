@@ -1714,6 +1714,74 @@ class AjaxReportEndpointTests(TestCase):
         self.assertTrue(self.report.is_resolved)
 
 
+class StaffAjaxCsrfTests(TestCase):
+    """Tests CSRF enforcement for staff AJAX endpoints."""
+
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            'admin', 'admin@test.com', 'pass123', is_staff=True
+        )
+        self.user = User.objects.create_user('user', 'user@test.com', 'pass123')
+        self.category = Category.objects.create(name='Test Category', slug='test-category')
+        self.website = Website.objects.create(
+            title='Test Site',
+            url='https://example.com',
+            status='pending',
+            category=self.category,
+            created_by=self.user,
+        )
+        self.report = Report.objects.create(
+            website=self.website,
+            user=self.user,
+            report_type='broken',
+        )
+        self.tag = Tag.objects.create(name='Test Tag', slug='test-tag')
+        self.client = Client(enforce_csrf_checks=True)
+        self.client.force_login(self.admin)
+
+    def test_staff_ajax_endpoints_reject_posts_without_csrf_token(self):
+        endpoints = [
+            ('approve_website', {'pk': self.website.pk}, {}),
+            ('reject_website_ajax', {'pk': self.website.pk}, {}),
+            ('delete_website_ajax', {'pk': self.website.pk}, {}),
+            ('update_website_status_ajax', {'pk': self.website.pk}, {'status': 'approved'}),
+            (
+                'edit_website_ajax',
+                {'pk': self.website.pk},
+                {'title': 'Updated', 'url': 'https://updated.example.com'},
+            ),
+            ('resolve_report_ajax', {'pk': self.report.pk}, {}),
+            ('add_category_ajax', {}, {'name': 'New Category'}),
+            ('edit_category_ajax', {'pk': self.category.pk}, {'name': 'Updated Category'}),
+            ('delete_category_ajax', {'pk': self.category.pk}, {}),
+            ('add_tag_ajax', {}, {'tag_name': 'New Tag'}),
+            ('edit_tag_ajax', {'pk': self.tag.pk}, {'name': 'Updated Tag'}),
+            ('delete_tag_ajax', {'pk': self.tag.pk}, {}),
+        ]
+
+        for url_name, kwargs, data in endpoints:
+            with self.subTest(endpoint=url_name):
+                response = self.client.post(reverse(url_name, kwargs=kwargs), data)
+                self.assertEqual(response.status_code, 403)
+
+    def test_admin_dashboard_exposes_csrf_token_for_staff_ajax(self):
+        response = self.client.get(reverse('admin_dashboard'))
+        self.assertEqual(response.status_code, 200)
+
+        match = re.search(
+            r'<meta name="csrf-token" content="([^"]+)"',
+            response.content.decode(),
+        )
+        self.assertIsNotNone(match)
+        self.assertTrue(match.group(1))
+
+        response = self.client.post(
+            reverse('approve_website', kwargs={'pk': self.website.pk}),
+            HTTP_X_CSRFTOKEN=match.group(1),
+        )
+        self.assertEqual(response.status_code, 200)
+
+
 # =============================================================================
 # API/SEARCH TESTS
 # =============================================================================

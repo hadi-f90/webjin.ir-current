@@ -1,14 +1,14 @@
 # WebJin (dirweb.ir / webjin.ir) Development Roadmap
 
-Persian web directory for discovering and submitting Iranian/Farsi websites.  
+Persian web directory for discovering and submitting Iranian/Farsi websites.
 Stack: Django 6, Bootstrap 5 RTL, taggit, django-simple-captcha, django-csp,
 Vazirmatn, Jalali via `farsi` app only (FarsiSaz removed).
 
-See `.ai_files/technical-conventions.md` for locked decisions.  
-See `feature_list.md` for the day-to-day checklist.  
+See `.ai_files/technical-conventions.md` for locked decisions.
+See `feature_list.md` for the day-to-day checklist.
 See `AGENTS.md` for agent onboarding.
 
-**Phase 0 closed:** 2026-08-03 (forms, settings, tags, commands, error URL names, tests green).  
+**Phase 0 closed:** 2026-08-03 (forms, settings, tags, commands, error URL names, tests green).
 **Current focus:** Phase 1 — MWS polish.
 
 ---
@@ -59,12 +59,12 @@ See `AGENTS.md` for agent onboarding.
 - [x] Single public submit path (`submit.html` + `PublicWebsiteSubmitForm`, AJAX + POST fallback)
 - [x] Consistent URL name + success redirect + messaging
 - [x] Tag chips + suggestions on live submit (`/tags/suggestions/`)
-- [ ] Categories reliably available on the active submit form
+- [x] Categories reliably available on the active submit form
 - [ ] Optional: email staff on new pending submission
 
 ### 1.2 Staff / admin dashboard
 
-- [ ] Fix modal / ID mismatches (`editWebsiteModal` vs `editModal`, missing hidden fields for status/delete URLs)
+- [x] Fix modal / ID mismatches (`editWebsiteModal` vs `editModal`, missing hidden fields for status/delete URLs)
 - [x] Resolve-report AJAX wired via confirmStatusModal + hidden action fields
 - [x] Counts in context: `pending_count`, report count, category/tag website counts (lists stay correct)
 - [ ] CSRF on all staff AJAX endpoints verified
@@ -102,8 +102,17 @@ See `AGENTS.md` for agent onboarding.
 
 **Instrumentation (optional in Phase 1):** baseline metrics with `analytics-metrics-agent` so Phase 2 growth is not blind.
 
-**Phase 1 success criteria:**  
+**Phase 1 success criteria:**
 Anonymous submit → pending → staff approve from dashboard (modals work) → site on index with category/tags → user rates/reviews/reports → staff sees report. Navbar and submit path feel finished; no known P0 crashers.
+
+### Recommended Phase 1 execution order
+
+1. Verify CSRF enforcement and token delivery on every staff AJAX endpoint.
+2. Resolve broken legacy modules, WhiteNoise/CSS duplication, stale URL copies, and confirmed junk.
+3. Align owner-edit lifecycle and permission responses (`pending` reset, 302 vs 403, and edit visibility).
+4. Finish essential dashboard and discovery UX (empty states, filter behavior, pagination, owner details, and rate/review/report flow).
+5. Decide whether to add staff notification email, extra table columns, or a rejected reason before implementing those optional items.
+6. Run CI smoke checks and verify production-MySQL/dev-SQLite documentation; close Phase 1 only when the success criteria above pass.
 
 ---
 
@@ -123,6 +132,10 @@ Anonymous submit → pending → staff approve from dashboard (modals work) → 
 - [ ] Error pages fully extend shared directory/base chrome (beyond URL-name fix)
 - [ ] Caching for index category counts / popular tags (LocMem done; Redis optional)
 - [ ] `to_jalali` optional format argument (farsi API polish)
+- [ ] Prefill the contact form's name field for logged-in users
+- [ ] Store and display a website's country with an accessible flag and country name; omit it when unknown
+- [ ] Save and list favorite websites for logged-in users
+- [ ] Add language-model-assisted tag/category suggestions on submission and staff tools for adding/editing tags and categories; staff must review and confirm changes
 - [ ] Ad placement (Yektanet allowed in CSP; card/footer slots without harming CLS)
 - [ ] About / FAQ / Terms / contact response handling / footer completion
 - [ ] Admin view-count or simple statistics columns (if product wants)
@@ -133,18 +146,36 @@ Use **seo-agent**, **business-model-agent**, **growth-agent**, **analytics-metri
 
 ## Phase 3 — Engagement & quality
 
-- [ ] Bookmarks / favorites for logged-in users
 - [ ] “Claim this website” ownership verification (DNS or email domain)
 - [ ] View counts per site (privacy-respecting, no required third-party analytics)
-- [ ] Broken-link / reachability checker management command (periodic; “from Iran” is an ops constraint)
+- [ ] Periodic website availability checker and last-checked status on detail pages; keep checks server-side, SSRF-safe, and account for reachability from Iran
 - [ ] Tag synonyms / merge UI for staff
 - [ ] Public user profiles (optional, privacy-first)
-- [ ] Bulk import UX documented (CSV + optional Firefox/Chromium bookmark export)
-- [ ] Ping / reachability status surfaced on detail (if checker exists)
+- [ ] Import user-exported browser bookmarks (Firefox/Chromium); confirm entries before submitting them
 
 ---
 
 ## Phase 4 — Ops & hardening
+
+### Release1.2 cPanel cutover — 2026-11-20 (deployed; post-deploy verification)
+
+**Status:** The owner reports that Release1.2 is now running at `webjin.ir`. The initial root-domain under-construction page and cPanel “no app” message cleared after waiting for the slow host to complete the cutover. Keep the Phase 4 deployment items open until post-deploy checks and rollback readiness are confirmed.
+
+**Actions completed / observed**
+
+- Confirmed the host offers Python 3.13.5, meeting the project's Python >=3.12 requirement.
+- Transferred Release1.2 manually through cPanel because Git commands were unavailable on the host.
+- Verified the new app under `/beta`, then completed the production update at `webjin.ir`.
+- Observed `migrate --plan` warning `django_check_seo.Page (models.W036)`: MariaDB will not create that package model's conditional unique constraint. This is a warning, not proof that the WebJin migrations failed.
+- During troubleshooting, the app-root `.env` shown had `DEBUG=True` and loopback-only `DJANGO_ALLOWED_HOSTS`. `passenger_wsgi.py` loads `.env` with `override=True`; confirm production values were corrected. A Django secret was exposed during troubleshooting and must be rotated if that has not already been done. Do not record its value here.
+
+**Remaining actions**
+
+1. Verify the live app reports `DEBUG=False`, the correct production `ALLOWED_HOSTS`, and the intended MySQL backend/database; confirm `.env` and cPanel variables do not conflict.
+2. Rotate the exposed Django secret if not already rotated, and keep it outside the upload archive and repository.
+3. Confirm a fresh production MySQL backup exists and review the applied migration state. Decide whether the SEO package's unsupported conditional constraint is acceptable or needs follow-up.
+4. Smoke-test the live root domain and any aliases, static assets, captcha submission, login/registration, contact form, and staff dashboard. Check Passenger logs after the host has had time to settle.
+5. Preserve the Release1.1 files and rollback instructions until Release1.2 is stable. Record the final cPanel app/domain mapping and manual upload procedure; close Phase 4 deployment items only after the checks pass.
 
 - [ ] CI: migrate + test + `check --deploy` on every PR
 - [ ] Staging environment with production-like env vars
@@ -161,16 +192,16 @@ Use **seo-agent**, **business-model-agent**, **growth-agent**, **analytics-metri
 submit → pending → approved | rejected
 ```
 
-- Public index/detail: `status='approved'` only  
-- Tags via taggit; categories are flat (no nested trees)  
-- Dates: Gregorian in DB; Jalali only in templates  
+- Public index/detail: `status='approved'` only
+- Tags via taggit; categories are flat (no nested trees)
+- Dates: Gregorian in DB; Jalali only in templates
 
 ## AJAX contract (locked)
 
-- Staff: `require_POST` + `staff_member_required`  
-- JSON: `{"status": "success"|"error", "message": "...", ...}`  
-- CSRF: cookie / meta + `X-CSRFToken`  
-- Progressive enhancement preferred  
+- Staff: `require_POST` + `staff_member_required`
+- JSON: `{"status": "success"|"error", "message": "...", ...}`
+- CSRF: cookie / meta + `X-CSRFToken`
+- Progressive enhancement preferred
 
 ## Display limits (by design)
 
@@ -220,6 +251,6 @@ Phase 4 remains ops (CI, staging, Sentry, backups) — no new revenue agent requ
 
 ## Branch policy
 
-- Keep `main` and development branch tips aligned after merges  
-- Feature work: short-lived branches → PR into `main`  
-- Do not commit secrets, concatenated dumps, or editor temp files  
+- Keep `main` and development branch tips aligned after merges
+- Feature work: short-lived branches → PR into `main`
+- Do not commit secrets, concatenated dumps, or editor temp files
