@@ -1,9 +1,11 @@
+{% load static %}
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-theme sticky-top shadow-theme">
     <div class="container">
         <!-- Brand -->
         <a class="navbar-brand text-primary fw-bold" href="{% url 'index' %}">
-            <i class="bi bi-link-45deg"></i> وب‌جین: راهنمای وب ایران
+            <img src="{% static 'images/logo-mark.svg' %}" alt="" width="32" height="32"
+                class="align-middle me-2"> وب‌جین: راهنمای وب ایران
         </a>
 
         <!-- Mobile Toggler -->
