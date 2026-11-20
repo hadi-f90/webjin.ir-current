@@ -263,7 +263,12 @@ def submit_website(request):
     categories = Category.objects.all()
 
     if request.method == 'POST':
-        form = PublicWebsiteSubmitForm(request.POST)
+        form_data = request.POST
+        if request.user.is_authenticated:
+            form_data = request.POST.copy()
+            form_data.pop('owner_name', None)
+            form_data.pop('owner_email', None)
+        form = PublicWebsiteSubmitForm(form_data)
         if form.is_valid():
             website = form.save(commit=False)
             website.status = 'pending'
@@ -271,12 +276,10 @@ def submit_website(request):
                 website.description = 'ثبت شده توسط کاربر'
             if request.user.is_authenticated:
                 website.created_by = request.user
-                if not website.owner_name:
-                    website.owner_name = (
-                        request.user.get_full_name() or request.user.username
-                    )
-                if not website.owner_email:
-                    website.owner_email = request.user.email or ''
+                website.owner_name = (
+                    request.user.get_full_name() or request.user.username
+                )
+                website.owner_email = request.user.email or ''
             else:
                 if not website.owner_name:
                     website.owner_name = 'ناشناس'

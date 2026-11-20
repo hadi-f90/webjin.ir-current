@@ -967,6 +967,25 @@ class SubmitWebsiteViewTests(TestCase):
         """Test GET request shows form."""
         response = self.client.get(reverse('submit_website'))
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="id_owner_name"')
+        self.assertContains(response, 'id="id_owner_email"')
+
+    def test_submit_view_hides_owner_fields_for_authenticated_user(self):
+        user = User.objects.create_user(
+            'testuser',
+            'test@test.com',
+            'pass123',
+            first_name='Test',
+            last_name='User',
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('submit_website'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'id="id_owner_name"')
+        self.assertNotContains(response, 'id="id_owner_email"')
+        self.assertContains(response, 'مشخصات ثبت‌کننده از حساب کاربری شما ثبت می‌شود.')
 
     @patch('captcha.fields.CaptchaField.clean')
     def test_submit_view_post_valid(self, mock_clean):
@@ -997,16 +1016,26 @@ class SubmitWebsiteViewTests(TestCase):
     def test_submit_view_associates_user(self, mock_clean):
         """Test logged-in user's website is associated."""
         mock_clean.return_value = 'PASSED'
-        User.objects.create_user('testuser', 'test@test.com', 'pass123')
+        User.objects.create_user(
+            'testuser',
+            'test@test.com',
+            'pass123',
+            first_name='Test',
+            last_name='User',
+        )
         self.client.login(username='testuser', password='pass123')
 
         self.client.post(reverse('submit_website'), {
             'title': 'User Site',
             'url': 'https://usersite.com',
+            'owner_name': 'Forged Name',
+            'owner_email': 'not-an-email',
         })
 
         website = Website.objects.first()
         self.assertEqual(website.created_by.username, 'testuser')
+        self.assertEqual(website.owner_name, 'Test User')
+        self.assertEqual(website.owner_email, 'test@test.com')
 
 
 class EditWebsiteViewTests(TestCase):
