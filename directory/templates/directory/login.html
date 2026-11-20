@@ -1,22 +1,53 @@
 {% extends 'directory/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}ورود - راهنمای وب ایران{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="bi bi-box-arrow-in-left"></i> ورود به حساب</h4>
+                <h1 class="h4 mb-0"><i class="bi bi-box-arrow-in-left" aria-hidden="true"></i> ورود به حساب</h1>
             </div>
-            <div class="card-body">
-                <form method="post">
+            <div class="card-body p-4">
+                <form method="post" action="{% url 'login' %}" id="loginForm"
+                    data-ajax-form="1" data-success-url="{% url 'index' %}">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary w-100">ورود</button>
+
+                    <div class="alert alert-danger{% if not form.errors %} d-none{% endif %}"
+                        data-form-summary data-persistent-alert role="alert" aria-live="assertive" tabindex="-1">
+                        {% if form.errors %}
+                        <p class="mb-1">لطفاً خطاهای زیر را بررسی کنید.</p>
+                        {% for error in form.non_field_errors %}
+                        <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="alert d-none" data-form-status data-persistent-alert role="status" aria-live="polite" tabindex="-1"></div>
+
+                    <div data-field-group="username">
+                        {{ form.username|as_crispy_field }}
+                        <div class="invalid-feedback" id="login-username-feedback"
+                            data-field-feedback hidden></div>
+                    </div>
+                    <div data-field-group="password">
+                        {{ form.password|as_crispy_field }}
+                        <div class="invalid-feedback" id="login-password-feedback"
+                            data-field-feedback hidden></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-2">
+                        <i class="bi bi-box-arrow-in-left me-1" aria-hidden="true"></i> ورود
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth-contact-forms.js' %}" defer></script>
 {% endblock %}

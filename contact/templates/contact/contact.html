@@ -1,31 +1,64 @@
 {% extends '_base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
-{% block title %}Send an email{% endblock %}
+
+{% block title %}تماس با ما - راهنمای وب ایران{% endblock %}
 
 {% block content %}
-<div class="container px-5 my-5">
+<div class="container my-4 my-lg-5">
     <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card border-0 rounded-3 shadow-lg bg-gradient text-light ">
-          <div class="card-body p-4 ">
-              <div class="h1 fw-light text-center">تماس با ما</div>
-                    <form action="." method="post">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h1 class="h4 mb-0">تماس با ما</h1>
+                    <p class="mb-0 mt-1">پیام خود را برای ما بفرستید.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{% url 'contact_page' %}" method="post" id="contactForm"
+                        data-ajax-form="1" data-success-url="{% url 'contact_page' %}">
                         {% csrf_token %}
-                        {{ form | crispy }}
 
-                        <!-- Submit error message -->
-                        <div class="d-none" id="submitErrorMessage">
-                            {% if success_message %}
-                            <div class="text-center text-success mb-3">{{ message }}</div>
-                            {% elif fail_message %}
-                            <div class="text-center text-danger mb-3">{{ message }}</div>
-                            {% else %}
+                        <div class="alert alert-danger{% if not form.errors %} d-none{% endif %}"
+                            data-form-summary data-persistent-alert role="alert" aria-live="assertive" tabindex="-1">
+                            {% if form.errors %}
+                            <p class="mb-1">لطفاً خطاهای زیر را بررسی کنید.</p>
+                            {% for error in form.non_field_errors %}
+                            <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
                             {% endif %}
                         </div>
-                        <div class="d-grid">
-                            <!-- Submit button -->
-                            <input class="btn btn-primary btn-lg" id="submitButton" type="submit" value="ثبت" />
-                                <!-- End of contact form -->
+                        <div class="alert d-none" data-form-status data-persistent-alert role="status" aria-live="polite" tabindex="-1"></div>
+
+                        <div data-field-group="name">
+                            {{ form.name|as_crispy_field }}
+                            <div class="invalid-feedback" id="contact-name-feedback"
+                                data-field-feedback hidden></div>
+                        </div>
+                        <div data-field-group="email">
+                            {{ form.email|as_crispy_field }}
+                            <div class="invalid-feedback" id="contact-email-feedback"
+                                data-field-feedback hidden></div>
+                        </div>
+                        <div data-field-group="subject">
+                            {{ form.subject|as_crispy_field }}
+                            <div class="invalid-feedback" id="contact-subject-feedback"
+                                data-field-feedback hidden></div>
+                        </div>
+                        <div data-field-group="message">
+                            {{ form.message|as_crispy_field }}
+                            <div class="invalid-feedback" id="contact-message-feedback"
+                                data-field-feedback hidden></div>
+                        </div>
+                        <div data-field-group="captcha" class="contact-captcha">
+                            {{ form.captcha|as_crispy_field }}
+                            <div class="invalid-feedback" id="contact-captcha-feedback"
+                                data-field-feedback hidden></div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button class="btn btn-primary btn-lg" id="submitButton" type="submit">
+                                <i class="bi bi-send me-1" aria-hidden="true"></i> ارسال پیام
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -33,11 +66,8 @@
         </div>
     </div>
 </div>
-{% endblock content%}
+{% endblock %}
+
 {% block extra_js %}
-<script type="text/javascript">
-$(function() {
-    $('#id_name').focus()
-});
-</script>
-{% endblock extra_js %}
+<script src="{% static 'js/auth-contact-forms.js' %}" defer></script>
+{% endblock %}
