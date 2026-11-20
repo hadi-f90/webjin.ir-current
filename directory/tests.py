@@ -987,6 +987,19 @@ class SubmitWebsiteViewTests(TestCase):
         self.assertNotContains(response, 'id="id_owner_email"')
         self.assertContains(response, 'مشخصات ثبت‌کننده از حساب کاربری شما ثبت می‌شود.')
 
+    @patch('captcha.fields.CaptchaField.clean', return_value='PASSED')
+    def test_submit_validation_opens_details_when_optional_field_has_error(self, mock_clean):
+        response = self.client.post(reverse('submit_website'), {
+            'title': 'Invalid Contact Site',
+            'url': 'https://invalid-contact.example',
+            'owner_email': 'not-an-email',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('owner_email', response.context['form'].errors)
+        self.assertContains(response, 'aria-expanded="true"')
+        self.assertNotContains(response, 'id="extraDetails" class="extra-details mt-3 d-none"')
+
     @patch('captcha.fields.CaptchaField.clean')
     def test_submit_view_post_valid(self, mock_clean):
         """Test POST with valid data creates website (with mocked captcha)."""

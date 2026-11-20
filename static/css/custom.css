@@ -35,6 +35,31 @@
     transform: rotate(20deg);
 }
 
+.contact-captcha #div_id_captcha fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.contact-captcha #div_id_captcha legend {
+    flex: 0 0 100%;
+    margin-bottom: 0;
+}
+
+.contact-captcha #div_id_captcha img.captcha {
+    flex: 0 0 auto;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+.contact-captcha #div_id_captcha input.captchaanswerinput {
+    flex: 1 1 12rem;
+    width: auto;
+    min-width: min(100%, 12rem);
+}
+
 [data-theme="dark"] #themeToggle {
     color: #6ea8fe;
 }
