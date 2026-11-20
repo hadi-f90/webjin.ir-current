@@ -941,10 +941,13 @@
         alertDiv.className = `alert alert-${type} alert-dismissible fade show dynamic-alert position-fixed top-0 start-50 translate-middle-x mt-3`;
         alertDiv.style.zIndex = '9999';
         alertDiv.style.width = '50%';
-        alertDiv.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
+        alertDiv.appendChild(document.createTextNode(message));
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'btn-close';
+        closeButton.setAttribute('data-bs-dismiss', 'alert');
+        closeButton.setAttribute('aria-label', 'Close');
+        alertDiv.appendChild(closeButton);
         document.body.appendChild(alertDiv);
 
         // Auto remove after 3 seconds
@@ -953,6 +956,24 @@
                 alertDiv.remove();
             }
         }, 3000);
+    }
+
+    function reloadDashboardSection(sectionId, message) {
+        sessionStorage.setItem('adminDashboardReturnSection', sectionId);
+        sessionStorage.setItem('adminDashboardReturnMessage', message);
+        location.reload();
+    }
+
+    const returnSection = sessionStorage.getItem('adminDashboardReturnSection');
+    const returnMessage = sessionStorage.getItem('adminDashboardReturnMessage');
+    sessionStorage.removeItem('adminDashboardReturnSection');
+    sessionStorage.removeItem('adminDashboardReturnMessage');
+    if (returnSection === 'manage-categories' || returnSection === 'manage-tags') {
+        const sectionTab = document.querySelector(
+            `#adminSidebar a[href="#${returnSection}"]`
+        );
+        if (sectionTab) bootstrap.Tab.getOrCreateInstance(sectionTab).show();
+        if (returnMessage) showAlert('success', returnMessage);
     }
 
         // Generic AJAX POST Helper
@@ -1033,11 +1054,9 @@
                         'description': desc,
                         'icon': icon
                     }, function (data) {
-                        showAlert('success', data.message);
-                        // Close modal and reload
                         const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
                         modal.hide();
-                        location.reload();
+                        reloadDashboardSection('manage-categories', data.message);
                     }, function () {
                         saveAddCategoryBtn.disabled = false;
                         saveAddCategoryBtn.textContent = 'ذخیره';
@@ -1087,7 +1106,11 @@
                         }, function (data) {
                             showAlert('success', data.message);
                             // Update row content dynamically
-                            const row = document.querySelector(`button[data-id="${document.getElementById('editCatId').value}"]`).closest('tr');
+                            const categoryId = document.getElementById('editCatId').value;
+                            const categoryButton = document.querySelector(
+                                `#manage-categories button[data-id="${categoryId}"]`
+                            );
+                            const row = categoryButton?.closest('tr');
                             if (row) {
                                 row.querySelector('td strong').textContent = data.updated_name;
                                 const iconCell = row.querySelector('td i');
@@ -1156,11 +1179,9 @@
                     sendAjaxRequest("{% url 'add_tag_ajax' %}", {
                         'tag_name': tagName
                     }, function (data) {
-                        showAlert('success', data.message);
-                        // Close modal and reload
                         const modal = bootstrap.Modal.getInstance(document.getElementById('addTagModal'));
                         modal.hide();
-                        location.reload();
+                        reloadDashboardSection('manage-tags', data.message);
                     }, function () {
                         saveAddTagBtn.disabled = false;
                         saveAddTagBtn.textContent = 'ذخیره';
@@ -1206,7 +1227,9 @@
 
                                 // Update the row in the table
                                 // Find the row that contains the button with this specific ID
-                                const buttonRow = document.querySelector(`button[data-id="${id}"]`);
+                                const buttonRow = document.querySelector(
+                                    `#manage-tags button[data-id="${id}"]`
+                                );
                                 if (buttonRow) {
                                     const row = buttonRow.closest('tr');
                                     if (row) {

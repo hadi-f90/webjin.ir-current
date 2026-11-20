@@ -397,8 +397,27 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'حساب کاربری شما ایجاد شد!')
+            message = 'حساب کاربری شما ایجاد شد!'
+            messages.success(request, message)
+            if _wants_json(request):
+                return JsonResponse({
+                    'status': 'success',
+                    'message': message,
+                    'redirect': reverse('index'),
+                })
             return redirect('index')
+        if _wants_json(request):
+            return JsonResponse(
+                {
+                    'status': 'error',
+                    'message': 'لطفاً اطلاعات را به درستی وارد کنید.',
+                    'errors': {
+                        field: [str(error) for error in errors]
+                        for field, errors in form.errors.items()
+                    },
+                },
+                status=400,
+            )
     else:
         form = UserCreationForm()
     return render(request, 'directory/register.html', {'form': form})
@@ -412,8 +431,27 @@ def user_login(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.success(request, 'خوش آمدید!')
+                message = 'خوش آمدید!'
+                messages.success(request, message)
+                if _wants_json(request):
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': message,
+                        'redirect': reverse('index'),
+                    })
                 return redirect('index')
+        if _wants_json(request):
+            return JsonResponse(
+                {
+                    'status': 'error',
+                    'message': 'لطفاً اطلاعات را به درستی وارد کنید.',
+                    'errors': {
+                        field: [str(error) for error in errors]
+                        for field, errors in form.errors.items()
+                    },
+                },
+                status=400,
+            )
     else:
         form = AuthenticationForm()
     return render(request, 'directory/login.html', {'form': form})
