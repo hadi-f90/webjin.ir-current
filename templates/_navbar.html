@@ -1,4 +1,3 @@
-{% load static %}
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-theme sticky-top shadow-theme">
     <div class="container">
@@ -94,42 +93,3 @@
         </div>
     </div>
 </nav>
-<!-- Theme Toggle Script -->
-<script>
-    (function () {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-
-        document.getElementById('themeToggle').addEventListener('click', function () {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('themeIcon');
-            if (theme === 'dark') {
-                icon.classList.remove('bi-moon-fill');
-                icon.classList.add('bi-sun-fill');
-            } else {
-                icon.classList.remove('bi-sun-fill');
-                icon.classList.add('bi-moon-fill');
-            }
-        }
-    })();
-
-    // Navbar scroll - solid background
-    window.addEventListener('scroll', function () {
-        var navbar = document.querySelector('.navbar');
-        if (navbar) {
-            if (window.scrollY > 10) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        }
-    });
-</script>

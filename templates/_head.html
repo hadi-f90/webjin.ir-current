@@ -6,6 +6,7 @@
 <meta name="csrf-token" content="{{ csrf_token }}" />
 <!-- Favicon-->
 <link rel="icon" type="image/x-icon" href="{% static 'images/icon.png' %}" />
+<script src="{% static 'js/theme.js' %}"></script>
 
 <!-- jQuery (load first) -->
 <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -271,11 +272,3 @@
         z-index: 1050 !important;
     }
 </style>
-
-<!-- Initialize Theme (Prevent Flash) -->
-<script>
-    (function () {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    })();
-</script>
