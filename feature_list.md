@@ -1,6 +1,6 @@
 # Feature list & bug tracker — WebJin (وب‌جین)
 
-**Updated:** 2026-08-03  
+**Updated:** 2026-11-21
 **Phase 0:** complete  
 **Current focus:** Phase 1 — MWS polish  
 
@@ -51,13 +51,16 @@ Full phased detail: `.ai_files/roadmap.md` (restored open items from pre–Phase
 ---
 
 ## Phase 2+ (summary — see roadmap)
-
 - SEO, sitemap, OG, structured data, check-seo
 - Favicon/thumbnail proxy; share buttons; dark mode
 - Product rate limits; approval emails; bulk admin tools
 - Ads placement (Yektanet); About/FAQ/Terms/footer
 - Claim site; bookmarks; view counts; link checker; tag merge
 - CI, staging, Sentry, backups, Passenger docs
+ - TopAI benchmark gaps: Persian assisted discovery, richer listing filters/attributes,
+  category/use-case indexes, sorting and curated lists, verified-listing workflow,
+  listing-update flow, listing comparisons, saved listings, disclosed paid placement,
+  and optional deal/offer alerts
 
 ---
 

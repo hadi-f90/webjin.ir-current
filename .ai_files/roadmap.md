@@ -51,7 +51,6 @@ See `AGENTS.md` for agent onboarding.
 ---
 
 ## Phase 1 — MWS completion (current)
-
 **Goal:** Moderated submission → public discovery loop is polished and safe for daily use.
 
 ### 1.1 Submission UX
@@ -113,6 +112,78 @@ Anonymous submit → pending → staff approve from dashboard (modals work) → 
 4. Finish essential dashboard and discovery UX (empty states, filter behavior, pagination, owner details, and rate/review/report flow).
 5. Decide whether to add staff notification email, extra table columns, or a rejected reason before implementing those optional items.
 6. Run CI smoke checks and verify production-MySQL/dev-SQLite documentation; close Phase 1 only when the success criteria above pass.
+
+## TopAI.tools benchmark gap — 2026-11-21
+
+Benchmark basis: public browsing, search, submit, update, category, and deals experiences on
+TopAI.tools / TopAI.deals. This is a feature-gap roadmap, not a request to copy its visual design,
+content, branding, or external ranking model. Relevance for WebJin must be decided by the
+product, security, and Persian-RTL requirements before implementation.
+
+### 2A — Discovery and finding (Phase 2)
+- [ ] Add a Persian-first assisted discovery search that translates a visitor's task into category,
+  tag, and attribute filters; keep ordinary keyword search available and return an explainable
+  result set rather than relying on an unaudited model-only answer.
+- [ ] Expand directory filters from category/tag to purpose, input, output, audience, platform,
+  pricing, verification, API, open-source status, mobile app, and browser extension where
+  meaningful for a website/listing.
+- [ ] Add a dedicated public category index and use-case landing pages with stable Persian and
+  ASCII URL names, including search, sorting, pagination, and empty states.
+- [ ] Add sorting and discovery presets for recent, popular, highest rated, free, open source,
+  verified, and top 100-style curated lists.
+- [ ] Add editorial/listing badges with explicit, staff-visible rules: free, open source,
+  mobile app, API, browser extension, and verified.
+- [ ] Add a verified-listing review workflow: staff criteria, evidence, verification state,
+  expiry/re-review, and clear public disclosure of what “verified” means.
+- [ ] Add a public listing-update path for owners or submitters, with change review and
+  pending-status behavior consistent with the locked website lifecycle.
+
+### 2B — Listings and trust (Phase 2)
+- [ ] Add listing detail attributes for platforms, pricing model, API availability, data/contact
+  links, screenshots, and optional media with SSRF-safe ingestion and broken-media fallbacks.
+- [ ] Add a factual comparison view for 2–N listings when sufficient, normalized attributes
+  exist; do not present unverified claims or scraped rankings as editorial fact.
+- [ ] Add saved/favorite listings for logged-in users, with private default visibility and easy
+  removal.
+- [ ] Add a public “update listing” notice/status and staff-confirmed owner claim workflow.
+- [ ] Publish FAQ, terms, privacy, submission policy, verification policy, deal disclosure,
+  and advertising disclosure in Persian, without broken or fabricated contact claims.
+
+### 2C — Monetization and offers (Phase 2, gated by business/analytics specs)
+- [ ] Add clearly disclosed paid submission tracks such as priority review or featured listing,
+  after capacity, pricing, refund, and editorial-review policy are defined.
+- [ ] Keep featured placement visibly labeled and enforce one or more standard slots by policy,
+  avoiding ad-like rankings in ordinary relevance/order.
+- [ ] Add homepage/category/search placement boosts with an auditable campaign, start/end time,
+  budget/fee state, disclosure, and staff controls.
+- [ ] Add a deal/offer module: official offer, expiration, discount code, disclosure, staff
+  approval, alert subscription, and a user-requested-deal queue.
+- [ ] Separate paid placement analytics from organic popularity metrics; never alter a site's
+  rating, reviews, or organic relevance solely because it is paid.
+
+### 3A — Personalization and content (Phase 3)
+- [ ] Add “for you” recommendations only after consent/privacy and recommendation quality rules;
+  first implement anonymous, explainable recommendations based on category/tag/attributes.
+- [ ] Add importable browser bookmarks and confirm matching/new submission records in a review
+  step, preserving the existing pending lifecycle.
+- [ ] Add Persian AI-tools/user guides and use-case hubs with sitemap and structured navigation.
+- [ ] Add periodic availability and metadata checks with privacy, SSRF, timeout, and Iran
+  reachability safeguards; expose only an accurate “last checked” status.
+- [ ] Add alert preferences for new listings, category updates, deal updates, and claimed-owner
+  changes, with unsubscribe and rate limiting.
+
+### Benchmark acceptance gates
+1. No TopAI.tools or TopAI.deals clone: names, URLs, copy, layout, ranking, badge claims, and
+   monetization disclosures must be original and suitable for WebJin.
+2. No feature may silently change the locked `pending → approved | rejected` lifecycle.
+3. Assisted search may use model-assisted query expansion only as a retrieval aid; it must not
+   invent listings, attributes, verification, ratings, or availability.
+4. Verified, open source, free, API, mobile, and browser-extension labels require a source/evidence
+   field or explicit staff-confirmed editorial status.
+5. Any deal or paid submission remains optional, disclosed, reversible, and separated from organic
+   ranking/relevance.
+6. Before implementation, run product requirements, naming-law, security, testing, Persian QA,
+   watchdog, final gate, and documentation in that feature's agreed chain.
 
 ---
 
