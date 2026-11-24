@@ -120,36 +120,38 @@ TopAI.tools / TopAI.deals. This is a feature-gap roadmap, not a request to copy 
 content, branding, or external ranking model. Relevance for WebJin must be decided by the
 product, security, and Persian-RTL requirements before implementation.
 
-### 2A — Discovery and finding (Phase 2)
+### 1A — Core directory and trust foundation (Phase 1)
+- [ ] Add a dedicated public category index and use-case landing pages with stable Persian and
+  ASCII URL names, including search, sorting, pagination, and empty states.
+- [ ] Add a public listing-update path for owners or submitters, with change review and
+  pending-status behavior consistent with the locked website lifecycle.
+- [ ] Add a public “update listing” notice/status and staff-confirmed owner claim workflow.
+- [ ] Publish FAQ, terms, privacy, and submission-policy pages in Persian, without broken or
+  fabricated contact claims.
+- [ ] Add listing detail attributes for core data and contact links, with broken-media fallbacks.
+
+### 2A — Discovery and trust expansion (Phase 2)
 - [ ] Add a Persian-first assisted discovery search that translates a visitor's task into category,
   tag, and attribute filters; keep ordinary keyword search available and return an explainable
   result set rather than relying on an unaudited model-only answer.
 - [ ] Expand directory filters from category/tag to purpose, input, output, audience, platform,
   pricing, verification, API, open-source status, mobile app, and browser extension where
   meaningful for a website/listing.
-- [ ] Add a dedicated public category index and use-case landing pages with stable Persian and
-  ASCII URL names, including search, sorting, pagination, and empty states.
 - [ ] Add sorting and discovery presets for recent, popular, highest rated, free, open source,
   verified, and top 100-style curated lists.
 - [ ] Add editorial/listing badges with explicit, staff-visible rules: free, open source,
   mobile app, API, browser extension, and verified.
 - [ ] Add a verified-listing review workflow: staff criteria, evidence, verification state,
   expiry/re-review, and clear public disclosure of what “verified” means.
-- [ ] Add a public listing-update path for owners or submitters, with change review and
-  pending-status behavior consistent with the locked website lifecycle.
-
-### 2B — Listings and trust (Phase 2)
-- [ ] Add listing detail attributes for platforms, pricing model, API availability, data/contact
-  links, screenshots, and optional media with SSRF-safe ingestion and broken-media fallbacks.
-- [ ] Add a factual comparison view for 2–N listings when sufficient, normalized attributes
-  exist; do not present unverified claims or scraped rankings as editorial fact.
+- [ ] Add factual comparison views for 2–N listings when sufficient, normalized attributes exist;
+  do not present unverified claims or scraped rankings as editorial fact.
 - [ ] Add saved/favorite listings for logged-in users, with private default visibility and easy
   removal.
-- [ ] Add a public “update listing” notice/status and staff-confirmed owner claim workflow.
-- [ ] Publish FAQ, terms, privacy, submission policy, verification policy, deal disclosure,
-  and advertising disclosure in Persian, without broken or fabricated contact claims.
+- [ ] Add listing-detail platforms, pricing-model, API, data/contact links, screenshots, and
+  optional-media fields with SSRF-safe ingestion and broken-media fallbacks.
+- [ ] Publish verification, deal, and advertising disclosure pages in Persian.
 
-### 2C — Monetization and offers (Phase 2, gated by business/analytics specs)
+### 2B — Monetization and offers (Phase 2, gated by business/analytics specs)
 - [ ] Add clearly disclosed paid submission tracks such as priority review or featured listing,
   after capacity, pricing, refund, and editorial-review policy are defined.
 - [ ] Keep featured placement visibly labeled and enforce one or more standard slots by policy,
@@ -171,6 +173,13 @@ product, security, and Persian-RTL requirements before implementation.
   reachability safeguards; expose only an accurate “last checked” status.
 - [ ] Add alert preferences for new listings, category updates, deal updates, and claimed-owner
   changes, with unsubscribe and rate limiting.
+
+### 4A — Advanced scale and optimization (Phase 4)
+- [ ] Promote the benchmark features to Phase 4 only after measurable Phase 2–3 adoption:
+  scale assisted discovery, optimize recommendation quality, add campaign reporting depth,
+  and expand availability-monitoring capacity.
+- [ ] Keep all advanced additions opt-in and reversible; do not change organic ranking,
+  ratings, reviews, the moderation lifecycle, or public disclosure requirements.
 
 ### Benchmark acceptance gates
 1. No TopAI.tools or TopAI.deals clone: names, URLs, copy, layout, ranking, badge claims, and

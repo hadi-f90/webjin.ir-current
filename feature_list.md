@@ -78,3 +78,39 @@ No app-level max tags per website.
 **Phase 3:** partnerships-bd, lifecycle-crm  
 
 See `.ai_files/roadmap.md` § Agent skills — profitability track.
+## TopAI.tools benchmark gap phase mapping
+
+### Phase 1
+- [ ] Dedicated public category index and use-case landing pages
+- [ ] Public listing-update path for owners or submitters
+- [ ] Public update-listing notice and staff-confirmed owner claim workflow
+- [ ] Persian FAQ, terms, privacy, and submission-policy pages
+- [ ] Core listing-detail attributes and contact links
+
+### Phase 2
+- [ ] Persian-first assisted discovery search
+- [ ] Extended directory filters and sorting presets
+- [ ] Editorial and verified-listing badges
+- [ ] Verified-listing review workflow
+- [ ] Listing comparison view
+- [ ] Saved/favorite listings
+- [ ] Listing screenshots and SSRF-safe optional media
+- [ ] Verification, deal, and advertising disclosure pages
+- [ ] Paid submission tracks
+- [ ] Visibly labeled featured placement
+- [ ] Auditable placement campaigns
+- [ ] Deal/offer module
+- [ ] Separation of paid-placement and organic analytics
+
+### Phase 3
+- [ ] Consent-based personalized recommendations
+- [ ] Browser-bookmark import review
+- [ ] Persian AI-tools and use-case guides
+- [ ] Safe periodic availability and metadata checks
+- [ ] Category, listing, deal, and owner-change alerts
+
+### Phase 4
+- [ ] Scale assisted discovery after Phase 2–3 evidence
+- [ ] Optimize recommendation quality and reporting depth
+- [ ] Expand availability-monitoring capacity
+
