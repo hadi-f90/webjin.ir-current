@@ -1406,6 +1406,10 @@ class UserDashboardViewTests(TestCase):
         self.assertEqual(self.website.deletion_reason, 'No longer maintained')
         self.assertIsNotNone(self.website.deleted_at)
         self.assertEqual(self.website.status, Website.STATUS_APPROVED)
+        self.assertEqual(
+            [str(message) for message in get_messages(response.wsgi_request)],
+            ['وب‌سایت از فهرست اصلی شما حذف شد.'],
+        )
         self.assertRedirects(response, reverse('user_dashboard'))
 
     def test_owner_can_restore_website_they_deleted(self):

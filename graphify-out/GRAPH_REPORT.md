@@ -1,7 +1,7 @@
 # Graph Report - webjin.ir-current  (2026-11-24)
 
 ## Corpus Check
-- 337 files · ~2,458,541 words
+- 337 files · ~2,458,599 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 767 file(s) not represented in the graph (top: .gz 452, .css 131, .woff2 58)
 - WARNING: 767 of 1245 files seen (62%) have no supported extractor and are missing from this graph entirely. It may look complete while representing only part of the codebase.
@@ -12,7 +12,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `05762a5c`
+- Built from commit: `8c5b7b1b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -557,10 +557,10 @@
 10. `Pe` - 40 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `User Stories` --references--> `Website`  [INFERRED]
-  .ai_files/specs/website-submission.md → directory/models.py
 - `1.1 Submission UX` --references--> `PublicWebsiteSubmitForm`  [INFERRED]
   .ai_files/roadmap.md → directory/forms.py
+- `User Stories` --references--> `Website`  [INFERRED]
+  .ai_files/specs/website-submission.md → directory/models.py
 - `Decision matrix — residual items (from 2026-08-02 audit)` --references--> `to_jalali()`  [INFERRED]
   .ai_files/roadmap.md → farsi/templatetags/farsi_tags.py
 - `Register (seed, from the repo snapshot)` --references--> `to_jalali()`  [INFERRED]
@@ -1672,15 +1672,15 @@ Nodes (5): Assumptions, Out of Scope, Problem Statement, Spec: User Accounts & D
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `ci()` connect `Si` to `Si`, `staticfiles/js/bootstrap.bundle.min.js`, `pi`?**
-  _High betweenness centrality (0.019) - this node is a cross-community bridge._
+  _High betweenness centrality (0.020) - this node is a cross-community bridge._
 - **Should `htmx.2.0.8.min.js` be split into smaller, more focused modules?**
   _Cohesion score 0.07690925426774484 - nodes in this community are weakly interconnected._
 - **Why does `fi` connect `Si` to `static/js/bootstrap.bundle.min.js`, `bi`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+  _High betweenness centrality (0.015) - this node is a cross-community bridge._
 - **Should `htmx.2.0.8.min.d073ff63d1ed.js` be split into smaller, more focused modules?**
   _Cohesion score 0.07690925426774484 - nodes in this community are weakly interconnected._
-- **Why does `Ne()` connect `Me` to `jquery.min (copy).js`, `jquery.min (copy).8fb8fee4fcc3.js`, `jquery/jquery.min.js`, `staticfiles/js/bootstrap.bundle.min.js`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Why does `ae()` connect `bootstrap.bundle.min.46f7b49f1198.js` to `htmx.2.0.8.min.js`, `htmx.2.0.8.min.d073ff63d1ed.js`, `._queueCallback`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Should `static/js/bootstrap.bundle.js` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `staticfiles/js/bootstrap.bundle.js` be split into smaller, more focused modules?**

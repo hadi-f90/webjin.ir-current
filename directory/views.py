@@ -547,7 +547,7 @@ def delete_my_website(request, pk):
         is_deleted=False,
     )
     _soft_delete_website(website, request.user, request.POST.get('deletion_reason'))
-    messages.success(request, 'وب‌سایت به بخش حذف‌شده‌ها منتقل شد.')
+    messages.success(request, 'وب‌سایت از فهرست اصلی شما حذف شد.')
     return redirect('user_dashboard')
 
 

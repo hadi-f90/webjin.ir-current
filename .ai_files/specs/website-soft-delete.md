@@ -22,6 +22,7 @@ Owners and staff need to remove websites from public discovery without permanent
      - [ ] An owner can restore a website only when that owner moved it to trash.
      - [ ] An owner cannot restore a website moved to trash by staff.
      - [ ] The owner and staff can view a trashed detail page and its deletion reason; other visitors cannot.
+     - [ ] After owner deletion, the dashboard says `وب‌سایت از فهرست اصلی شما حذف شد.` without claiming permanent erasure.
 
 ## In Scope / Out of Scope
 - In scope: reversible website deletion, actor/time/reason metadata, owner and staff trash views, restore permissions, and excluding trash from public discovery.
@@ -45,3 +46,4 @@ Owners and staff need to remove websites from public discovery without permanent
 
 ## Revision Notes
 - 2026-11-24: Owner decision: use soft deletion with an optional reason; staff can restore any record, while an owner can restore only a record that owner deleted. Record the deleting user.
+- 2026-11-24: Owner-facing confirmation uses concise, accurate wording that describes removal from the main list without exposing implementation terminology or claiming permanent erasure.
