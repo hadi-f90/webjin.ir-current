@@ -6,9 +6,10 @@ Staff need a single dashboard to approve, reject, edit, and manage categories/ta
 ## User Stories
 1. As staff, I want to list pending websites and approve/reject/delete them via AJAX.
    - Acceptance criteria:
-     - [ ] Non-staff get redirect (302) away from dashboard
+     - [ ] Non-staff get redirect (302) away from the dashboard page
      - [ ] Staff see pending titles
      - [ ] AJAX endpoints return `{status, message, ...}` JSON
+     - [ ] Anonymous and non-staff POSTs to staff AJAX endpoints return HTTP 403 JSON
 2. As staff, I want edit/status modals to use matching DOM IDs and CSRF headers.
 3. As staff, I want accurate pending and report counts.
 
@@ -25,4 +26,4 @@ Staff need a single dashboard to approve, reject, edit, and manage categories/ta
 - `staff_member_required` / `user_passes_test(is_admin)` gating
 
 ## Open Questions
-- Soft-delete vs rejected-reason field (product decision still open on roadmap)
+- Soft-delete trash and restore behavior is specified in `website-soft-delete.md`.

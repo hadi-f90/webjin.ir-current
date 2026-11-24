@@ -14,6 +14,8 @@ Visitors and registered users need one reliable way to submit a website for mode
    - Acceptance criteria:
      - [ ] `fetch` with `X-Requested-With: XMLHttpRequest` returns JSON `{status, message, redirect?|errors?}`
      - [ ] Success redirects to `success` URL
+     - [ ] Tag suggestions and chips render tag names as text, not executable markup
+     - [ ] Inline submit scripts use the CSP nonce without allowing `'unsafe-inline'`
 3. As a registered user, I want my account linked as `created_by` and owner fields prefilled when empty.
 
 ## In Scope

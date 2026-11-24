@@ -1,18 +1,18 @@
 # Graph Report - webjin.ir-current  (2026-11-24)
 
 ## Corpus Check
-- 335 files · ~2,456,169 words
+- 337 files · ~2,458,541 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 767 file(s) not represented in the graph (top: .gz 452, .css 131, .woff2 58)
-- WARNING: 767 of 1243 files seen (62%) have no supported extractor and are missing from this graph entirely. It may look complete while representing only part of the codebase.
+- WARNING: 767 of 1245 files seen (62%) have no supported extractor and are missing from this graph entirely. It may look complete while representing only part of the codebase.
 
 ## Summary
-- 10943 nodes · 20964 edges · 723 communities (271 shown, 452 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 828 edges (avg confidence: 0.86)
+- 10988 nodes · 21028 edges · 721 communities (273 shown, 448 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 831 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `9b4aa0ea`
+- Built from commit: `05762a5c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -77,7 +77,7 @@
 - jquery.12e87d2f3a4c.js
 - Pe
 - Pe
-- directory/admin.py
+- RatingModelTests
 - Website
 - WebsiteSubmitForm
 - static/js/bootstrap.js
@@ -98,7 +98,7 @@
 - TemplateFactory
 - TemplateFactory
 - ._queueCallback
-- SubmitWebsiteViewTests
+- QuickSubmitForm
 - Si
 - Modal
 - Modal
@@ -112,7 +112,7 @@
 - Modal
 - staticfiles/js/bootstrap.min.js
 - Ze
-- preventOverflow
+- getWindow
 - Modal
 - Si
 - Ln
@@ -181,7 +181,7 @@
 - Offcanvas
 - Offcanvas
 - TemplateFactory
-- Offcanvas
+- ti
 - Qn
 - Offcanvas
 - Offcanvas
@@ -294,7 +294,7 @@
 - getCanonicalIcon
 - getCanonicalIcon
 - Collapse
-- addHandler
+- Feature list & bug tracker — WebJin (وب‌جین)
 - Collapse
 - pt
 - qt
@@ -307,7 +307,7 @@
 - getCanonicalIcon
 - getCanonicalIcon
 - persian_list
-- QuickSubmitForm
+- Swipe
 - U
 - Swipe
 - Backdrop
@@ -424,9 +424,9 @@
 - replaceForPosition
 - Spec: Preserve Admin Category and Tag Section
 - Django Backend
-- RatingModelTests
-- RatingViewTests
-- ReportViewTests
+- Swipe
+- Me
+- CategoryModelTests
 - SearchSuggestionsTests
 - Animation
 - Information about icons in this directory
@@ -440,23 +440,22 @@
 - Spec: Authentication and Contact Form UX
 - Spec: Staff Moderation Dashboard
 - Spec: Website Edit Permissions and Approval Lifecycle
-- Security
-- PerformanceTests
-- Ei
+- RatingViewTests
+- Ie
+- Spec: Website Trash
 - Ut
 - static/js/brands.min.js
 - domManip
 - Ei
-- Persian QA
+- ReportViewTests
 - staticfiles/js/brands.min.js
 - brands.min.ab3eeaf8c702.js
 - domManip
 - domManip
-- PublicWebsiteSubmitForm
-- TagSuggestionsTests
-- ContactFormFeedbackTests
+- StaticPagesTests
+- Ei
+- ReportModelTests
 - Spec: Ratings & Reviews
-- ReviewViewTests
 - generateMutation
 - generateMutation
 - Animation
@@ -471,7 +470,6 @@
 - Animation
 - Animation
 - Spec: Reports / Abuse Handling
-- re
 - _setPrototypeOf
 - _setPrototypeOf
 - getWidthOrHeight
@@ -481,7 +479,7 @@
 - _setPrototypeOf
 - getWidthOrHeight
 - getWidthOrHeight
-- WebsiteLifecycleTests
+- K
 - migrate_skills_layout.sh
 - K
 - expectSync
@@ -492,7 +490,6 @@
 - theme.91cf832f559e.js
 - AjaxAdapter
 - AjaxAdapter
-- Spec: Public Discovery / Search
 - expectSync
 - expectSync
 - staticfiles/js/jquery-migrate-1.4.1.js
@@ -560,21 +557,21 @@
 10. `Pe` - 40 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Names introduced` --references--> `approve_website_ajax()`  [INFERRED]
-  .ai_files/specs/website-edit-permissions.md → directory/views.py
 - `User Stories` --references--> `Website`  [INFERRED]
   .ai_files/specs/website-submission.md → directory/models.py
+- `1.1 Submission UX` --references--> `PublicWebsiteSubmitForm`  [INFERRED]
+  .ai_files/roadmap.md → directory/forms.py
+- `Decision matrix — residual items (from 2026-08-02 audit)` --references--> `to_jalali()`  [INFERRED]
+  .ai_files/roadmap.md → farsi/templatetags/farsi_tags.py
 - `Register (seed, from the repo snapshot)` --references--> `to_jalali()`  [INFERRED]
   .claude/skills/facts-register-agent/SKILL.md → farsi/templatetags/farsi_tags.py
 - `Known bugs (fix with a failing test first)` --references--> `register()`  [INFERRED]
-  .claude/skills/django-backend-agent/SKILL.md → directory/views.py
-- `Rules` --references--> `user_logout()`  [INFERRED]
   .claude/skills/django-backend-agent/SKILL.md → directory/views.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (723 total, 452 thin omitted)
+## Communities (721 total, 448 thin omitted)
 
 ### Community 0 - "htmx.2.0.8.min.js"
 Cohesion: 0.08
@@ -585,12 +582,12 @@ Cohesion: 0.08
 Nodes (103): a(), Ae(), an(), at(), B(), be(), bn(), bt() (+95 more)
 
 ### Community 2 - "static/js/bootstrap.bundle.js"
-Cohesion: 0.06
-Nodes (74): addHandler(), applyStyles(), areValidElements(), bootstrapDelegationHandler(), bootstrapHandler(), contains(), debounce(), detectOverflow() (+66 more)
+Cohesion: 0.05
+Nodes (91): addHandler(), applyStyles(), areValidElements(), arrow(), bootstrapDelegationHandler(), bootstrapHandler(), computeAutoPlacement(), computeOffsets() (+83 more)
 
 ### Community 3 - "staticfiles/js/bootstrap.bundle.js"
 Cohesion: 0.05
-Nodes (78): applyStyles(), areValidElements(), arrow(), computeAutoPlacement(), computeOffsets(), computeStyles(), contains(), debounce() (+70 more)
+Nodes (58): addHandler(), areValidElements(), arrow(), bootstrapDelegationHandler(), bootstrapHandler(), computeAutoPlacement(), computeOffsets(), computeStyles() (+50 more)
 
 ### Community 4 - "xregexp.a7e08b0ce686.js"
 Cohesion: 0.02
@@ -601,16 +598,16 @@ Cohesion: 0.02
 Nodes (4): buildAstral(), cacheAstral(), getContextualTokenSeparator(), isQuantifierNext()
 
 ### Community 6 - "staticfiles/js/bootstrap.bundle.min.js"
-Cohesion: 0.05
-Nodes (50): ni, be(), bi(), Ce(), D(), De(), _e(), ei() (+42 more)
+Cohesion: 0.09
+Nodes (42): be(), bi(), Ce(), D(), De(), _e(), F(), ge() (+34 more)
 
 ### Community 7 - "bootstrap.bundle.4c93ab530860.js"
 Cohesion: 0.06
 Nodes (74): addHandler(), applyStyles(), areValidElements(), bootstrapDelegationHandler(), bootstrapHandler(), contains(), debounce(), detectOverflow() (+66 more)
 
 ### Community 8 - "directory/views.py"
-Cohesion: 0.06
-Nodes (37): In Scope, In Scope, In Scope, In Scope, Naming, Known bugs (fix with a failing test first), Rules, 3. Django surface (+29 more)
+Cohesion: 0.05
+Nodes (47): In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Public Discovery / Search, User Stories, In Scope, In Scope (+39 more)
 
 ### Community 9 - "staticfiles/js/bootstrap.esm.js"
 Cohesion: 0.03
@@ -661,8 +658,8 @@ Cohesion: 0.09
 Nodes (43): a(), b(), be(), d(), de(), E(), ee(), en() (+35 more)
 
 ### Community 21 - "bootstrap.bundle.min.46f7b49f1198.js"
-Cohesion: 0.09
-Nodes (46): ae(), be(), Bt(), ce(), D(), de(), ee(), Ft() (+38 more)
+Cohesion: 0.10
+Nodes (45): ae(), be(), Bt(), ce(), D(), de(), ee(), Ft() (+37 more)
 
 ### Community 22 - "jquery/jquery.min.js"
 Cohesion: 0.08
@@ -670,11 +667,11 @@ Nodes (38): Ae(), B(), Be(), c(), $e(), ee(), F(), fe() (+30 more)
 
 ### Community 23 - "jquery.min.2c872dbe60f4.js"
 Cohesion: 0.08
-Nodes (38): Ae(), B(), Be(), c(), $e(), ee(), F(), fe() (+30 more)
+Nodes (37): Ae(), B(), Be(), c(), $e(), ee(), F(), fe() (+29 more)
 
 ### Community 24 - "directory/tests.py"
-Cohesion: 0.03
-Nodes (13): RatingForm, ReviewForm, AjaxReportEndpointTests, AuthenticationAjaxFeedbackTests, CategoryModelTests, CategoryTagIntegrationTests, DataIntegrityTests, RatingFormTests (+5 more)
+Cohesion: 0.02
+Nodes (15): RatingForm, ReviewForm, AjaxReportEndpointTests, AuthenticationAjaxFeedbackTests, CategoryTagIntegrationTests, DataIntegrityTests, PerformanceTests, RatingFormTests (+7 more)
 
 ### Community 25 - "jquery.min (copy).js"
 Cohesion: 0.07
@@ -689,24 +686,20 @@ Cohesion: 0.11
 Nodes (43): ae(), be(), Bt(), ce(), D(), de(), ee(), Ft() (+35 more)
 
 ### Community 28 - "contact/views.py"
-Cohesion: 0.10
-Nodes (5): MyInlines1, ContactForm, Meta, Contact, ContactFormView
+Cohesion: 0.06
+Nodes (7): MyInlines1, ContactForm, Meta, Contact, ContactFormFeedbackTests, ContactFormView, tag_suggestions()
 
 ### Community 29 - "Tooltip"
 Cohesion: 0.08
 Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
 
 ### Community 30 - "farsi_tags.py"
-Cohesion: 0.07
-Nodes (15): Known defects in the `farsi` app (fix with tests), persian_currency(), persian_number_word(), persian_ordinal(), persian_weekday(), remove_get_param(), to_hindi_with_comma(), to_jalali_datetime() (+7 more)
+Cohesion: 0.06
+Nodes (19): 3. Stack (do not invent alternatives), Phase 2 — Polish & trust, persian_currency(), persian_phone(), persian_weekday(), remove_get_param(), rtl_class(), text_align() (+11 more)
 
 ### Community 31 - "Tooltip"
 Cohesion: 0.09
 Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
-
-### Community 32 - "Tooltip"
-Cohesion: 0.09
-Nodes (4): distanceAndSkiddingToXY(), offset(), Popover, Tooltip
 
 ### Community 33 - "Tooltip"
 Cohesion: 0.09
@@ -764,13 +757,9 @@ Nodes (12): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr(
 Cohesion: 0.06
 Nodes (12): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr(), done(), finalPropName(), getData(), leverageNative() (+4 more)
 
-### Community 60 - "directory/admin.py"
-Cohesion: 0.13
-Nodes (13): PostAdmin, CategoryAdmin, RatingAdmin, ReportAdmin, ReviewAdmin, WebsiteAdmin, Rating, Meta (+5 more)
-
 ### Community 61 - "Website"
 Cohesion: 0.04
-Nodes (21): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Authenticated Submission Identity, User Stories, Website lifecycle (+13 more)
+Nodes (28): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Authenticated Submission Identity, User Stories, Website lifecycle (+20 more)
 
 ### Community 65 - "WebsiteSubmitForm"
 Cohesion: 0.07
@@ -825,8 +814,8 @@ Cohesion: 0.08
 Nodes (21): _classCallCheck(), convertSVG(), _createClass(), css(), _defineProperties(), _defineProperty(), disableObservation(), enableObservation() (+13 more)
 
 ### Community 80 - "utils.py"
-Cohesion: 0.07
-Nodes (9): 6. Legacy exceptions register (finite; never copy these into new code), tag_suggestions(), format_jalali_date(), generate_slug(), get_client_ip(), send_email(), to_english_num(), to_persian_num() (+1 more)
+Cohesion: 0.06
+Nodes (13): Migration, Migration, Migration, Migration, Migration, Migration, Migration, format_jalali_date() (+5 more)
 
 ### Community 81 - "TemplateFactory"
 Cohesion: 0.10
@@ -840,9 +829,9 @@ Nodes (4): Config, getElement(), isElement(), TemplateFactory
 Cohesion: 0.11
 Nodes (4): Alert, Collapse, reflow(), Toast
 
-### Community 85 - "Si"
-Cohesion: 0.12
-Nodes (3): fi, Si, ci()
+### Community 84 - "QuickSubmitForm"
+Cohesion: 0.07
+Nodes (4): QuickSubmitForm, CSRFProtectionTests, QuickSubmitFormTests, SubmitWebsiteViewTests
 
 ### Community 95 - "Modal"
 Cohesion: 0.12
@@ -852,13 +841,13 @@ Nodes (3): Modal, reflow(), ScrollBarHelper
 Cohesion: 0.10
 Nodes (19): B(), D(), getDataAttributes(), H(), I(), j(), M(), N() (+11 more)
 
-### Community 97 - "Ze"
-Cohesion: 0.12
-Nodes (3): e(), Me, Ze
+### Community 98 - "getWindow"
+Cohesion: 0.14
+Nodes (35): applyStyles(), contains(), effect$1(), effect$2(), getBoundingClientRect(), getClientRectFromMixedType(), getClippingParents(), getCompositeRect() (+27 more)
 
-### Community 98 - "preventOverflow"
-Cohesion: 0.21
-Nodes (17): arrow(), computeAutoPlacement(), computeOffsets(), computeStyles(), flip(), getAltAxis(), getBasePlacement(), getExpandedFallbackPlacements() (+9 more)
+### Community 100 - "Si"
+Cohesion: 0.12
+Nodes (3): fi, Si, ci()
 
 ### Community 102 - "BaseComponent"
 Cohesion: 0.09
@@ -885,16 +874,20 @@ Cohesion: 0.10
 Nodes (13): _arrayLikeToArray(), augment(), cacheInvertedBmp(), charCode(), clipDuplicates(), copyRegex(), _createForOfIteratorHelper(), isType() (+5 more)
 
 ### Community 126 - "WebJin (dirweb.ir / webjin.ir) Development Roadmap"
-Cohesion: 0.10
-Nodes (21): 3. Stack (do not invent alternatives), 2A — Discovery and finding (Phase 2), 2B — Listings and trust (Phase 2), 2C — Monetization and offers (Phase 2, gated by business/analytics specs), 3A — Personalization and content (Phase 3), Agent skills — profitability track, AJAX contract (locked), Available now (essential) (+13 more)
+Cohesion: 0.08
+Nodes (26): 1.1 Submission UX, 1.2 Staff / admin dashboard, 1.3 Permissions & lifecycle messaging, 1.4 Public discovery & UX, 1.5 Hygiene & repo, 1A — Core directory and trust foundation (Phase 1), 2A — Discovery and trust expansion (Phase 2), 2B — Monetization and offers (Phase 2, gated by business/analytics specs) (+18 more)
 
 ### Community 127 - "Security"
-Cohesion: 0.17
-Nodes (5): default_icon(), get_color_from_domain(), get_initial(), website_icon(), website_icon_url()
+Cohesion: 0.10
+Nodes (14): Guidelines, Handoff (end every task with this block), In/Out, In scope, Out of scope, Priority findings to verify and fix, Required Input, Role & Scope (+6 more)
 
 ### Community 128 - "bootstrap.min.78ec300a4030.js"
-Cohesion: 0.15
-Nodes (18): B(), D(), F(), getDataAttributes(), I(), j(), M(), N() (+10 more)
+Cohesion: 0.11
+Nodes (19): B(), D(), F(), getDataAttributes(), I(), j(), M(), N() (+11 more)
+
+### Community 129 - "re"
+Cohesion: 0.10
+Nodes (3): blocks_of(), find_template(), main()
 
 ### Community 130 - "Dropdown"
 Cohesion: 0.13
@@ -976,6 +969,18 @@ Nodes (3): ArrayAdapter(), BaseAdapter(), SelectAdapter()
 Cohesion: 0.13
 Nodes (3): ArrayAdapter(), BaseAdapter(), SelectAdapter()
 
+### Community 158 - "Dropdown"
+Cohesion: 0.13
+Nodes (3): distanceAndSkiddingToXY(), Dropdown, offset()
+
+### Community 167 - "ti"
+Cohesion: 0.14
+Nodes (4): ni, ei(), ti(), ni
+
+### Community 175 - "pi"
+Cohesion: 0.20
+Nodes (3): je(), si(), pi
+
 ### Community 178 - "Toast"
 Cohesion: 0.16
 Nodes (3): Alert, reflow(), Toast
@@ -1009,8 +1014,8 @@ Cohesion: 0.15
 Nodes (3): getNextActiveElement(), isVisible(), ScrollSpy
 
 ### Community 195 - "to_hindi"
-Cohesion: 0.17
-Nodes (4): persian_phone(), to_hindi(), PersianPhoneTestCase, ToHindiFilterTestCase
+Cohesion: 0.15
+Nodes (6): Known defects in the `farsi` app (fix with tests), persian_number_word(), persian_ordinal(), to_hindi(), to_hindi_with_comma(), ToHindiFilterTestCase
 
 ### Community 201 - "ScrollSpy"
 Cohesion: 0.16
@@ -1023,6 +1028,10 @@ Nodes (3): AllowClear(), MaximumInputLength(), MinimumInputLength()
 ### Community 206 - ".trigger"
 Cohesion: 0.15
 Nodes (3): AllowClear(), MaximumInputLength(), MinimumInputLength()
+
+### Community 210 - "Toast"
+Cohesion: 0.10
+Nodes (3): Alert, Offcanvas, Toast
 
 ### Community 215 - "ScrollSpy"
 Cohesion: 0.16
@@ -1041,8 +1050,8 @@ Cohesion: 0.12
 Nodes (17): 10. Files agents edit most often, 11. Known P0/P1 items (see roadmap for full matrix), 12. Deployment notes (Passenger / host), 13. Questions to ask the user if unclear, 1. Project in one paragraph, 2. Canonical sources of truth (read order), 4. Quick start (local), 5. Project layout (what lives where) (+9 more)
 
 ### Community 236 - "Naming Law"
-Cohesion: 0.09
-Nodes (15): 1. Language rule, 2. Python, 4. Front end, 5. Domain glossary (baseline; the owner may amend once, see section 9), 7. Pre-flight (run before handing off), 8. Review checklist, 9. Amendment procedure, Guidelines (+7 more)
+Cohesion: 0.06
+Nodes (26): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Website Submission, User Stories, 1. Language rule (+18 more)
 
 ### Community 238 - "BaseComponent"
 Cohesion: 0.13
@@ -1081,8 +1090,8 @@ Cohesion: 0.13
 Nodes (3): Alert, BaseComponent, Button
 
 ### Community 249 - "Feature list & bug tracker — WebJin (وب‌جین)"
-Cohesion: 0.08
-Nodes (19): graphify, AJAX conventions, Language & locale, Security, Stack, Static & media, Technical Conventions — WebJin (dirweb.ir), Testing expectations (+11 more)
+Cohesion: 0.14
+Nodes (9): graphify, AJAX conventions, Language & locale, Security, Stack, Static & media, Technical Conventions — WebJin (dirweb.ir), Testing expectations (+1 more)
 
 ### Community 250 - "_toConsumableArray"
 Cohesion: 0.15
@@ -1156,9 +1165,9 @@ Nodes (15): applyShimAndAlias(), asFoundIcon(), byAlias(), byOldName(), findIcon
 Cohesion: 0.16
 Nodes (15): applyShimAndAlias(), asFoundIcon(), byAlias(), byOldName(), findIcon(), findIconDefinition(), getCanonicalIcon(), getCanonicalPrefix() (+7 more)
 
-### Community 280 - "addHandler"
-Cohesion: 0.19
-Nodes (15): addHandler(), bootstrapDelegationHandler(), bootstrapHandler(), findHandler(), getElementEvents(), getTypeEvent(), hydrateObj(), makeEventUid() (+7 more)
+### Community 280 - "Feature list & bug tracker — WebJin (وب‌جین)"
+Cohesion: 0.12
+Nodes (16): Agent skills (profitability), Dashboard, Discovery / UX, Display limits, Feature list & bug tracker — WebJin (وب‌جین), Hygiene, Permissions / lifecycle, Phase 0 — closed (+8 more)
 
 ### Community 290 - "getCanonicalIcon"
 Cohesion: 0.16
@@ -1243,6 +1252,14 @@ Nodes (11): Business Model, Guidelines, Handoff (end every task with this block)
 ### Community 340 - "Deployment"
 Cohesion: 0.17
 Nodes (11): Deployment, Facts from the repo, Guidelines, Handoff (end every task with this block), In/Out, In scope, Never, Out of scope (+3 more)
+
+### Community 342 - "EditWebsiteViewTests"
+Cohesion: 0.12
+Nodes (3): CspNonceAssertionsMixin, CspNonceTests, EditWebsiteViewTests
+
+### Community 344 - "persianize"
+Cohesion: 0.12
+Nodes (10): Checklist (blocker = B, advisory = A), Guidelines, Handoff (end every task with this block), In/Out, Persian QA, Required Input, Role & Scope, Tests to add (+2 more)
 
 ### Community 345 - "WebJin (وب‌جین) — Persian Web Directory"
 Cohesion: 0.17
@@ -1404,6 +1421,10 @@ Nodes (8): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statemen
 Cohesion: 0.22
 Nodes (8): Django Backend, Done when, Guidelines, Handoff (end every task with this block), In/Out, In scope, Required Input, Role & Scope
 
+### Community 413 - "Me"
+Cohesion: 0.29
+Nodes (3): He(), Ne(), Me
+
 ### Community 416 - "Animation"
 Cohesion: 0.22
 Nodes (9): Animation(), camelCase(), createFxNow(), createTween(), defaultPrefilter(), fcamelCase(), getDefaultDisplay(), propFilter() (+1 more)
@@ -1442,11 +1463,11 @@ Nodes (7): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statemen
 
 ### Community 427 - "Spec: Website Edit Permissions and Approval Lifecycle"
 Cohesion: 0.25
-Nodes (7): Assumptions / Open Questions, In Scope / Out of Scope, Names introduced, Problem Statement, Revision Notes, Spec: Website Edit Permissions and Approval Lifecycle, User Stories
+Nodes (7): Assumptions / Open Questions, In Scope / Out of Scope, Names introduced, Problem Statement, Revision Notes, Spec: Website Edit Permissions, User Stories
 
-### Community 428 - "Security"
-Cohesion: 0.20
-Nodes (9): Guidelines, Handoff (end every task with this block), In/Out, In scope, Out of scope, Priority findings to verify and fix, Required Input, Role & Scope (+1 more)
+### Community 430 - "Spec: Website Trash"
+Cohesion: 0.29
+Nodes (6): Assumptions / Open Questions, In Scope / Out of Scope, Problem Statement, Revision Notes, Spec: Website Trash, User Stories
 
 ### Community 432 - "static/js/brands.min.js"
 Cohesion: 0.39
@@ -1455,10 +1476,6 @@ Nodes (6): a(), e(), h(), M(), s(), y()
 ### Community 433 - "domManip"
 Cohesion: 0.32
 Nodes (8): buildFragment(), disableScript(), DOMEval(), domManip(), getAll(), remove(), restoreScript(), setGlobalEval()
-
-### Community 435 - "Persian QA"
-Cohesion: 0.22
-Nodes (8): Checklist (blocker = B, advisory = A), Guidelines, Handoff (end every task with this block), In/Out, Persian QA, Required Input, Role & Scope, Tests to add
 
 ### Community 436 - "staticfiles/js/brands.min.js"
 Cohesion: 0.39
@@ -1475,10 +1492,6 @@ Nodes (8): buildFragment(), disableScript(), DOMEval(), domManip(), getAll(), re
 ### Community 439 - "domManip"
 Cohesion: 0.32
 Nodes (8): buildFragment(), disableScript(), DOMEval(), domManip(), getAll(), remove(), restoreScript(), setGlobalEval()
-
-### Community 440 - "PublicWebsiteSubmitForm"
-Cohesion: 0.11
-Nodes (16): 1.1 Submission UX, 1.2 Staff / admin dashboard, 1.3 Permissions & lifecycle messaging, 1.4 Public discovery & UX, 1.5 Hygiene & repo, Phase 1 — MWS completion (current), Recommended Phase 1 execution order, Assumptions (+8 more)
 
 ### Community 443 - "Spec: Ratings & Reviews"
 Cohesion: 0.29
@@ -1532,10 +1545,6 @@ Nodes (7): Animation(), createFxNow(), createTween(), defaultPrefilter(), getDef
 Cohesion: 0.33
 Nodes (5): Open Questions, Out of Scope, Problem Statement, Spec: Reports / Abuse Handling, User Stories
 
-### Community 459 - "re"
-Cohesion: 0.17
-Nodes (5): blocks_of(), find_template(), rtl_class(), text_align(), TextAlignTestCase
-
 ### Community 460 - "_setPrototypeOf"
 Cohesion: 0.50
 Nodes (4): _inherits(), _setPrototypeOf(), _wrapRegExp(), BabelRegExp()
@@ -1587,10 +1596,6 @@ Nodes (3): cycleTheme(), initTheme(), setTheme()
 ### Community 479 - "theme.91cf832f559e.js"
 Cohesion: 0.83
 Nodes (3): cycleTheme(), initTheme(), setTheme()
-
-### Community 482 - "Spec: Public Discovery / Search"
-Cohesion: 0.33
-Nodes (5): Open Questions, Out of Scope, Problem Statement, Spec: Public Discovery / Search, User Stories
 
 ### Community 483 - "expectSync"
 Cohesion: 0.50
@@ -1661,22 +1666,22 @@ Cohesion: 0.33
 Nodes (5): Assumptions, Out of Scope, Problem Statement, Spec: User Accounts & Dashboard, User Stories
 
 ## Knowledge Gaps
-- **452 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **448 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `ci()` connect `Si` to `Si`, `staticfiles/js/bootstrap.bundle.min.js`, `pi`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Should `htmx.2.0.8.min.js` be split into smaller, more focused modules?**
   _Cohesion score 0.07690925426774484 - nodes in this community are weakly interconnected._
 - **Why does `fi` connect `Si` to `static/js/bootstrap.bundle.min.js`, `bi`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **Should `htmx.2.0.8.min.d073ff63d1ed.js` be split into smaller, more focused modules?**
   _Cohesion score 0.07690925426774484 - nodes in this community are weakly interconnected._
-- **Why does `ae()` connect `bootstrap.bundle.min.46f7b49f1198.js` to `htmx.2.0.8.min.js`, `htmx.2.0.8.min.d073ff63d1ed.js`, `._queueCallback`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `Ne()` connect `Me` to `jquery.min (copy).js`, `jquery.min (copy).8fb8fee4fcc3.js`, `jquery/jquery.min.js`, `staticfiles/js/bootstrap.bundle.min.js`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Should `static/js/bootstrap.bundle.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.056948798328108674 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
 - **Should `staticfiles/js/bootstrap.bundle.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.04817027632561613 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.045037292025243834 - nodes in this community are weakly interconnected._

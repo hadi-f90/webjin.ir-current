@@ -21,6 +21,23 @@
 
         <div class="card mb-4 card-theme">
             <div class="card-body">
+                {% if website.is_deleted %}
+                <div class="alert alert-warning" role="status">
+                    <strong>این وب‌سایت در بخش حذف‌شده‌ها قرار دارد.</strong>
+                    {% if website.deletion_reason %}
+                    <p class="mb-1">دلیل: {{ website.deletion_reason }}</p>
+                    {% endif %}
+                    {% if website.deleted_by %}
+                    <small>انتقال‌دهنده: {{ website.deleted_by.get_full_name|default:website.deleted_by.username }}</small>
+                    {% endif %}
+                    {% if is_owner and can_restore_website %}
+                    <form method="post" action="{% url 'restore_my_website' website.pk %}" class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">بازگردانی وب‌سایت</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endif %}
                 <div class="row">
                     <div class="col-md-10">
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -31,7 +48,7 @@
                         </div>
                     </div>
                     <div class="col-md-2">
-                        {% if is_owner %}
+                        {% if can_edit_website %}
                         <div class="mb-3">
                             <a href="{% url 'edit_website' website.slug %}" class="btn btn-sm btn-outline-primary end">
                                 <i class="bi bi-pencil"></i> ویرایش
@@ -91,6 +108,7 @@
                     <i class="bi bi-box-arrow-up-right"></i> بازدید از وب‌سایت
                 </a>
                 <hr>
+                {% if not website.is_deleted %}
                 <!-- Report Section (Accordion) -->
                 <div class="accordion mb-4 card-theme" id="reportAccordion">
                     <div class="accordion-item border-danger">
@@ -127,9 +145,11 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
 
+        {% if not website.is_deleted %}
         <!-- Rating Section -->
         <div class="card mb-4 card-theme">
             <div class="card-header bg-warning text-dark">
@@ -194,9 +214,11 @@
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
 
     </div>
 
+    {% if not website.is_deleted %}
     <div class="col-md-4">
         <div class="card card-theme">
             <div class="card-header bg-primary text-white">
@@ -213,6 +235,7 @@
                 <div class="list-group-item">وب‌سایت مرتبطی پیدا نشد</div>
                 {% endfor %}
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -1,14 +1,17 @@
+from functools import wraps
+
 from django.urls import reverse
 from django.db.models.manager import BaseManager
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import Http404, HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
-from django.http import JsonResponse
 from django.db.models import Q, Count
+from django.utils import timezone
 from django_ratelimit.decorators import ratelimit
 import json
 from django.views.decorators.http import require_POST
@@ -28,13 +31,56 @@ import random
 def is_admin(user):
     return user.is_staff
 
+
+def staff_ajax_required(view_func):
+    protected_view = staff_member_required(view_func)
+
+    @wraps(view_func)
+    def wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_staff:
+            return JsonResponse(
+                {'status': 'error', 'message': 'شما اجازه انجام این عملیات را ندارید.'},
+                status=403,
+            )
+        return protected_view(request, *args, **kwargs)
+
+    return wrapped_view
+
+
+def _soft_delete_website(website, actor, reason):
+    website.is_deleted = True
+    website.deleted_at = timezone.now()
+    website.deleted_by = actor
+    website.deletion_reason = (reason or '').strip()
+    website.save(
+        update_fields=('is_deleted', 'deleted_at', 'deleted_by', 'deletion_reason', 'updated_at')
+    )
+
+
 # ==================== Home Page ====================
 def index(request):
-    websites = Website.objects.filter(status='approved').select_related('category')
-    categories = Category.objects.annotate(website_count=Count('website_set'))
-    all_tags = Tag.objects.annotate(website_count=Count('websites_tagged')).order_by(
-        '-website_count'
-    )[:10]
+    websites = Website.objects.filter(
+        status=Website.STATUS_APPROVED,
+        is_deleted=False,
+    ).select_related('category')
+    categories = Category.objects.annotate(
+        website_count=Count(
+            'website_set',
+            filter=Q(
+                website_set__status=Website.STATUS_APPROVED,
+                website_set__is_deleted=False,
+            ),
+        )
+    )
+    all_tags = Tag.objects.annotate(
+        website_count=Count(
+            'websites_tagged',
+            filter=Q(
+                websites_tagged__status=Website.STATUS_APPROVED,
+                websites_tagged__is_deleted=False,
+            ),
+        )
+    ).order_by('-website_count')[:10]
 
     category_slug = request.GET.get('category')
     selected_category = None
@@ -65,7 +111,7 @@ def index(request):
 
     # Limit before shuffle — avoid loading the full approved table
     featured_qs = list(
-        Website.objects.filter(status='approved')
+        Website.objects.filter(status=Website.STATUS_APPROVED, is_deleted=False)
         .select_related('category')
         .order_by('-created_at')[:24]
     )
@@ -94,7 +140,8 @@ def search_suggestions(request):
         return JsonResponse({'suggestions': []})
 
     websites = Website.objects.filter(
-        status='approved',
+        status=Website.STATUS_APPROVED,
+        is_deleted=False,
         title__icontains=query
     )[:5]
 
@@ -122,15 +169,25 @@ def website_detail(request, slug):
     website = get_object_or_404(
         Website.objects.select_related('category').prefetch_related('tags'),
         slug=slug,
-        status='approved',
     )
+    is_owner = request.user.is_authenticated and website.created_by_id == request.user.id
+    can_edit_website = is_owner or request.user.is_staff
+    if website.is_deleted:
+        if not can_edit_website:
+            raise Http404
+    elif website.status != Website.STATUS_APPROVED:
+        raise Http404
 
     # Prefer shared tags (prefetch avoids extra tag-id query); fill with category
     tag_ids = [t.id for t in website.tags.all()]
     related_list = []
-    if tag_ids:
+    if tag_ids and not website.is_deleted:
         related_list = list(
-            Website.objects.filter(status='approved', tags__id__in=tag_ids)
+            Website.objects.filter(
+                status=Website.STATUS_APPROVED,
+                is_deleted=False,
+                tags__id__in=tag_ids,
+            )
             .exclude(id=website.id)
             .distinct()
             .select_related('category')[:4]
@@ -141,7 +198,9 @@ def website_detail(request, slug):
         related_list.extend(
             list(
                 Website.objects.filter(
-                    status='approved', category_id=website.category_id
+                    status=Website.STATUS_APPROVED,
+                    is_deleted=False,
+                    category_id=website.category_id,
                 )
                 .exclude(id__in=exclude_ids)
                 .select_related('category')[:need]
@@ -149,23 +208,24 @@ def website_detail(request, slug):
         )
     related_websites = related_list
 
-    reviews = website.reviews.filter(is_approved=True)[:10]
+    reviews = website.reviews.filter(is_approved=True)[:10] if not website.is_deleted else []
 
     user_rating = None
     user_review = None
     user_report = None
-    is_owner = False
 
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and not website.is_deleted:
         user_rating = website.ratings.filter(user=request.user).first()
         user_review = website.reviews.filter(user=request.user).first()
         user_report = website.reports.filter(user=request.user).first()
-        is_owner = (website.created_by_id == request.user.id) or request.user.is_staff
-
 
     rating_form = RatingForm()
     review_form = ReviewForm()
     report_form = ReportForm()
+    can_restore_website = (
+        request.user.is_staff
+        or (is_owner and website.deleted_by_id == request.user.id)
+    )
 
     context = {
         'website': website,
@@ -178,6 +238,8 @@ def website_detail(request, slug):
         'user_review': user_review,
         'user_report': user_report,
         'is_owner': is_owner,
+        'can_edit_website': can_edit_website and not website.is_deleted,
+        'can_restore_website': can_restore_website,
     }
     return render(request, 'directory/detail.html', context)
 
@@ -187,7 +249,9 @@ def website_detail(request, slug):
 @ratelimit(key='user', rate='20/m', method='POST', block=False)
 def rate_website(request, slug):
     """Record 1–5 star rating. Ratelimit is advisory (block=False) so tests/dev never drop writes."""
-    website = get_object_or_404(Website, slug=slug, status='approved')
+    website = get_object_or_404(
+        Website, slug=slug, status=Website.STATUS_APPROVED, is_deleted=False
+    )
     rating_value = request.POST.get('rating')
     try:
         score = int(rating_value)
@@ -209,7 +273,9 @@ def rate_website(request, slug):
 
 @login_required
 def review_website(request, slug):
-    website = get_object_or_404(Website, slug=slug, status='approved')
+    website = get_object_or_404(
+        Website, slug=slug, status=Website.STATUS_APPROVED, is_deleted=False
+    )
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -227,7 +293,9 @@ def review_website(request, slug):
 
 @login_required
 def report_website(request, slug):
-    website = get_object_or_404(Website, slug=slug, status='approved')
+    website = get_object_or_404(
+        Website, slug=slug, status=Website.STATUS_APPROVED, is_deleted=False
+    )
     existing_report = website.reports.filter(user=request.user).exists()
     if existing_report:
         messages.warning(request, 'شما قبلاً این وب‌سایت را گزارش کرده‌اید.')
@@ -271,7 +339,7 @@ def submit_website(request):
         form = PublicWebsiteSubmitForm(form_data)
         if form.is_valid():
             website = form.save(commit=False)
-            website.status = 'pending'
+            website.status = Website.STATUS_PENDING
             if not website.description:
                 website.description = 'ثبت شده توسط کاربر'
             if request.user.is_authenticated:
@@ -330,7 +398,7 @@ def submit_website(request):
 # ==================== Edit Website ====================
 @login_required
 def edit_website(request, slug):
-    website = get_object_or_404(Website, slug=slug)
+    website = get_object_or_404(Website, slug=slug, is_deleted=False)
     if website.created_by != request.user and not request.user.is_staff:
         messages.error(request, 'شما اجازه ویرایش این وب‌سایت را ندارید.')
         return redirect('website_detail', slug=slug)
@@ -339,30 +407,15 @@ def edit_website(request, slug):
         form = WebsiteSubmitForm(request.POST, instance=website)
         if form.is_valid():
             prior_status = website.status
-            prior_url = website.url
-            prior_title = website.title
-            prior_desc = website.description or ''
-            prior_cat = website.category_id
-
             updated = form.save(commit=False)
-            # Major change: URL always; otherwise title/description/category change
-            url_changed = (updated.url or '') != (prior_url or '')
-            major = url_changed or (
-                (updated.title or '') != (prior_title or '')
-                or (updated.description or '') != prior_desc
-                or updated.category_id != prior_cat
-            )
-            if prior_status == 'approved' and major:
-                updated.status = 'pending'
+            if prior_status == Website.STATUS_APPROVED:
+                updated.status = Website.STATUS_PENDING
                 msg = (
-                    'وب‌سایت با موفقیت ویرایش شد و به‌خاطر تغییرات مهم '
-                    'دوباره در انتظار تأیید قرار گرفت.'
+                    'وب‌سایت با موفقیت ویرایش شد و برای بررسی دوباره '
+                    'در انتظار تأیید قرار گرفت.'
                 )
-            elif prior_status == 'approved' and not major:
-                # Minor / no material field change — keep approved; staff may still review reports
-                msg = 'وب‌سایت با موفقیت ویرایش شد.'
             else:
-                updated.status = 'pending'
+                updated.status = Website.STATUS_PENDING
                 msg = 'وب‌سایت با موفقیت ویرایش شد و در انتظار تأیید است.'
 
             updated.save()
@@ -387,6 +440,7 @@ def edit_website(request, slug):
             'categories': categories,
             'website': website,
             'current_tags': current_tags,
+            'current_tag_names': [tag.name for tag in website.tags.all()],
         },
     )
 
@@ -467,23 +521,52 @@ def user_logout(request):
 # ==================== User Dashboard ====================
 @login_required
 def user_dashboard(request):
-    my_websites = Website.objects.filter(created_by=request.user)
+    my_websites = Website.objects.filter(created_by=request.user, is_deleted=False)
+    deleted_websites = Website.objects.filter(
+        created_by=request.user,
+        is_deleted=True,
+    ).select_related('deleted_by')
     my_ratings = Rating.objects.filter(user=request.user)
     my_reviews = Review.objects.filter(user=request.user)
 
     context = {
         'my_websites': my_websites,
+        'deleted_websites': deleted_websites,
         'my_ratings': my_ratings,
         'my_reviews': my_reviews,
     }
     return render(request, 'directory/user_dashboard.html', context)
 
 @login_required
+@require_POST
 def delete_my_website(request, pk):
-    website = get_object_or_404(Website, pk=pk, created_by=request.user)
-    website.delete()
-    messages.success(request, 'وب‌سایت حذف شد.')
+    website = get_object_or_404(
+        Website,
+        pk=pk,
+        created_by=request.user,
+        is_deleted=False,
+    )
+    _soft_delete_website(website, request.user, request.POST.get('deletion_reason'))
+    messages.success(request, 'وب‌سایت به بخش حذف‌شده‌ها منتقل شد.')
     return redirect('user_dashboard')
+
+
+@login_required
+@require_POST
+def restore_my_website(request, pk):
+    website = get_object_or_404(
+        Website,
+        pk=pk,
+        created_by=request.user,
+        is_deleted=True,
+    )
+    if website.deleted_by_id != request.user.id:
+        return HttpResponseForbidden('شما اجازه بازگردانی این وب‌سایت را ندارید.')
+    website.is_deleted = False
+    website.save(update_fields=('is_deleted', 'updated_at'))
+    messages.success(request, 'وب‌سایت به فهرست شما بازگردانده شد.')
+    return redirect('user_dashboard')
+
 
 @login_required
 def delete_my_review(request, pk):
@@ -502,13 +585,44 @@ def terms(request):
 # ==================== Admin Dashboard ====================
 @user_passes_test(is_admin)
 def admin_dashboard(request):
-    pending_websites = Website.objects.select_related('category').filter(status='pending')
-    approved_websites = Website.objects.select_related('category').filter(status='approved')
-    rejected_websites = Website.objects.select_related('category').filter(status='rejected')
+    pending_websites = Website.objects.select_related('category').filter(
+        status=Website.STATUS_PENDING,
+        is_deleted=False,
+    )
+    approved_websites = Website.objects.select_related('category').filter(
+        status=Website.STATUS_APPROVED,
+        is_deleted=False,
+    )
+    rejected_websites = Website.objects.select_related('category').filter(
+        status=Website.STATUS_REJECTED,
+        is_deleted=False,
+    )
     reports = Report.objects.select_related('website', 'user').filter(is_resolved=False)
-    categories = Category.objects.all()
-    # Tags are now managed by taggit, but we can still list them
-    tags = Tag.objects.all()
+    deleted_websites = Website.objects.filter(is_deleted=True).select_related(
+        'category',
+        'created_by',
+        'deleted_by',
+    )
+    categories = Category.objects.annotate(
+        website_count=Count('website_set', filter=Q(website_set__is_deleted=False))
+    )
+    tags = Tag.objects.annotate(
+        website_count=Count(
+            'websites_tagged',
+            filter=Q(websites_tagged__is_deleted=False),
+        )
+    )
+    users = User.objects.annotate(
+        website_count=Count(
+            'submitted_websites',
+            filter=Q(submitted_websites__is_deleted=False),
+            distinct=True,
+        ),
+        review_count=Count('review', distinct=True),
+    ).order_by('-date_joined')[:5]
+    recent_reviews = Review.objects.select_related('user', 'website').order_by(
+        '-created_at'
+    )[:10]
 
     # For the dashboard, we might want to count websites per tag
     # taggit handles this, but we can annotate if needed
@@ -519,47 +633,74 @@ def admin_dashboard(request):
         'reports': reports,
         'categories': categories,
         'tags': tags,
+        'deleted_websites': deleted_websites,
+        'pending_count': pending_websites.count(),
+        'report_count': reports.count(),
+        'users': users,
+        'recent_reviews': recent_reviews,
     }
     return render(request, 'directory/admin_dashboard.html', context)
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def approve_website_ajax(request, pk):
-    website = get_object_or_404(Website, pk=pk)
-    website.status = 'approved'
+    website = get_object_or_404(Website, pk=pk, is_deleted=False)
+    website.status = Website.STATUS_APPROVED
     website.save()
-    return JsonResponse(
-        {'status': 'success', 'message': f"{website.title} تأیید شد!", "new_status": "approved"}
-    )
+    return JsonResponse({
+        'status': 'success',
+        'message': f'{website.title} تأیید شد!',
+        'new_status': Website.STATUS_APPROVED,
+    })
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def reject_website_ajax(request, pk):
-    website = get_object_or_404(Website, pk=pk)
-    website.status = 'rejected'
+    website = get_object_or_404(Website, pk=pk, is_deleted=False)
+    website.status = Website.STATUS_REJECTED
     website.save()
     return JsonResponse({
         'status': 'success',
         'message': f'{website.title} رد شد.',
-        'new_status': 'rejected'
+        'new_status': Website.STATUS_REJECTED
     })
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def delete_website_ajax(request, pk):
-    website = get_object_or_404(Website, pk=pk)
+    website = get_object_or_404(Website, pk=pk, is_deleted=False)
     website_title = website.title
-    website.delete()
+    _soft_delete_website(website, request.user, request.POST.get('deletion_reason'))
     return JsonResponse(
-        {'status': 'success', 'message': f"{website_title} حذف شد.", "deleted": True}
+        {
+            'status': 'success',
+            'message': f'{website_title} به بخش حذف‌شده‌ها منتقل شد.',
+            'deleted': True,
+        }
     )
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
+def restore_website_ajax(request, pk):
+    website = get_object_or_404(Website, pk=pk, is_deleted=True)
+    website.is_deleted = False
+    website.save(update_fields=('is_deleted', 'updated_at'))
+    return JsonResponse({
+        'status': 'success',
+        'message': f'{website.title} به فهرست وب‌سایت‌ها بازگردانده شد.',
+        'restored': True,
+    })
+
+@require_POST
+@staff_ajax_required
 def update_website_status_ajax(request, pk):
-    website = get_object_or_404(Website, pk=pk)
+    website = get_object_or_404(Website, pk=pk, is_deleted=False)
     new_status = request.POST.get('status')
-    if new_status in {'pending', 'approved', 'rejected'}:
+    if new_status in {
+        Website.STATUS_PENDING,
+        Website.STATUS_APPROVED,
+        Website.STATUS_REJECTED,
+    }:
         website.status = new_status
         website.save()
         return JsonResponse({
@@ -570,9 +711,9 @@ def update_website_status_ajax(request, pk):
     return JsonResponse({'status': 'error', 'message': 'Invalid status'}, status=400)
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def edit_website_ajax(request, pk):
-    website = get_object_or_404(Website, pk=pk)
+    website = get_object_or_404(Website, pk=pk, is_deleted=False)
     title = request.POST.get('title')
     url = request.POST.get('url')
     description = request.POST.get('description')
@@ -595,7 +736,7 @@ def edit_website_ajax(request, pk):
     })
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def resolve_report_ajax(request, pk):
     report = get_object_or_404(Report, pk=pk)
     report.is_resolved = True
@@ -603,7 +744,7 @@ def resolve_report_ajax(request, pk):
     return JsonResponse({'status': 'success', 'message': "گزارش حل شد.", "resolved": True})
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def add_category_ajax(request):
     name = request.POST.get('name')
     description = request.POST.get('description', '')
@@ -629,7 +770,7 @@ def add_category_ajax(request):
     })
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def edit_category_ajax(request, pk):
     category = get_object_or_404(Category, pk=pk)
     name = request.POST.get('name')
@@ -652,7 +793,7 @@ def edit_category_ajax(request, pk):
     })
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def delete_category_ajax(request, pk):
     category = get_object_or_404(Category, pk=pk)
     if category.website_set.exists():
@@ -667,7 +808,7 @@ def delete_category_ajax(request, pk):
 # We can keep a simple AJAX endpoint if needed, but often not required.
 # If you still want to add tags via AJAX in admin:
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def add_tag_ajax(request):
     """Handles creation of a new global tag"""
     tag_name = request.POST.get('tag_name')
@@ -687,7 +828,7 @@ def add_tag_ajax(request):
     )
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def delete_tag_ajax(request, pk):
     """Handles deletion of a tag via AJAX"""
     tag = get_object_or_404(Tag, pk=pk)
@@ -712,7 +853,7 @@ def delete_tag_ajax(request, pk):
 
 
 @require_POST
-@staff_member_required
+@staff_ajax_required
 def edit_tag_ajax(request, pk):
     """Handles editing a tag via AJAX"""
     tag = get_object_or_404(Tag, pk=pk)

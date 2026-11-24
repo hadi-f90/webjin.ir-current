@@ -27,6 +27,7 @@ urlpatterns = [
 
     # User actions
     path('website/delete/<int:pk>/', views.delete_my_website, name='delete_my_website'),
+    path('website/restore/<int:pk>/', views.restore_my_website, name='restore_my_website'),
     path('review/delete/<int:pk>/', views.delete_my_review, name='delete_my_review'),
 
     # Static pages
@@ -38,6 +39,7 @@ urlpatterns = [
     path('approve/<int:pk>/', views.approve_website_ajax, name='approve_website'),
     path('ajax/reject/<int:pk>/', views.reject_website_ajax, name='reject_website_ajax'),
     path('ajax/delete/<int:pk>/', views.delete_website_ajax, name='delete_website_ajax'),
+    path('ajax/restore-website/<int:pk>/', views.restore_website_ajax, name='restore_website_ajax'),
     path(
         'ajax/update-status/<int:pk>/',
         views.update_website_status_ajax,

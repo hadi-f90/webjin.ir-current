@@ -1,6 +1,6 @@
 # Feature list & bug tracker — WebJin (وب‌جین)
 
-**Updated:** 2026-11-21
+**Updated:** 2026-11-24
 **Phase 0:** complete  
 **Current focus:** Phase 1 — MWS polish  
 
@@ -22,15 +22,20 @@ Full phased detail: `.ai_files/roadmap.md` (restored open items from pre–Phase
 ### Submit
 - [x] Unify submit templates + AJAX progressive enhancement (`submit.html`)
 - [x] Tag chips + suggestions on live submit form (endpoint `/tags/suggestions/`)
-- [ ] Categories always load on active submit form
+- [x] Categories always load on active submit form
 - [ ] Optional staff email on pending
 
 ### Dashboard
-- [ ] Modal/ID mismatches (edit/delete/status)
-- [ ] Resolve-report AJAX in UI
-- [ ] Correct pending/report/category/tag counts
-- [ ] CSRF on all staff AJAX
-- [ ] Rejected reason or soft-delete policy decision
+- [x] Modal/ID mismatches (edit/delete/status)
+- [x] Resolve-report AJAX in UI
+- [x] Correct pending/report/category/tag counts
+- [x] CSRF on all staff AJAX
+- [x] Soft-delete trash, optional reason, deleting actor, and role-based restore
+
+### Permissions / lifecycle
+- [x] Document page redirects (302) and forbidden staff AJAX (403 JSON)
+- [x] Owner/staff edits of approved websites return them to pending with a clear message
+- [x] Show the detail-page edit action to owners and staff when permitted
 
 ### Discovery / UX
 - [ ] Navbar solid after scroll

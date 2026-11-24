@@ -59,11 +59,11 @@ Phase 1 is done only when: anonymous submit > pending > staff approve (modals wo
 ## Known drift register (seed; update on every audit)
 | ID | Drift | Owner skill |
 |---|---|---|
-| D-01 | `admin_dashboard` view omits `pending_count`, `report_count`, `users`, `recent_reviews`; template reads them | django-backend |
-| D-02 | CSP `script-src 'self'` with many inline `<script>` blocks (theme toggle, submit AJAX, dashboard, Yektanet): verify in a browser for CSP violations; fix with nonces | security |
+| D-01 | `admin_dashboard` view omits `pending_count`, `report_count`, `users`, `recent_reviews`; template reads them | **Resolved 2026-11-24** — context now supplies counts, records, and active category/tag counts |
+| D-02 | CSP nonce now covers submit/edit/dashboard and Yektanet loader; index inline search and Yektanet connect/frame origins still need browser follow-up | security |
 | D-03 | Two base templates and two theme systems (`directory/base.html` lacks theme variables) | ui-ux |
 | D-04 | `edit_website.html` uses undefined `safeTagName`; inline `onclick` with raw tag names | ui-ux + security |
-| D-05 | Edit-resets-to-pending rule: conventions say reset, view resets only on major change, messages differ | product-requirements |
+| D-05 | Edit-resets-to-pending rule: conventions say reset, view resets only on major change, messages differ | **Resolved 2026-11-24** — owner-facing edits of approved websites always re-queue with a clear message; dashboard staff edits preserve status |
 | D-06 | Legacy `.claude/agents/*` skill copies or missing canonical skills | documentation |
 | D-07 | Success page and about page promise emails/addresses that do not exist | facts-register |
 | D-08 | Duplicate Persian utilities (`farsi/templatetags/utils.py` vs `farsi_tags.py`) | persian-qa |

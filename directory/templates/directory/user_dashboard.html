@@ -40,8 +40,13 @@
                             </td>
                             <td>{{ website.created_at|date:"Y/m/d"|to_jalali|to_hindi }}</td>
                             <td>
-                                <a href="{% url 'delete_my_website' website.pk %}" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('آیا مطمئن هستید؟')">حذف</a>
+                                <form method="post" action="{% url 'delete_my_website' website.pk %}">
+                                    {% csrf_token %}
+                                    <label class="form-label small" for="deletionReason{{ website.pk }}">دلیل حذف (اختیاری)</label>
+                                    <textarea class="form-control form-control-sm mb-2" id="deletionReason{{ website.pk }}"
+                                        name="deletion_reason" rows="2"></textarea>
+                                    <button type="submit" class="btn btn-sm btn-danger">انتقال به حذف‌شده‌ها</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -49,6 +54,53 @@
                 </table>
                 {% else %}
                 <p class="text-muted">هنوز وب‌سایتی ثبت نکرده‌اید.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">وب‌سایت‌های حذف‌شده</h5>
+            </div>
+            <div class="card-body">
+                {% if deleted_websites %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>عنوان</th>
+                                <th>دلیل</th>
+                                <th>انتقال‌دهنده</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for website in deleted_websites %}
+                            <tr>
+                                <td><a href="{% url 'website_detail' website.slug %}">{{ website.title }}</a></td>
+                                <td>{{ website.deletion_reason|default:"دلیلی ثبت نشده است." }}</td>
+                                <td>
+                                    {% if website.deleted_by %}
+                                    {{ website.deleted_by.get_full_name|default:website.deleted_by.username }}
+                                    {% else %}—{% endif %}
+                                </td>
+                                <td>
+                                    {% if website.deleted_by_id == user.id %}
+                                    <form method="post" action="{% url 'restore_my_website' website.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success">بازگردانی</button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted">بازگردانی فقط با دسترسی کارکنان</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">وب‌سایتی در این بخش وجود ندارد.</p>
                 {% endif %}
             </div>
         </div>

@@ -28,16 +28,16 @@ The project remains pinned to Django 6.0.3 and Python >=3.12.
 - Messages shown to users must match behavior (`facts-register-agent`).
 
 ## Known bugs (fix with a failing test first)
-1. `admin_dashboard` context lacks `pending_count`, `report_count`, `users`, `recent_reviews`, per-category and per-tag counts (D-01).
+1. `admin_dashboard` context lacks `pending_count`, `report_count`, `users`, `recent_reviews`, per-category and per-tag counts (D-01) — **resolved 2026-11-24**.
 2. `add_category_ajax` never sets `slug` (unique `''` collides on the second category) and returns `Category.objects.last().pk` (race); create once and return the object's pk.
 3. `update_website_status_ajax` formats `website.get_status_display` without calling it.
-4. `index` counts include pending/rejected sites in sidebar numbers.
+4. `index` counts include pending/rejected sites in sidebar numbers — **resolved 2026-11-24**; public counts now include approved, non-deleted websites only.
 5. `ContactFormView.form_valid` tests `email not in <queryset of Contact objects>` and filters `spam_status=True` on an integer field; compare against spam emails with `.filter(email=..., spam_status=1).exists()`. `form_invalid` renders without status code semantics.
 6. `review_website` and `report_website` fail silently on invalid forms; return a message.
 7. `Website.save()` rewrites an existing slug on every save and drops Persian titles to uuid slugs (see persian-qa defect 6).
 8. `tag_suggestions` lives in `forms.py` (move) and returns tags for unapproved sites.
 9. `user_login` ignores `next`; `register`/`login` have no rate limit.
-10. `edit_website`: non-owner gets 302 with message; ajax staff endpoints get 302 for non-staff. Document and keep consistent (tests assume this).
+10. `edit_website`: non-owner gets 302 with message; staff AJAX endpoints return 403 JSON for anonymous/non-staff users. **Resolved 2026-11-24** and covered by tests.
 
 ## Done when
 Tests cover the acceptance criteria and the bug above; `python .claude/skills/naming-law/scripts/naming_check.py .` clean; no new inline JS dependency.

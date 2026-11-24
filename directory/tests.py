@@ -2,8 +2,8 @@ import os
 import re
 import json
 from decimal import Decimal
-from django.test import override_settings
-from django.test import TestCase, Client, override_settings
+from django.contrib import admin
+from django.test import TestCase, Client, RequestFactory, override_settings
 from django.contrib.auth.models import User, Permission
 from django.contrib.messages import get_messages
 from django.urls import reverse
@@ -970,6 +970,15 @@ class SubmitWebsiteViewTests(TestCase):
         self.assertContains(response, 'id="id_owner_name"')
         self.assertContains(response, 'id="id_owner_email"')
 
+    def test_submit_form_includes_available_categories(self):
+        category = Category.objects.create(name='Available Category', slug='available-category')
+
+        response = self.client.get(reverse('submit_website'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(category, response.context['form'].fields['category'].queryset)
+        self.assertContains(response, 'Available Category')
+
     def test_submit_view_hides_owner_fields_for_authenticated_user(self):
         user = User.objects.create_user(
             'testuser',
@@ -1051,7 +1060,27 @@ class SubmitWebsiteViewTests(TestCase):
         self.assertEqual(website.owner_email, 'test@test.com')
 
 
-class EditWebsiteViewTests(TestCase):
+class CspNonceAssertionsMixin:
+    def assert_csp_nonce_matches_header(self, response):
+        content = response.content.decode()
+        policy = response['Content-Security-Policy']
+        inline_scripts = [
+            tag
+            for tag in re.findall(r'<script\b[^>]*>', content, flags=re.IGNORECASE)
+            if not re.search(r'\bsrc\s*=', tag, flags=re.IGNORECASE)
+            and 'application/json' not in tag.lower()
+        ]
+
+        self.assertGreaterEqual(len(inline_scripts), 1)
+        for tag in inline_scripts:
+            nonce_match = re.search(r'\bnonce="([^"]+)"', tag, flags=re.IGNORECASE)
+            if nonce_match is None:
+                self.fail(f'Inline script is missing a CSP nonce: {tag}')
+            nonce = nonce_match.group(1)
+            self.assertIn(f"'nonce-{nonce}'", policy)
+
+
+class EditWebsiteViewTests(CspNonceAssertionsMixin, TestCase):
     """Tests for edit website view."""
 
     def setUp(self):
@@ -1105,6 +1134,77 @@ class EditWebsiteViewTests(TestCase):
 
         self.website.refresh_from_db()
         self.assertEqual(self.website.title, 'Updated Title')
+        self.assertEqual(self.website.status, Website.STATUS_PENDING)
+
+    def test_noop_owner_edit_of_approved_website_returns_to_pending(self):
+        self.client.login(username='testuser', password='pass123')
+
+        response = self.client.post(
+            reverse('edit_website', kwargs={'slug': self.website.slug}),
+            {
+                'title': self.website.title,
+                'url': self.website.url,
+                'description': self.website.description or '',
+                'owner_name': self.website.owner_name or '',
+                'owner_email': self.website.owner_email or '',
+                'hide_owner_info': '',
+                'tags_input': '',
+            },
+            follow=True,
+        )
+
+        self.website.refresh_from_db()
+        self.assertEqual(self.website.status, Website.STATUS_PENDING)
+        self.assertContains(response, 'برای بررسی دوباره در انتظار تأیید قرار گرفت')
+
+    def test_edit_page_escapes_tag_data_and_uses_csp_nonce(self):
+        malicious_name = '\"><img src=x onerror=alert(1)>'
+        tag = Tag.objects.create(name=malicious_name, slug='unsafe-tag')
+        self.website.tags.add(tag)
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse('edit_website', kwargs={'slug': self.website.slug})
+        )
+
+        self.assertContains(response, '&lt;img', html=False)
+        self.assertNotContains(response, '<img src=x onerror=alert(1)>', html=False)
+        self.assertNotContains(response, 'onclick="removeTag', html=False)
+        self.assert_csp_nonce_matches_header(response)
+
+
+class CspNonceTests(CspNonceAssertionsMixin, TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            'cspadmin',
+            'cspadmin@test.com',
+            'pass123',
+            is_staff=True,
+        )
+        self.owner = User.objects.create_user('cspowner', 'cspowner@test.com', 'pass123')
+        self.website = Website.objects.create(
+            title='CSP Website',
+            url='https://csp.example',
+            status=Website.STATUS_APPROVED,
+            created_by=self.owner,
+        )
+
+    def test_submit_page_csp_nonce_matches_header(self):
+        self.assert_csp_nonce_matches_header(self.client.get(reverse('submit_website')))
+
+    def test_staff_dashboard_csp_nonce_matches_header(self):
+        self.client.force_login(self.admin)
+
+        self.assert_csp_nonce_matches_header(self.client.get(reverse('admin_dashboard')))
+
+    def test_owner_edit_page_csp_nonce_matches_header(self):
+        self.client.force_login(self.owner)
+
+        response = self.client.get(
+            reverse('edit_website', kwargs={'slug': self.website.slug})
+        )
+
+        self.assert_csp_nonce_matches_header(response)
 
 
 class AuthenticationViewTests(TestCase):
@@ -1280,21 +1380,72 @@ class UserDashboardViewTests(TestCase):
 
         self.assertContains(response, 'My Site')
 
+    def test_delete_website_requires_post(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse('delete_my_website', kwargs={'pk': self.website.pk})
+        )
+
+        self.assertEqual(response.status_code, 405)
+
     def test_delete_website(self):
-        """Test deleting own website."""
+        """Test owner deletion moves the website to trash and records the actor."""
+        self.client.login(username='testuser', password='pass123')
+        self.website.status = Website.STATUS_APPROVED
+        self.website.save()
+
+        response = self.client.post(
+            reverse('delete_my_website', kwargs={'pk': self.website.pk}),
+            {'deletion_reason': '  No longer maintained  '},
+        )
+
+        self.website.refresh_from_db()
+        self.assertTrue(self.website.is_deleted)
+        self.assertEqual(self.website.deleted_by, self.user)
+        self.assertEqual(self.website.deletion_reason, 'No longer maintained')
+        self.assertIsNotNone(self.website.deleted_at)
+        self.assertEqual(self.website.status, Website.STATUS_APPROVED)
+        self.assertRedirects(response, reverse('user_dashboard'))
+
+    def test_owner_can_restore_website_they_deleted(self):
+        self.website.is_deleted = True
+        self.website.deleted_by = self.user
+        self.website.deletion_reason = 'Owner requested deletion'
+        self.website.save()
         self.client.login(username='testuser', password='pass123')
 
-        response = self.client.get(reverse('delete_my_website', kwargs={'pk': self.website.pk}))
+        response = self.client.post(
+            reverse('restore_my_website', kwargs={'pk': self.website.pk})
+        )
 
-        self.assertEqual(Website.objects.count(), 0)
+        self.website.refresh_from_db()
         self.assertRedirects(response, reverse('user_dashboard'))
+        self.assertFalse(self.website.is_deleted)
+        self.assertEqual(self.website.status, Website.STATUS_PENDING)
+        self.assertEqual(self.website.deleted_by, self.user)
+
+    def test_owner_cannot_restore_website_deleted_by_staff(self):
+        staff = User.objects.create_user('staff', 'staff@test.com', 'pass123', is_staff=True)
+        self.website.is_deleted = True
+        self.website.deleted_by = staff
+        self.website.save()
+        self.client.login(username='testuser', password='pass123')
+
+        response = self.client.post(
+            reverse('restore_my_website', kwargs={'pk': self.website.pk})
+        )
+
+        self.website.refresh_from_db()
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(self.website.is_deleted)
 
     def test_cannot_delete_others_website(self):
         """Test cannot delete another user's website."""
         other = User.objects.create_user('other', 'other@test.com', 'pass123')
         self.client.login(username='other', password='pass123')
 
-        response = self.client.get(reverse('delete_my_website', kwargs={'pk': self.website.pk}))
+        response = self.client.post(reverse('delete_my_website', kwargs={'pk': self.website.pk}))
         self.assertEqual(response.status_code, 404)
 
 
@@ -1438,11 +1589,13 @@ class AdminDashboardViewTests(TestCase):
     def setUp(self):
         self.admin = User.objects.create_user('admin', 'admin@test.com', 'pass123', is_staff=True)
         self.user = User.objects.create_user('user', 'user@test.com', 'pass123')
+        self.category = Category.objects.create(name='Dashboard Category', slug='dashboard-category')
         self.pending_website = Website.objects.create(
             title='Pending Site',
             url='https://pending.com',
             status='pending',
-            created_by=self.user
+            created_by=self.user,
+            category=self.category,
         )
 
     def test_admin_dashboard_requires_staff(self):
@@ -1463,6 +1616,95 @@ class AdminDashboardViewTests(TestCase):
         response = self.client.get(reverse('admin_dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Pending Site')
+
+    def test_admin_dashboard_supplies_counts_and_recent_records(self):
+        approved = Website.objects.create(
+            title='Approved Site',
+            url='https://approved.com',
+            status=Website.STATUS_APPROVED,
+            created_by=self.user,
+            category=self.category,
+        )
+        approved.tags.add('dashboard-tag')
+        deleted_website = Website.objects.create(
+            title='Deleted Dashboard Site',
+            url='https://deleted.com',
+            status=Website.STATUS_APPROVED,
+            created_by=self.user,
+            category=self.category,
+            is_deleted=True,
+        )
+        deleted_website.tags.add('dashboard-tag')
+        Website.objects.create(
+            title='Rejected Site',
+            url='https://rejected.com',
+            status=Website.STATUS_REJECTED,
+            created_by=self.user,
+            category=self.category,
+        )
+        Report.objects.create(website=approved, user=self.user, report_type='broken')
+        Review.objects.create(website=approved, user=self.user, content='Useful')
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse('admin_dashboard'))
+
+        self.assertEqual(response.context['pending_count'], 1)
+        self.assertEqual(response.context['report_count'], 1)
+        self.assertEqual(response.context['categories'][0].website_count, 3)
+        self.assertEqual(response.context['tags'][0].website_count, 1)
+        self.assertEqual(response.context['users'][0].website_count, 3)
+        self.assertEqual(response.context['users'][0].review_count, 1)
+        self.assertEqual(response.context['recent_reviews'].count(), 1)
+
+    def test_admin_dashboard_shows_trashed_website_and_deletion_metadata(self):
+        deleted_website = Website.objects.create(
+            title='Trashed Site',
+            url='https://trashed.com',
+            status=Website.STATUS_APPROVED,
+            created_by=self.user,
+            is_deleted=True,
+            deleted_by=self.user,
+            deletion_reason='Staff review',
+        )
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse('admin_dashboard'))
+
+        self.assertContains(response, 'Trashed Site')
+        self.assertContains(response, 'Staff review')
+        self.assertIn(deleted_website, response.context['deleted_websites'])
+
+    def test_admin_can_restore_trashed_website(self):
+        website = Website.objects.create(
+            title='Trashed Site',
+            url='https://trashed.com',
+            status=Website.STATUS_APPROVED,
+            is_deleted=True,
+            deleted_by=self.user,
+        )
+        self.client.force_login(self.admin)
+
+        response = self.client.post(
+            reverse('restore_website_ajax', kwargs={'pk': website.pk}),
+        )
+
+        website.refresh_from_db()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'success')
+        self.assertFalse(website.is_deleted)
+        self.assertEqual(website.status, Website.STATUS_APPROVED)
+
+    def test_dashboard_modal_targets_and_report_action_are_present(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse('admin_dashboard'))
+
+        self.assertContains(response, 'id="editWebsiteModal"')
+        self.assertContains(response, 'id="confirmDeleteModal"')
+        self.assertContains(response, 'id="currentDeleteActionUrl"')
+        self.assertContains(response, 'id="currentDeleteCategoryActionUrl"')
+        self.assertContains(response, 'id="currentDeleteTagActionUrl"')
+        self.assertContains(response, "resolve_report_ajax")
 
 
 # =============================================================================
@@ -1509,16 +1751,21 @@ class AjaxWebsiteEndpointTests(TestCase):
         self.assertEqual(self.website.status, 'rejected')
 
     def test_delete_website(self):
-        """Test deleting website via AJAX."""
+        """Test staff deletion moves a website to trash."""
         self.client.login(username='admin', password='pass123')
         pk = self.website.pk
 
         response = self.client.post(
             reverse('delete_website_ajax', kwargs={'pk': pk}),
+            {'deletion_reason': 'Staff cleanup'},
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
 
-        self.assertFalse(Website.objects.filter(pk=pk).exists())
+        self.website.refresh_from_db()
+        self.assertTrue(self.website.is_deleted)
+        self.assertEqual(self.website.deleted_by, self.admin)
+        self.assertEqual(self.website.deletion_reason, 'Staff cleanup')
+        self.assertEqual(response.json()['status'], 'success')
 
     def test_update_status(self):
         """Test updating website status."""
@@ -1751,6 +1998,7 @@ class StaffAjaxCsrfTests(TestCase):
                 {'title': 'Updated', 'url': 'https://updated.example.com'},
             ),
             ('resolve_report_ajax', {'pk': self.report.pk}, {}),
+            ('restore_website_ajax', {'pk': self.website.pk}, {}),
             ('add_category_ajax', {}, {'name': 'New Category'}),
             ('edit_category_ajax', {'pk': self.category.pk}, {'name': 'Updated Category'}),
             ('delete_category_ajax', {'pk': self.category.pk}, {}),
@@ -1887,6 +2135,24 @@ class PermissionTests(TestCase):
         response = self.client.get(reverse('edit_website', kwargs={'slug': self.website.slug}))
         self.assertEqual(response.status_code, 200)
 
+    def test_staff_sees_edit_button_on_website_detail(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.get(
+            reverse('website_detail', kwargs={'slug': self.website.slug})
+        )
+
+        self.assertContains(response, reverse('edit_website', kwargs={'slug': self.website.slug}))
+
+    def test_owner_sees_edit_button_on_website_detail(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse('website_detail', kwargs={'slug': self.website.slug})
+        )
+
+        self.assertContains(response, reverse('edit_website', kwargs={'slug': self.website.slug}))
+
     def test_ajax_requires_post(self):
         """Test AJAX endpoints require POST method."""
         self.client.login(username='admin', password='pass123')
@@ -1907,7 +2173,85 @@ class PermissionTests(TestCase):
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
 
-        self.assertEqual(response.status_code, 302)  # anonymous/non-staff → login redirect
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['status'], 'error')
+        self.assertIn('message', response.json())
+
+    def test_anonymous_staff_ajax_request_returns_forbidden_json(self):
+        response = self.client.post(
+            reverse('approve_website', kwargs={'pk': self.website.pk}),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['status'], 'error')
+
+    def test_django_admin_cannot_hard_delete_or_edit_trash_metadata(self):
+        website_admin = admin.site._registry[Website]
+        request = RequestFactory().get('/admin/directory/website/')
+
+        self.assertFalse(website_admin.has_delete_permission(request, self.website))
+        readonly_fields = website_admin.get_readonly_fields(request, self.website)
+        self.assertIn('is_deleted', readonly_fields)
+        self.assertIn('deleted_by', readonly_fields)
+        self.assertIn('deletion_reason', readonly_fields)
+
+
+class SoftDeletedWebsiteVisibilityTests(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user('owner', 'owner@test.com', 'pass123')
+        self.staff = User.objects.create_user('staff', 'staff@test.com', 'pass123', is_staff=True)
+        self.category = Category.objects.create(name='Trash Category', slug='trash-category')
+        self.website = Website.objects.create(
+            title='Private Trashed Website',
+            url='https://trashed.example',
+            status=Website.STATUS_APPROVED,
+            category=self.category,
+            created_by=self.owner,
+            is_deleted=True,
+            deleted_by=self.staff,
+            deletion_reason='Needs staff review',
+        )
+        self.website.tags.add('trash-only-tag')
+
+    def test_public_detail_hides_trashed_website(self):
+        response = self.client.get(
+            reverse('website_detail', kwargs={'slug': self.website.slug})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_owner_can_view_trashed_website_and_reason(self):
+        self.client.force_login(self.owner)
+
+        response = self.client.get(
+            reverse('website_detail', kwargs={'slug': self.website.slug})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Needs staff review')
+        self.assertNotContains(response, reverse('edit_website', kwargs={'slug': self.website.slug}))
+        self.assertNotContains(response, 'ثبت دیدگاه')
+
+    def test_non_owner_cannot_view_trashed_website(self):
+        other_user = User.objects.create_user('other', 'other@test.com', 'pass123')
+        self.client.force_login(other_user)
+
+        response = self.client.get(
+            reverse('website_detail', kwargs={'slug': self.website.slug})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_public_index_and_suggestions_exclude_trashed_website_and_tag(self):
+        index_response = self.client.get(reverse('index'))
+        website_suggestions = self.client.get(
+            reverse('search_suggestions'),
+            {'q': 'Private Trashed Website'},
+        )
+        self.assertNotContains(index_response, 'Private Trashed Website')
+        self.assertEqual(index_response.context['categories'][0].website_count, 0)
+        self.assertEqual(website_suggestions.json()['suggestions'], [])
 
 
 # =============================================================================
@@ -1988,7 +2332,7 @@ class ErrorHandlingTests(TestCase):
         """Test invalid PK returns 404 for authenticated owner path."""
         user = User.objects.create_user('pkuser', 'pk@test.com', 'pass123')
         self.client.login(username='pkuser', password='pass123')
-        response = self.client.get(reverse('delete_my_website', kwargs={'pk': 99999}))
+        response = self.client.post(reverse('delete_my_website', kwargs={'pk': 99999}))
         self.assertEqual(response.status_code, 404)
 
     def test_invalid_category_returns_empty(self):

@@ -95,7 +95,7 @@ template, route, database or API surface.
 | L-06 | admin_dashboard context `pending/approved/rejected/reports/tags` | counts and `users`, `recent_reviews`, `pending_count`, `report_count` used by template but not passed | `pending_websites`, ... plus the missing keys |
 | L-07 | `farsi/templatetags/utils.py` | duplicates `truncate_persian`, `to_persian_num` of `farsi_tags`; not a tag library | single implementation |
 | L-08 | `tag_suggestions` in `forms.py` | view outside `views.py` | move |
-| L-09 | ids `tagInput` (form widget and manual input), `confirmModal` unused, missing `currentDeleteCatActionUrl`, `currentDeleteTagActionUrl` | id collisions / dangling | unique, defined ids |
+| L-09 | ids `tagInput` (form widget and manual input), `confirmModal` unused | id collisions / dangling | unique, defined ids |
 | L-10 | «نظر» vs «دیدگاه», «ایمیل» vs «رایانامه», «سایت» vs «وب‌سایت» | mixed vocabulary | glossary terms |
 | L-11 | `custome.css` (if present) | typo duplicate | delete |
 

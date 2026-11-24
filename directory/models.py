@@ -18,13 +18,19 @@ class Category(models.Model):
         return self.name
 
     def get_website_count(self):
-        return self.website_set.filter(status='approved').count()
+        return self.website_set.filter(
+            status=Website.STATUS_APPROVED,
+            is_deleted=False,
+        ).count()
 
 class Website(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_APPROVED = 'approved'
+    STATUS_REJECTED = 'rejected'
     STATUS_CHOICES = [
-        ('pending', "در انتظار بررسی"),
-        ('approved', "تأیید شده"),
-        ('rejected', "رد شده"),
+        (STATUS_PENDING, "در انتظار بررسی"),
+        (STATUS_APPROVED, "تأیید شده"),
+        (STATUS_REJECTED, "رد شده"),
     ]
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
@@ -43,8 +49,23 @@ class Website(models.Model):
     owner_email = models.EmailField(blank=True, null=True)
     hide_owner_info = models.BooleanField(default=False, verbose_name="مخفی کردن اطلاعات")
 
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='deleted_websites',
+    )
+    deletion_reason = models.TextField(blank=True, default='')
+
     # Status
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING,
+    )
     created_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name='submitted_websites'
     )

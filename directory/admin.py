@@ -15,15 +15,28 @@ class WebsiteAdmin(admin.ModelAdmin):
         'slug',
         'category',
         'status',
+        'is_deleted',
         'average_rating',
         'total_ratings',
         'created_at',
     ]
-    list_filter = ['status', 'category', 'created_at']
+    list_filter = ['status', 'is_deleted', 'category', 'created_at']
     search_fields = ['title', 'url', 'description']
     list_editable = ['status']
-    readonly_fields = ['created_at', 'updated_at', 'average_rating', 'total_ratings']
+    readonly_fields = [
+        'created_at',
+        'updated_at',
+        'average_rating',
+        'total_ratings',
+        'is_deleted',
+        'deleted_at',
+        'deleted_by',
+        'deletion_reason',
+    ]
     # taggit provides a widget automatically in admin if installed correctly
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):

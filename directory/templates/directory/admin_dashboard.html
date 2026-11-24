@@ -141,6 +141,14 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="#manage-trash" data-bs-toggle="tab" role="tab">
+                        <i class="bi bi-trash"></i> حذف‌شده‌ها
+                        {% if deleted_websites %}
+                        <span class="badge bg-secondary badge-notification">{{ deleted_websites.count|to_hindi }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="#manage-reports" data-bs-toggle="tab" role="tab">
                         <i class="bi bi-flag-fill"></i> گزارش‌ها
                         {% if report_count > 0 %}
@@ -310,6 +318,11 @@
                                                         data-action="{% url 'update_website_status_ajax' website.pk %}"
                                                         data-status="rejected" data-title="رد"
                                                         data-message="آیا مطمئن هستید؟">رد</button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                        data-bs-target="#confirmDeleteModal"
+                                                        data-action="{% url 'delete_website_ajax' website.pk %}"
+                                                        data-title="انتقال به حذف‌شده‌ها"
+                                                        data-message="این وب‌سایت از دسترس عمومی خارج می‌شود.">حذف</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -368,8 +381,8 @@
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#confirmDeleteModal"
                                                                     data-action="{% url 'delete_website_ajax' website.pk %}"
-                                                                    data-title="حذف"
-                                                                    data-message="آیا مطمئن هستید؟">حذف</a></li>
+                                                                    data-title="انتقال به حذف‌شده‌ها"
+                                                                    data-message="این وب‌سایت از دسترس عمومی خارج می‌شود.">حذف</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -430,8 +443,8 @@
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#confirmDeleteModal"
                                                                     data-action="{% url 'delete_website_ajax' website.pk %}"
-                                                                    data-title="حذف"
-                                                                    data-message="آیا مطمئن هستید؟">حذف</a></li>
+                                                                    data-title="انتقال به حذف‌شده‌ها"
+                                                                    data-message="این وب‌سایت از دسترس عمومی خارج می‌شود.">حذف</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -635,6 +648,49 @@
                     </div>
                 </div>
 
+                <div class="tab-pane fade" id="manage-trash" role="tabpanel">
+                    <h3 class="mb-4">وب‌سایت‌های حذف‌شده</h3>
+                    {% if deleted_websites %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>عنوان</th>
+                                    <th>ثبت‌کننده</th>
+                                    <th>دلیل حذف</th>
+                                    <th>انتقال‌دهنده</th>
+                                    <th>تاریخ</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for website in deleted_websites %}
+                                <tr>
+                                    <td><a href="{{ website.get_absolute_url }}">{{ website.title }}</a></td>
+                                    <td>{{ website.created_by.username|default:website.owner_name|default:"—" }}</td>
+                                    <td>{{ website.deletion_reason|default:"ثبت نشده است." }}</td>
+                                    <td>
+                                        {% if website.deleted_by %}
+                                        {{ website.deleted_by.get_full_name|default:website.deleted_by.username }}
+                                        {% else %}—{% endif %}
+                                    </td>
+                                    <td>{{ website.deleted_at|date:"Y/m/d"|to_jalali|to_hindi }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-success restore-website-btn"
+                                            data-action="{% url 'restore_website_ajax' website.pk %}">
+                                            بازگردانی
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">وب‌سایتی در بخش حذف‌شده‌ها وجود ندارد.</div>
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     </div>
@@ -738,6 +794,7 @@
             </div>
             <div class="modal-body">
                 <p id="deleteCatModalMessage">آیا مطمئن هستید؟</p>
+                <input type="hidden" id="currentDeleteCategoryActionUrl" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
@@ -808,6 +865,7 @@
             </div>
             <div class="modal-body">
                 <p id="deleteTagModalMessage">آیا مطمئن هستید؟</p>
+                <input type="hidden" id="currentDeleteTagActionUrl" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
@@ -892,6 +950,8 @@
             <div class="modal-body">
                 <p id="deleteModalMessage">آیا مطمئن هستید؟</p>
                 <input type="hidden" id="currentDeleteActionUrl" value="">
+                <label class="form-label" for="deleteWebsiteReason">دلیل حذف (اختیاری)</label>
+                <textarea id="deleteWebsiteReason" class="form-control" rows="3"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
@@ -904,7 +964,7 @@
 
 
 {% block extra_js %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
     // ==========================================
     // Helper Functions
     // ==========================================
@@ -968,7 +1028,7 @@
     const returnMessage = sessionStorage.getItem('adminDashboardReturnMessage');
     sessionStorage.removeItem('adminDashboardReturnSection');
     sessionStorage.removeItem('adminDashboardReturnMessage');
-    if (returnSection === 'manage-categories' || returnSection === 'manage-tags') {
+    if (returnSection === 'manage-categories' || returnSection === 'manage-tags' || returnSection === 'manage-trash') {
         const sectionTab = document.querySelector(
             `#adminSidebar a[href="#${returnSection}"]`
         );
@@ -1133,7 +1193,7 @@
             if (confirmDeleteCategoryBtn) {
                 document.getElementById('confirmDeleteCategoryModal').addEventListener('show.bs.modal', function (event) {
                     const button = event.relatedTarget;
-                    document.getElementById('currentDeleteCatActionUrl').value = button.getAttribute('data-action');
+                    document.getElementById('currentDeleteCategoryActionUrl').value = button.getAttribute('data-action');
                     const catName = button.getAttribute('data-name');
                     const catCount = button.getAttribute('data-count');
 
@@ -1142,7 +1202,7 @@
                 });
 
                 confirmDeleteCategoryBtn.addEventListener('click', function () {
-                    const actionUrl = document.getElementById('currentDeleteCatActionUrl').value;
+                    const actionUrl = document.getElementById('currentDeleteCategoryActionUrl').value;
                     if (!actionUrl) return;
 
                     confirmDeleteCategoryBtn.disabled = true;
@@ -1393,6 +1453,7 @@
 
             document.getElementById('deleteModalTitle').textContent = button.getAttribute('data-title');
             document.getElementById('deleteModalMessage').textContent = button.getAttribute('data-message');
+            document.getElementById('deleteWebsiteReason').value = '';
         });
 
         confirmDeleteBtn.addEventListener('click', function () {
@@ -1402,15 +1463,25 @@
             confirmDeleteBtn.disabled = true;
             confirmDeleteBtn.textContent = 'در حال حذف...';
 
-            sendAjaxRequest(actionUrl, {}, function (data) {
+            sendAjaxRequest(actionUrl, {
+                'deletion_reason': document.getElementById('deleteWebsiteReason').value
+            }, function (data) {
                 showAlert('success', data.message);
-                location.reload();
+                reloadDashboardSection('manage-trash', data.message);
             }, function () {
                 confirmDeleteBtn.disabled = false;
                 confirmDeleteBtn.textContent = 'حذف';
             });
         });
     }
+
+    document.querySelectorAll('.restore-website-btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            sendAjaxRequest(button.dataset.action, {}, function (data) {
+                reloadDashboardSection('manage-trash', data.message);
+            });
+        });
+    });
 
     // Resolve report: uses #confirmStatusModal with data-action=resolve_report_ajax
     // and data-status="resolved" (see report row buttons). Handled by confirmStatusBtn above.

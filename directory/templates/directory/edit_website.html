@@ -37,19 +37,17 @@
                     <div class="mb-3">
                         <label class="form-label">برچسب‌ها</label>
                         <div class="position-relative">
-                            <input type="text" id="tagInput" class="form-control" placeholder="برچسب را تایپ کنید..."
+                            <input type="text" id="tagInput" class="form-control"
+                                data-tag-suggestions-url="{% url 'tag_suggestions' %}"
+                                placeholder="برچسب را تایپ کنید..."
                                 autocomplete="off">
                             <div id="tagSuggestions" class="tag-suggestions"></div>
                         </div>
-                        <div id="tagChips" class="tag-chips">
-                            {% for tag in website.tags.all %}
-                            <span class="tag-chip" data-tag="{{ tag.name }}">
-                                {{ tag.name }}
-                                <span class="remove-tag" onclick="removeTag('{{ tag.name }}')">×</span>
-                            </span>
-                            {% endfor %}
-                        </div>
+                        <div id="tagChips" class="tag-chips"></div>
                         <input type="hidden" name="tags_input" id="tagsInput" value="{{ current_tags }}">
+                        {% for tag_name in current_tag_names %}
+                        <input type="hidden" class="existing-tag" value="{{ tag_name }}">
+                        {% endfor %}
                     </div>
 
                     <div class="mb-3">
@@ -88,15 +86,15 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    let selectedTags = [];
-
-    {% for tag in website.tags.all %}
-    selectedTags.push('{{ tag.name }}');
-    {% endfor %}
+<script nonce="{{ request.csp_nonce }}">
+    let selectedTags = Array.from(
+        document.querySelectorAll('.existing-tag'),
+        tagElement => tagElement.value
+    );
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function () {
+        renderChips();
         updateTagsInput();
     });
 
@@ -106,50 +104,52 @@
     const tagsInput = document.getElementById('tagsInput');
 
     tagInput.addEventListener('input', function () {
-        const query = this.value;
+        const query = this.value.trim();
 
         if (query.length < 1) {
             tagSuggestions.classList.remove('show');
             return;
         }
 
-        fetch('/tags/suggestions/?q=' + encodeURIComponent(query))
+        fetch(tagInput.dataset.tagSuggestionsUrl + '?q=' + encodeURIComponent(query))
             .then(response => response.json())
             .then(data => {
-                if (data.tags.length > 0) {
-                    let html = '';
-                    data.tags.forEach(tag => {
-                        if (!selectedTags.includes(tag.name)) {
-                            html += `<div class="tag-suggestion-item" onclick="addTag('${safeTagName}')">${safeTagName  }</div>`;
-                        }
-                    });
-                    tagSuggestions.innerHTML = html;
-                    tagSuggestions.classList.add('show');
-                } else {
-                    // Allow adding new tag
-                    if (!selectedTags.includes(query)) {
-                        html = `<div class="tag-suggestion-item" onclick="addTag('${query}')">+ افزودن "${query}"</div>`;
-                        tagSuggestions.innerHTML = html;
-                        tagSuggestions.classList.add('show');
-                    } else {
-                        tagSuggestions.classList.remove('show');
+                tagSuggestions.replaceChildren();
+                (data.tags || []).forEach(tag => {
+                    if (!selectedTags.includes(tag.name)) {
+                        tagSuggestions.appendChild(createSuggestion(tag.name, false));
                     }
+                });
+                if (!selectedTags.includes(query)) {
+                    tagSuggestions.appendChild(createSuggestion(query, true));
                 }
-            });
+                tagSuggestions.classList.toggle('show', tagSuggestions.childElementCount > 0);
+            })
+            .catch(error => console.error('Error fetching tag suggestions:', error));
     });
 
-    function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+    function createSuggestion(tagName, isNew) {
+        const suggestion = document.createElement('div');
+        suggestion.className = 'tag-suggestion-item' + (isNew ? ' tag-suggestion-create' : '');
+        suggestion.setAttribute('role', 'button');
+        suggestion.tabIndex = 0;
+        const label = document.createElement('span');
+        label.textContent = isNew ? `افزودن «${tagName}»` : tagName;
+        suggestion.appendChild(label);
+        suggestion.addEventListener('click', () => addTag(tagName));
+        suggestion.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                addTag(tagName);
+            }
+        });
+        return suggestion;
+    }
 
     function addTag(tagName) {
-        if (!selectedTags.includes(tagName)) {
-            selectedTags.push(tagName);
+        const normalizedTag = tagName.trim();
+        if (normalizedTag && !selectedTags.includes(normalizedTag)) {
+            selectedTags.push(normalizedTag);
             renderChips();
             updateTagsInput();
         }
@@ -164,14 +164,21 @@
     }
 
     function renderChips() {
-        let html = '';
+        tagChips.replaceChildren();
         selectedTags.forEach(tag => {
-            html += `<span class="tag-chip" data-tag="${tag}">
-            ${tag}
-            <span class="remove-tag" onclick="removeTag('${tag}')">×</span>
-        </span>`;
+            const chip = document.createElement('span');
+            chip.className = 'tag-chip';
+            const label = document.createElement('span');
+            label.textContent = tag;
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-tag';
+            removeButton.textContent = '×';
+            removeButton.setAttribute('aria-label', `حذف برچسب ${tag}`);
+            removeButton.addEventListener('click', () => removeTag(tag));
+            chip.append(label, removeButton);
+            tagChips.appendChild(chip);
         });
-        tagChips.innerHTML = html;
     }
 
     function updateTagsInput() {

@@ -144,7 +144,8 @@ scripts/          # maintenance scripts (e.g. clean_junk.sh)
 - Status: `pending` → `approved` | `rejected`
 - Public index/detail show only `status='approved'`
 - New submissions always start `pending`
-- Owner edit of an approved site should reset to `pending` (confirm per-view)
+- Owner-facing edit of an approved site resets it to `pending`; staff dashboard edits preserve status
+- Soft deletion uses a separate flag, hides a website from public discovery, and follows `.ai_files/specs/website-soft-delete.md` for owner/staff trash and restore access.
 - Tags via taggit; categories are a flat FK (no nested trees)
 
 ---

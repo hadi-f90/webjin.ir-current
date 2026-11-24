@@ -10,6 +10,7 @@ from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
+from csp.constants import NONCE
 
 load_dotenv()
 
@@ -182,7 +183,12 @@ CSRF_TRUSTED_ORIGINS = [
 CONTENT_SECURITY_POLICY = {
     'DIRECTIVES': {
         'default-src': ("'self'",),
-        'script-src': ("'self'", 'https://cdn.yektanet.com', 'https://cdn.ampproject.org'),
+        'script-src': (
+            "'self'",
+            'https://cdn.yektanet.com',
+            'https://cdn.ampproject.org',
+            NONCE,
+        ),
         'style-src': ("'self'", "'unsafe-inline'"),  # inline styles used in templates
         'frame-src': ("'self'", 'https://cdn.ampproject.org'),
         'img-src': ("'self'", 'data:', 'https:', 'https://cdn.ampproject.org'),

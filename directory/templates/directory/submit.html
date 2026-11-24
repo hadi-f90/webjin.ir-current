@@ -15,7 +15,8 @@
 
 
             <div class="card-body p-4">
-                <form method="post" id="websiteForm" action="{% url 'submit_website' %}" data-ajax="1">
+                <form method="post" id="websiteForm" action="{% url 'submit_website' %}"
+                    data-ajax="1" data-success-url="{% url 'success' %}">
                     {% csrf_token %}
 
                     <!-- ✅ Section 1: Always Visible Fields -->
@@ -91,6 +92,7 @@
                                 </label>
                                 <div class="position-relative">
                                     <input type="text" id="tagInput" class="form-control"
+                                        data-tag-suggestions-url="{% url 'tag_suggestions' %}"
                                         placeholder="برچسب را تایپ کنید..." autocomplete="off">
                                     <div id="tagSuggestions" class="tag-suggestions"></div>
                                 </div>
@@ -253,10 +255,18 @@
     }
 
     .tag-suggestion-item {
+        display: block;
+        width: 100%;
         padding: 10px 15px;
         cursor: pointer;
         transition: background 0.2s;
         border-bottom: 1px solid #f1f1f1;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        background: transparent;
+        font: inherit;
+        text-align: right;
     }
 
     .tag-suggestion-item:last-child {
@@ -264,6 +274,11 @@
     }
 
     .tag-suggestion-item:hover {
+        background-color: #e7f1ff;
+        color: #0d6efd;
+    }
+
+    .tag-suggestion-create {
         background-color: #e7f1ff;
         color: #0d6efd;
     }
@@ -301,6 +316,11 @@
 
     .tag-chip .remove-tag {
         cursor: pointer;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
         font-size: 1.1rem;
         line-height: 1;
         opacity: 0.8;
@@ -354,7 +374,7 @@
 
 {% block extra_js %}
 <script src="{% static 'js/submit-details.js' %}" defer></script>
-<script>
+<script nonce="{{ request.csp_nonce }}">
     // ==========================================
     // Tag Suggestion Functionality (Preserved)
     // ==========================================
@@ -373,36 +393,49 @@
             return;
         }
 
-        fetch('/tags/suggestions/?q=' + encodeURIComponent(query))
+        fetch(tagInput.dataset.tagSuggestionsUrl + '?q=' + encodeURIComponent(query))
             .then(response => response.json())
             .then(data => {
-                let html = '';
-
+                tagSuggestions.replaceChildren();
                 if (data.tags && data.tags.length > 0) {
                     data.tags.forEach(tag => {
                         if (!selectedTags.includes(tag.name)) {
-                            html += `<div class="tag-suggestion-item" onclick="addTag('${tag.name}')">
-                                <i class="bi bi-tag me-2"></i>${tag.name}
-                            </div>`;
+                            tagSuggestions.appendChild(createSuggestion(tag.name, false));
                         }
                     });
                 }
 
                 // Add option to create new tag
                 if (!selectedTags.includes(query)) {
-                    html += `<div class="tag-suggestion-item" onclick="addTag('${query}')"
-                             style="background-color: #e7f1ff; color: #0d6efd;">
-                        <i class="bi bi-plus-circle me-2"></i>افزودن "${query}"
-                    </div>`;
+                    tagSuggestions.appendChild(createSuggestion(query, true));
                 }
 
-                tagSuggestions.innerHTML = html;
-                tagSuggestions.classList.add('show');
+                tagSuggestions.classList.toggle('show', tagSuggestions.childElementCount > 0);
             })
             .catch(error => {
                 console.error('Error fetching tag suggestions:', error);
             });
     });
+
+    function createSuggestion(tagName, isNew) {
+        const suggestion = document.createElement('div');
+        suggestion.className = 'tag-suggestion-item' + (isNew ? ' tag-suggestion-create' : '');
+        suggestion.setAttribute('role', 'button');
+        suggestion.tabIndex = 0;
+        const icon = document.createElement('i');
+        icon.className = isNew ? 'bi bi-plus-circle me-2' : 'bi bi-tag me-2';
+        const label = document.createElement('span');
+        label.textContent = isNew ? `افزودن «${tagName}»` : tagName;
+        suggestion.append(icon, label);
+        suggestion.addEventListener('click', () => addTag(tagName));
+        suggestion.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                addTag(tagName);
+            }
+        });
+        return suggestion;
+    }
 
     // Add Tag Function
     function addTag(tagName) {
@@ -424,15 +457,23 @@
 
     // Render Tag Chips
     function renderChips() {
-        let html = '';
+        tagChips.replaceChildren();
         selectedTags.forEach(tag => {
-            html += `<span class="tag-chip">
-                <i class="bi bi-tag"></i>
-                ${tag}
-                <span class="remove-tag" onclick="removeTag('${tag}')">&times;</span>
-            </span>`;
+            const chip = document.createElement('span');
+            chip.className = 'tag-chip';
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-tag';
+            const label = document.createElement('span');
+            label.textContent = tag;
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-tag';
+            removeButton.textContent = '×';
+            removeButton.setAttribute('aria-label', `حذف برچسب ${tag}`);
+            removeButton.addEventListener('click', () => removeTag(tag));
+            chip.append(icon, label, removeButton);
+            tagChips.appendChild(chip);
         });
-        tagChips.innerHTML = html;
     }
 
     // Update Hidden Input
@@ -474,10 +515,6 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> در حال ارسال...';
         }
-        const tagInput = document.getElementById('tagInput') || form.querySelector('[name="tags_input"]');
-        if (tagInput && window.selectedTags) {
-            tagInput.value = window.selectedTags.join(', ');
-        }
         const fd = new FormData(form);
         fetch(form.action, {
             method: 'POST',
@@ -491,7 +528,7 @@
         .then(async (res) => {
             const data = await res.json().catch(() => null);
             if (res.ok && data && data.status === 'success') {
-                window.location.href = data.redirect || '{% url "success" %}';
+                window.location.href = data.redirect || form.dataset.successUrl;
                 return;
             }
             let msg = (data && data.message) ? data.message : 'خطا در ارسال فرم';

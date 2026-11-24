@@ -66,15 +66,15 @@ See `AGENTS.md` for agent onboarding.
 - [x] Fix modal / ID mismatches (`editWebsiteModal` vs `editModal`, missing hidden fields for status/delete URLs)
 - [x] Resolve-report AJAX wired via confirmStatusModal + hidden action fields
 - [x] Counts in context: `pending_count`, report count, category/tag website counts (lists stay correct)
-- [ ] CSRF on all staff AJAX endpoints verified
+- [x] CSRF on all staff AJAX endpoints verified
 - [ ] More useful columns on site/category/tag tables (optional within Phase 1)
-- [ ] Soft-delete **or** “rejected reason” field (product decision; defer hard-delete policy)
+- [x] Soft-delete trash, optional reason, deleting actor, and role-based restore (keep moderation statuses unchanged)
 
 ### 1.3 Permissions & lifecycle messaging
 
-- [ ] Document and align **302 vs 403** for non-owner edit and non-staff AJAX
-- [ ] Owner edit of approved site resets to `pending` with clear user-facing message
-- [ ] Edit button visible for owner + staff on detail when allowed
+- [x] Document and align **302 vs 403** for non-owner edit and non-staff AJAX
+- [x] Owner edit of approved site resets to `pending` with clear user-facing message
+- [x] Edit button visible for owner + staff on detail when allowed
 
 ### 1.4 Public discovery & UX
 

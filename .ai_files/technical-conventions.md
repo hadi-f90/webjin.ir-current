@@ -40,6 +40,11 @@ For day-to-day coding style, see `.ai_files/coding-conventions.md` when it exist
 - New submissions always start as `pending`
 - Owner or staff edit of an approved site **should reset to pending** unless
   staff is editing from admin dashboard (document per-view behavior in specs)
+- Soft deletion is separate from moderation status: `is_deleted=True` hides a
+  website from all public discovery without changing `pending`, `approved`, or
+  `rejected`. Staff can restore any deleted website; an owner can restore only
+  a website that owner deleted. Keep the latest deleting account, timestamp,
+  and optional reason visible only to staff and the owning account.
 - Tags via taggit `TaggableManager`; categories are a separate `Category` FK
   (tags replace subcategories — do not add nested Category trees)
 
@@ -56,14 +61,21 @@ For day-to-day coding style, see `.ai_files/coding-conventions.md` when it exist
 - JSON shape: `{"status": "success"|"error", "message": "...", ...}`
 - CSRF: cookie or `meta[name=csrf-token]`; send `X-CSRFToken` + form body token
 - Prefer progressive enhancement: forms work without JS; AJAX is enhancement
+- Staff AJAX requests by anonymous or non-staff users return HTTP 403 JSON with
+  the standard `status` / `message` keys. Page requests keep their normal login
+  redirects; an authenticated non-owner edit request redirects to the detail
+  page with a Persian denial message.
 
 ## Security
 
 - Secrets only in environment / `.env` (never commit real keys or DB passwords)
 - CSP: allow only needed script origins (e.g. Yektanet CDN if ads enabled)
+- Inline scripts must use the per-response `django-csp` nonce; never enable
+  `'unsafe-inline'` to make scripts work.
 - Captcha on anonymous submit; rate-limit submit/rate/review/report
 - Staff dashboard never exposed without `is_staff`
-- XSS: escape user content in templates; be careful with `|safe` and favicon HTML
+- XSS: escape user content in templates; build DOM from untrusted text with
+  `textContent` rather than `innerHTML`; be careful with `|safe` and favicon HTML
 
 ## Static & media
 
@@ -74,6 +86,8 @@ For day-to-day coding style, see `.ai_files/coding-conventions.md` when it exist
 
 - Model/form unit tests for URL normalize, slug uniqueness, status transitions
 - View tests for permission (anonymous vs staff) on AJAX moderation endpoints
+- Tests that trashed websites are excluded from public pages and that only
+  authorized owners/staff can view and restore them
 - Template/integration tests for RTL critical paths when feasible
 
 ## Naming
