@@ -9,13 +9,16 @@
     <form method="get" action="{% url 'index' %}" class="position-relative">
         <div class="input-group input-group-lg">
             <input type="text" name="search" class="form-control" placeholder="جستجو در وب‌سایت‌ها..."
-                value="{{ request.GET.search|default:'' }}" id="searchInput" autocomplete="off">
+                value="{{ request.GET.search|default:'' }}" id="searchInput" autocomplete="off"
+                data-suggestions-url="{% url 'search_suggestions' %}" aria-controls="searchResults"
+                aria-autocomplete="list">
             <button class="btn btn-primary" type="submit">
                 <i class="bi bi-search"></i>
             </button>
         </div>
         <!-- Search Suggestions -->
-        <div id="searchResults" class="search-results d-none"></div>
+        <div id="searchResults" class="search-results d-none" role="region" aria-live="polite"
+            aria-label="پیشنهادهای جستجو"></div>
     </form>
 </div>
 
@@ -30,14 +33,16 @@
             <div class="list-group list-group-flush">
                 <a href="{% url 'index' %}"
                     class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
-                    همه ({{ categories|length }})
+                    همه وب‌سایت‌ها
                 </a>
                 {% for category in categories %}
                 <a href="?category={{ category.slug }}"
-                    class="list-group-item list-group-item-action {% if selected_category == category.slug %}active{% endif %}">
+                    class="list-group-item list-group-item-action {% if selected_category and selected_category.slug == category.slug %}active{% endif %}">
                     <i class="{{ category.icon }}"></i> {{ category.name }}
                     <span class="badge bg-secondary float-end">{{ category.website_count|to_hindi }}</span>
                 </a>
+                {% empty %}
+                <p class="list-group-item text-muted mb-0">دسته‌بندی‌ای برای نمایش وجود ندارد.</p>
                 {% endfor %}
             </div>
         </div>
@@ -55,6 +60,8 @@
                     <a href="?tag={{ tag.slug }}" class="badge bg-light text-dark text-decoration-none mb-1">
                         {{ tag.name }} ({{ tag.website_count|to_hindi }})
                     </a>
+                    {% empty %}
+                    <p class="text-muted mb-0">برچسبی برای نمایش وجود ندارد.</p>
                     {% endfor %}
                 </div>
             </div>
@@ -64,7 +71,7 @@
     <!-- Main Content -->
     <div class="col-md-9">
         <!-- Featured/Random Websites -->
-        {% if not request.GET.search and not selected_category and not tag_slug %}
+        {% if not request.GET.search and not selected_category and not tag_slug and featured_websites %}
         <div class="card mb-4 border-info">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0"><i class="bi bi-stars"></i> وب‌سایت‌های پیشنهادی</h5>
@@ -139,43 +146,78 @@
             </div>
             {% empty %}
             <div class="col-12">
-                <div class="alert alert-info">هیچ وب‌سایتی پیدا نشد.</div>
+                <div class="card card-theme text-center">
+                    <div class="card-body py-5">
+                        <i class="bi bi-search text-muted fs-2" aria-hidden="true"></i>
+                        <p class="text-muted mt-3 mb-2">
+                            {% if request.GET.search %}
+                            برای این جستجو وب‌سایتی پیدا نشد.
+                            {% elif selected_category %}
+                            در این دسته‌بندی وب‌سایتی برای نمایش وجود ندارد.
+                            {% elif tag_slug %}
+                            برای این برچسب وب‌سایتی پیدا نشد.
+                            {% else %}
+                            هنوز وب‌سایتی برای نمایش وجود ندارد.
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'index' %}" class="btn btn-outline-primary">نمایش همه وب‌سایت‌ها</a>
+                    </div>
+                </div>
             </div>
             {% endfor %}
         </div>
 
         <!-- Pagination -->
-        {% include 'directory/paginator.html' %}
+        {% include 'directory/_paginator.html' %}
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.getElementById('searchInput').addEventListener('input', function () {
+<script nonce="{{ request.csp_nonce }}">
+    const searchInput = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', function () {
         const query = this.value;
-        const resultsDiv = document.getElementById('searchResults');
 
         if (query.length < 2) {
+            resultsDiv.replaceChildren();
             resultsDiv.classList.add('d-none');
             return;
         }
 
-        fetch('/search/suggestions/?q=' + encodeURIComponent(query))
+        fetch(searchInput.dataset.suggestionsUrl + '?q=' + encodeURIComponent(query))
             .then(response => response.json())
             .then(data => {
-                if (data.suggestions.length > 0) {
-                    let html = '<div class="card">';
-                    data.suggestions.forEach(item => {
-                        html += `<a href="${item.url}" class="list-group-item list-group-item-action">
-                        <i class="${item.icon}"></i> ${item.title}
-                        <small class="text-muted float-end">${item.type}</small>
-                    </a>`;
-                    });
-                    html += '</div>';
-                    resultsDiv.innerHTML = html;
-                    resultsDiv.classList.remove('d-none');
-                } else {
-                    resultsDiv.classList.add('d-none');
-                }
+                const card = document.createElement('div');
+                card.className = 'card';
+                const suggestionsList = document.createElement('div');
+                suggestionsList.className = 'list-group list-group-flush';
+                (data.suggestions || []).forEach(item => {
+                    if (!item.url || item.url.startsWith('//')
+                        || (!item.url.startsWith('/') && !item.url.startsWith('?'))) {
+                        return;
+                    }
+                    const link = document.createElement('a');
+                    link.href = item.url;
+                    link.className = 'list-group-item list-group-item-action';
+                    const icon = document.createElement('i');
+                    icon.className = item.type === 'website' ? 'bi bi-globe' : 'bi bi-tag';
+                    const title = document.createElement('span');
+                    title.textContent = item.title;
+                    const type = document.createElement('small');
+                    type.className = 'text-muted float-end';
+                    type.textContent = item.type === 'website' ? 'وب‌سایت' : 'برچسب';
+                    link.append(icon, document.createTextNode(' '), title, type);
+                    suggestionsList.appendChild(link);
+                });
+                card.appendChild(suggestionsList);
+                resultsDiv.replaceChildren(card);
+                resultsDiv.classList.toggle('d-none', suggestionsList.childElementCount === 0);
+            })
+            .catch(error => {
+                console.error('Error fetching search suggestions:', error);
+                resultsDiv.replaceChildren();
+                resultsDiv.classList.add('d-none');
             });
     });
 

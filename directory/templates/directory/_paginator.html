@@ -1,0 +1,58 @@
+{% load farsi_tags %}
+{% load querystring %}
+
+<div class="row">
+    <nav aria-label="صفحه‌بندی">
+        <hr class="my-0" />
+
+        {% if page_obj.paginator.num_pages > 1 %}
+        <ul class="pagination flex-wrap justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=1 %}" aria-label="رفتن به صفحه نخست">نخست</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=page_obj.previous_page_number %}"
+                    aria-label="رفتن به صفحه قبلی">قبلی</a>
+            </li>
+            {% endif %}
+
+            {% for page_number in page_range %}
+            {% if page_number == page_obj.paginator.ELLIPSIS %}
+            <li class="page-item disabled" aria-hidden="true">
+                <span class="page-link">{{ page_number }}</span>
+            </li>
+            {% elif page_number == page_obj.number %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link" aria-label="صفحه {{ page_number|to_hindi }}">
+                    {{ page_number|to_hindi }}
+                </span>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=page_number %}"
+                    aria-label="رفتن به صفحه {{ page_number|to_hindi }}">
+                    {{ page_number|to_hindi }}
+                </a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=page_obj.next_page_number %}"
+                    aria-label="رفتن به صفحه بعدی">بعدی</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?{% query_string page=page_obj.paginator.num_pages %}"
+                    aria-label="رفتن به صفحه آخر">
+                    آخرین
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        <p class="visually-hidden">صفحه {{ page_obj.number|to_hindi }} از
+            {{ page_obj.paginator.num_pages|to_hindi }}</p>
+        {% endif %}
+    </nav>
+</div>

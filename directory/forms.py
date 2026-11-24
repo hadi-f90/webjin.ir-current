@@ -163,10 +163,10 @@ class ReviewForm(forms.Form):
             attrs={
                 'class': 'form-control',
                 'rows': 4,
-                'placeholder': 'نظر خود را بنویسید...',
+                'placeholder': 'دیدگاه خود را بنویسید...',
             }
         ),
-        label='نظر شما',
+        label='دیدگاه شما',
     )
 
 

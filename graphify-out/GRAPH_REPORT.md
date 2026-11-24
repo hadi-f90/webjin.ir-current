@@ -1,121 +1,121 @@
 # Graph Report - webjin.ir-current  (2026-11-24)
 
 ## Corpus Check
-- 337 files · ~2,458,599 words
+- 226 files · ~1,617,023 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 767 file(s) not represented in the graph (top: .gz 452, .css 131, .woff2 58)
-- WARNING: 767 of 1245 files seen (62%) have no supported extractor and are missing from this graph entirely. It may look complete while representing only part of the codebase.
+- Unclassified: 175 file(s) not represented in the graph (top: .css 79, .woff2 36, .ttf 32)
+- WARNING: 175 of 501 files seen (35%) have no supported extractor and are missing from this graph entirely. It may look complete while representing only part of the codebase.
 
 ## Summary
-- 10988 nodes · 21028 edges · 721 communities (273 shown, 448 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 831 edges (avg confidence: 0.86)
+- 7494 nodes · 14129 edges · 486 communities (204 shown, 282 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 691 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8c5b7b1b`
+- Built from commit: `50dc36a2`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - htmx.2.0.8.min.js
-- htmx.2.0.8.min.d073ff63d1ed.js
+- Pe
 - static/js/bootstrap.bundle.js
 - staticfiles/js/bootstrap.bundle.js
-- xregexp.a7e08b0ce686.js
-- xregexp.js
+- ie
 - staticfiles/js/bootstrap.bundle.min.js
-- bootstrap.bundle.4c93ab530860.js
+- te
 - directory/views.py
 - staticfiles/js/bootstrap.esm.js
 - static/js/bootstrap.esm.js
-- bootstrap.esm.31faa28984e4.js
+- mt
 - staticfiles/js/bootstrap.esm.min.js
 - static/js/bootstrap.esm.min.js
-- bootstrap.esm.min.3ba018d84c8c.js
+- z
 - static/js/all.min.js
 - staticfiles/js/all.min.js
-- all.min.c8854003ef97.js
+- smoke
 - staticfiles/js/fontawesome.min.js
-- fontawesome.min.e1ef1d1c28e6.js
+- je
 - static/js/fontawesome.min.js
-- bootstrap.bundle.min.46f7b49f1198.js
+- li
 - jquery/jquery.min.js
-- jquery.min.2c872dbe60f4.js
-- directory/tests.py
-- jquery.min (copy).js
-- jquery.min (copy).8fb8fee4fcc3.js
+- _e
+- TestCase
+- mn
+- ne
 - static/js/bootstrap.bundle.min.js
 - contact/views.py
 - Tooltip
 - farsi_tags.py
 - Tooltip
 - Tooltip
-- Tooltip
+- ni
 - Tooltip
 - Tooltip
 - Tooltip
 - select2.full.js
-- select2.full.c2afdeda3058.js
-- Tooltip
-- Tooltip
-- Tooltip
+- detectOverflow
+- On
+- Ae
+- getOffsetParent
 - Tooltip
 - Tooltip
 - static/js/jquery.min.js
 - an
-- an
-- ps
-- Fi
+- In
+- Yi
+- Collapse
 - staticfiles/js/jquery.min.js
-- jquery.min.6fc159d00dc3.js
+- Naming Law
 - static/js/jquery.js
-- Carousel
+- preventOverflow
 - Carousel
 - staticfiles/js/jquery.js
-- jquery.2849239b95f5.js
+- pt
 - jquery/jquery.js
-- jquery.12e87d2f3a4c.js
+- preventOverflow
 - Pe
-- Pe
+- bi
 - RatingModelTests
-- Website
+- Category
+- re
 - WebsiteSubmitForm
 - static/js/bootstrap.js
 - TemplateFactory
 - staticfiles/js/bootstrap.js
-- bootstrap.aac878dd9689.js
-- TemplateFactory
+- QuickSubmitForm
+- Z
 - static/js/all.js
 - ht
 - static/js/fontawesome.js
 - staticfiles/js/all.js
-- all.fcd011feaa2f.js
+- Offcanvas
 - TemplateFactory
-- ht
+- BaseComponent
 - staticfiles/js/fontawesome.js
-- fontawesome.f98c5f0c8288.js
+- ScrollBarHelper
 - utils.py
 - TemplateFactory
-- TemplateFactory
-- ._queueCallback
-- QuickSubmitForm
+- Vt
+- Toast
+- SubmitWebsiteViewTests
 - Si
 - Modal
 - Modal
 - Modal
 - Modal
+- popperGenerator
 - Modal
 - Modal
-- Modal
-- Modal
-- Modal
+- Popover
+- Security
 - Modal
 - staticfiles/js/bootstrap.min.js
-- Ze
-- getWindow
-- Modal
-- Si
-- Ln
+- ReviewViewTests
+- Spec: Public Discovery / Search
+- ContactFormFeedbackTests
+- FocusTrap
+- FocusTrap
 - BaseComponent
 - Modal
 - static/js/bootstrap.min.js
@@ -123,35 +123,26 @@
 - BaseComponent
 - Carousel
 - xregexp.min.js
-- xregexp.min.f1ae4617847c.js
-- Carousel
+- Ei
+- ReviewModelTests
 - Carousel
 - Carousel
 - Carousel
 - at
 - Carousel
 - Carousel
+- invertBmp
 - Results
-- Results
+- buildAstral
+- getContextualTokenSeparator
 - Carousel
-- at
-- St
-- Carousel
-- Carousel
-- mt
-- Nt
 - WebJin (dirweb.ir / webjin.ir) Development Roadmap
 - Security
-- bootstrap.min.78ec300a4030.js
 - re
 - Dropdown
 - Dropdown
 - ScrollSpy
 - ScrollSpy
-- Dropdown
-- ScrollSpy
-- Dropdown
-- ScrollSpy
 - BaseComponent
 - BaseComponent
 - li
@@ -159,21 +150,13 @@
 - V
 - BaseComponent
 - BaseComponent
-- BaseComponent
-- BaseComponent
-- B
-- Qi
+- at
 - Dropdown
 - Dropdown
-- Dropdown
-- V
 - ne
 - Dropdown
 - SelectAdapter
-- SelectAdapter
 - Dropdown
-- Dropdown
-- li
 - Dropdown
 - SecuritySettingsTests
 - WebsiteModelTests
@@ -181,34 +164,21 @@
 - Offcanvas
 - Offcanvas
 - TemplateFactory
-- ti
-- Qn
+- ni
+- an
 - Offcanvas
 - Offcanvas
-- Offcanvas
-- Offcanvas
-- ne
-- be
-- pi
+- Be
+- Si
 - TemplateFactory
 - TemplateFactory
 - Toast
 - ScrollSpy
 - Ae
 - .apply
-- .apply
-- XRegExp
 - XRegExp
 - TemplateFactory
 - TemplateFactory
-- TemplateFactory
-- ._queueCallback
-- es
-- Toast
-- ScrollSpy
-- TemplateFactory
-- je
-- Ti
 - to_hindi
 - Toast
 - Toast
@@ -220,49 +190,25 @@
 - Tab
 - je
 - .trigger
-- .trigger
 - Toast
 - Toast
-- Toast
-- Toast
-- Yi
-- z
-- Zs
-- mo
-- ScrollSpy
 - Tab
-- Tab
-- Tab
-- Ae
-- ._queueCallback
-- Es
-- Fs
-- R
+- V
 - On
 - Tab
 - Tab
-- Tab
-- Tab
-- On
 - Tab
 - ScrollSpy
 - ScrollSpy
 - Tab
 - Tab
 - AGENTS.md — WebJin (dirweb.ir / webjin.ir)
-- Naming Law
+- ReportForm
 - bi
 - BaseComponent
 - matcherFromTokens
-- matcherFromTokens
-- Utils
 - Utils
 - select2.full.min.js
-- select2.full.min.fcd7500d8e13.js
-- preventOverflow
-- bi
-- Be
-- BaseComponent
 - Feature list & bug tracker — WebJin (وب‌جین)
 - _toConsumableArray
 - mn
@@ -271,14 +217,8 @@
 - static/js/brands.js
 - _toConsumableArray
 - MultipleSelection
-- MultipleSelection
 - _toConsumableArray
-- _toConsumableArray
-- ._queueCallback
-- mn
 - staticfiles/js/brands.js
-- brands.ca7364d19aaa.js
-- _toConsumableArray
 - _toConsumableArray
 - Orchestrator
 - getCanonicalIcon
@@ -290,26 +230,15 @@
 - Toast
 - getCanonicalIcon
 - .GetData
-- .GetData
 - getCanonicalIcon
-- getCanonicalIcon
-- Collapse
 - Feature list & bug tracker — WebJin (وب‌جین)
 - Collapse
-- pt
-- qt
-- Ss
 - ScrollSpy
 - Collapse
-- Toast
-- Qt
-- ts
-- getCanonicalIcon
+- ht
 - getCanonicalIcon
 - persian_list
-- Swipe
 - U
-- Swipe
 - Backdrop
 - Swipe
 - Collapse
@@ -318,24 +247,12 @@
 - Collapse
 - Z
 - RelatedObjectLookups.js
-- RelatedObjectLookups.ed6240809a40.js
-- Swipe
-- U
-- ot
 - Swipe
 - Backdrop
 - Swipe
 - Collapse
 - Backdrop
 - Swipe
-- Collapse
-- Backdrop
-- Swipe
-- Collapse
-- Backdrop
-- Swipe
-- Z
-- lt
 - Product / Requirements
 - AjaxCategoryEndpointTests
 - AjaxWebsiteEndpointTests
@@ -344,11 +261,7 @@
 - Offcanvas
 - _objectSpread2
 - _objectSpread2
-- _objectSpread2
 - Offcanvas
-- Offcanvas
-- Offcanvas
-- _objectSpread2
 - _objectSpread2
 - SecurityTests
 - Spec: Submission Details Toggle and Contact Captcha Alignment
@@ -366,14 +279,8 @@
 - matcherFromTokens
 - matcherFromTokens
 - AttachBody
-- AttachBody
 - classParser
 - classParser
-- BaseComponent
-- classParser
-- classParser
-- matcherFromTokens
-- matcherFromTokens
 - matcherFromTokens
 - matcherFromTokens
 - Documentation
@@ -393,17 +300,9 @@
 - Vt
 - domManip
 - actions.js
-- actions.f1d5653edb59.js
-- domManip
 - domManip
 - Backdrop
 - Backdrop
-- Backdrop
-- Backdrop
-- Zi
-- Vt
-- Ce
-- domManip
 - domManip
 - Conversion / Monetization UX
 - Database
@@ -416,97 +315,61 @@
 - replaceForPosition
 - InputData
 - Search
-- InputData
-- Search
-- replaceForPosition
-- replaceForPosition
 - replaceForPosition
 - replaceForPosition
 - Spec: Preserve Admin Category and Tag Section
 - Django Backend
-- Swipe
-- Me
 - CategoryModelTests
 - SearchSuggestionsTests
 - Animation
 - Information about icons in this directory
-- Information about icons in this directory
-- Animation
 - Animation
 - Tags
-- Tags
-- Animation
 - Animation
 - Spec: Authentication and Contact Form UX
 - Spec: Staff Moderation Dashboard
 - Spec: Website Edit Permissions and Approval Lifecycle
 - RatingViewTests
-- Ie
 - Spec: Website Trash
-- Ut
+- R
 - static/js/brands.min.js
 - domManip
-- Ei
 - ReportViewTests
 - staticfiles/js/brands.min.js
-- brands.min.ab3eeaf8c702.js
-- domManip
 - domManip
 - StaticPagesTests
 - Ei
-- ReportModelTests
+- Report
 - Spec: Ratings & Reviews
 - generateMutation
 - generateMutation
 - Animation
 - nodeName
-- nodeName
-- InfiniteScroll
 - InfiniteScroll
 - generateMutation
 - generateMutation
-- generateMutation
-- generateMutation
 - Animation
-- Animation
-- Spec: Reports / Abuse Handling
 - _setPrototypeOf
 - _setPrototypeOf
 - getWidthOrHeight
 - _setPrototypeOf
 - _setPrototypeOf
-- _setPrototypeOf
-- _setPrototypeOf
 - getWidthOrHeight
-- getWidthOrHeight
-- K
 - migrate_skills_layout.sh
 - K
 - expectSync
 - static/js/jquery-migrate-1.4.1.js
 - calendar.js
-- calendar.1ba287b592e8.js
 - admin/js/theme.js
-- theme.91cf832f559e.js
 - AjaxAdapter
-- AjaxAdapter
-- expectSync
 - expectSync
 - staticfiles/js/jquery-migrate-1.4.1.js
-- jquery-migrate-1.4.1.6c57b762589f.js
 - done
 - getWidthOrHeight
 - resolve
 - resolve
-- initSidebarQuickFilter
 - initSidebarQuickFilter
 - urlify.js
-- urlify.ae970a820212.js
-- resolve
-- resolve
-- resolve
-- done
-- getWidthOrHeight
 - resolve
 - done
 - getWidthOrHeight
@@ -519,25 +382,14 @@
 - inspect
 - createCache
 - inspect
-- createCache
-- inspect
-- o
 - o
 - staticfiles/js/custom.js
-- custom.99f902523eae.js
-- createCache
-- inspect
-- createCache
-- inspect
 - createCache
 - inspect
 - createCache
 - inspect
 - buildParams
 - on
-- on
-- on
-- buildParams
 - on
 - buildParams
 - on
@@ -545,93 +397,81 @@
 - Spec: User Accounts & Dashboard
 
 ## God Nodes (most connected - your core abstractions)
-1. `Tooltip` - 41 edges
+1. `Website` - 67 edges
 2. `Tooltip` - 41 edges
 3. `Tooltip` - 41 edges
 4. `Tooltip` - 41 edges
 5. `Tooltip` - 41 edges
 6. `Tooltip` - 41 edges
 7. `Tooltip` - 41 edges
-8. `Tooltip` - 41 edges
-9. `Tooltip` - 41 edges
+8. `an` - 40 edges
+9. `Tooltip` - 40 edges
 10. `Pe` - 40 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `1.1 Submission UX` --references--> `PublicWebsiteSubmitForm`  [INFERRED]
   .ai_files/roadmap.md → directory/forms.py
+- `Website lifecycle` --references--> `Category`  [INFERRED]
+  .ai_files/technical-conventions.md → directory/models.py
+- `Assumptions` --references--> `Website`  [INFERRED]
+  .ai_files/specs/authenticated-submission-identity.md → directory/models.py
 - `User Stories` --references--> `Website`  [INFERRED]
   .ai_files/specs/website-submission.md → directory/models.py
-- `Decision matrix — residual items (from 2026-08-02 audit)` --references--> `to_jalali()`  [INFERRED]
-  .ai_files/roadmap.md → farsi/templatetags/farsi_tags.py
 - `Register (seed, from the repo snapshot)` --references--> `to_jalali()`  [INFERRED]
   .claude/skills/facts-register-agent/SKILL.md → farsi/templatetags/farsi_tags.py
-- `Known bugs (fix with a failing test first)` --references--> `register()`  [INFERRED]
-  .claude/skills/django-backend-agent/SKILL.md → directory/views.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (721 total, 448 thin omitted)
+## Communities (486 total, 282 thin omitted)
 
 ### Community 0 - "htmx.2.0.8.min.js"
-Cohesion: 0.08
-Nodes (103): a(), Ae(), an(), at(), B(), be(), bn(), bt() (+95 more)
-
-### Community 1 - "htmx.2.0.8.min.d073ff63d1ed.js"
-Cohesion: 0.08
-Nodes (103): a(), Ae(), an(), at(), B(), be(), bn(), bt() (+95 more)
+Cohesion: 0.12
+Nodes (34): Ae(), be(), c(), cn(), d(), et(), ht(), i() (+26 more)
 
 ### Community 2 - "static/js/bootstrap.bundle.js"
-Cohesion: 0.05
-Nodes (91): addHandler(), applyStyles(), areValidElements(), arrow(), bootstrapDelegationHandler(), bootstrapHandler(), computeAutoPlacement(), computeOffsets() (+83 more)
+Cohesion: 0.08
+Nodes (28): addHandler(), bootstrapDelegationHandler(), bootstrapHandler(), find(), findHandler(), focusableChildren(), getDataAttribute(), getDataAttributes() (+20 more)
 
 ### Community 3 - "staticfiles/js/bootstrap.bundle.js"
-Cohesion: 0.05
-Nodes (58): addHandler(), areValidElements(), arrow(), bootstrapDelegationHandler(), bootstrapHandler(), computeAutoPlacement(), computeOffsets(), computeStyles() (+50 more)
-
-### Community 4 - "xregexp.a7e08b0ce686.js"
-Cohesion: 0.02
-Nodes (4): buildAstral(), cacheAstral(), getContextualTokenSeparator(), isQuantifierNext()
-
-### Community 5 - "xregexp.js"
-Cohesion: 0.02
-Nodes (4): buildAstral(), cacheAstral(), getContextualTokenSeparator(), isQuantifierNext()
-
-### Community 6 - "staticfiles/js/bootstrap.bundle.min.js"
-Cohesion: 0.09
-Nodes (42): be(), bi(), Ce(), D(), De(), _e(), F(), ge() (+34 more)
-
-### Community 7 - "bootstrap.bundle.4c93ab530860.js"
 Cohesion: 0.06
 Nodes (74): addHandler(), applyStyles(), areValidElements(), bootstrapDelegationHandler(), bootstrapHandler(), contains(), debounce(), detectOverflow() (+66 more)
 
+### Community 4 - "ie"
+Cohesion: 0.14
+Nodes (33): a(), at(), bt(), ct(), De(), dt(), _e(), F() (+25 more)
+
+### Community 6 - "staticfiles/js/bootstrap.bundle.min.js"
+Cohesion: 0.09
+Nodes (45): He(), ae(), be(), Bt(), ce(), D(), de(), ee() (+37 more)
+
+### Community 7 - "te"
+Cohesion: 0.21
+Nodes (26): ce(), dn(), e(), ee(), en(), Fe(), G(), gn() (+18 more)
+
 ### Community 8 - "directory/views.py"
-Cohesion: 0.05
-Nodes (47): In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Public Discovery / Search, User Stories, In Scope, In Scope (+39 more)
+Cohesion: 0.06
+Nodes (45): In Scope, In Scope, In Scope, Names introduced, Naming, Known bugs (fix with a failing test first), Rules, 3. Django surface (+37 more)
 
 ### Community 9 - "staticfiles/js/bootstrap.esm.js"
-Cohesion: 0.03
+Cohesion: 0.04
 Nodes (59): addHandler(), allowedAttribute(), AttachmentMap, bootstrapDelegationHandler(), bootstrapHandler(), customEvents, Data, Default (+51 more)
 
 ### Community 10 - "static/js/bootstrap.esm.js"
 Cohesion: 0.04
 Nodes (59): addHandler(), allowedAttribute(), AttachmentMap, bootstrapDelegationHandler(), bootstrapHandler(), customEvents, Data, Default (+51 more)
 
-### Community 11 - "bootstrap.esm.31faa28984e4.js"
-Cohesion: 0.04
-Nodes (59): addHandler(), allowedAttribute(), AttachmentMap, bootstrapDelegationHandler(), bootstrapHandler(), customEvents, Data, Default (+51 more)
-
 ### Community 12 - "staticfiles/js/bootstrap.esm.min.js"
 Cohesion: 0.04
-Nodes (59): addHandler(), allowedAttribute(), AttachmentMap, bootstrapDelegationHandler(), bootstrapHandler(), customEvents, Data, Default (+51 more)
+Nodes (56): addHandler(), allowedAttribute(), AttachmentMap, bootstrapDelegationHandler(), bootstrapHandler(), customEvents, Data, Default (+48 more)
 
 ### Community 13 - "static/js/bootstrap.esm.min.js"
 Cohesion: 0.04
 Nodes (58): addHandler(), allowedAttribute(), AttachmentMap, bootstrapDelegationHandler(), bootstrapHandler(), customEvents, Data, Default (+50 more)
 
-### Community 14 - "bootstrap.esm.min.3ba018d84c8c.js"
-Cohesion: 0.04
-Nodes (58): addHandler(), allowedAttribute(), AttachmentMap, bootstrapDelegationHandler(), bootstrapHandler(), customEvents, Data, Default (+50 more)
+### Community 14 - "z"
+Cohesion: 0.11
+Nodes (3): F, q, z
 
 ### Community 15 - "static/js/all.min.js"
 Cohesion: 0.08
@@ -641,45 +481,37 @@ Nodes (50): $1(), _2(), a(), A1(), a2(), b(), c(), c2() (+42 more)
 Cohesion: 0.08
 Nodes (50): $1(), _2(), a(), A1(), a2(), b(), c(), c2() (+42 more)
 
-### Community 17 - "all.min.c8854003ef97.js"
-Cohesion: 0.08
-Nodes (50): $1(), _2(), a(), A1(), a2(), b(), c(), c2() (+42 more)
+### Community 17 - "smoke"
+Cohesion: 0.09
+Nodes (22): DEBUG, DJANGO_ALLOWED_HOSTS, DJANGO_SECRET_KEY, jobs, smoke, name, on, pull_request (+14 more)
 
 ### Community 18 - "staticfiles/js/fontawesome.min.js"
 Cohesion: 0.08
 Nodes (48): a(), b(), be(), d(), de(), E(), ee(), en() (+40 more)
 
-### Community 19 - "fontawesome.min.e1ef1d1c28e6.js"
-Cohesion: 0.08
-Nodes (48): a(), b(), be(), d(), de(), E(), ee(), en() (+40 more)
+### Community 19 - "je"
+Cohesion: 0.18
+Nodes (3): We(), Ye(), je
 
 ### Community 20 - "static/js/fontawesome.min.js"
-Cohesion: 0.09
-Nodes (43): a(), b(), be(), d(), de(), E(), ee(), en() (+35 more)
-
-### Community 21 - "bootstrap.bundle.min.46f7b49f1198.js"
 Cohesion: 0.10
-Nodes (45): ae(), be(), Bt(), ce(), D(), de(), ee(), Ft() (+37 more)
+Nodes (42): a(), b(), be(), d(), de(), E(), ee(), en() (+34 more)
 
 ### Community 22 - "jquery/jquery.min.js"
-Cohesion: 0.08
-Nodes (38): Ae(), B(), Be(), c(), $e(), ee(), F(), fe() (+30 more)
+Cohesion: 0.09
+Nodes (35): Ae(), B(), Be(), c(), $e(), ee(), F(), fe() (+27 more)
 
-### Community 23 - "jquery.min.2c872dbe60f4.js"
-Cohesion: 0.08
-Nodes (37): Ae(), B(), Be(), c(), $e(), ee(), F(), fe() (+29 more)
+### Community 23 - "_e"
+Cohesion: 0.13
+Nodes (3): re(), _e, Ut
 
-### Community 24 - "directory/tests.py"
-Cohesion: 0.02
-Nodes (15): RatingForm, ReviewForm, AjaxReportEndpointTests, AuthenticationAjaxFeedbackTests, CategoryTagIntegrationTests, DataIntegrityTests, PerformanceTests, RatingFormTests (+7 more)
+### Community 24 - "TestCase"
+Cohesion: 0.05
+Nodes (7): RatingForm, AuthenticationAjaxFeedbackTests, CategoryTagIntegrationTests, PerformanceTests, RatingFormTests, SoftDeletedWebsiteVisibilityTests, TagSuggestionsTests
 
-### Community 25 - "jquery.min (copy).js"
-Cohesion: 0.07
-Nodes (31): A(), at(), b(), be(), ce(), e(), Ee(), fe() (+23 more)
-
-### Community 26 - "jquery.min (copy).8fb8fee4fcc3.js"
-Cohesion: 0.07
-Nodes (31): A(), at(), b(), be(), ce(), e(), Ee(), fe() (+23 more)
+### Community 25 - "mn"
+Cohesion: 0.16
+Nodes (6): an(), fn(), on(), sn(), un(), mn
 
 ### Community 27 - "static/js/bootstrap.bundle.min.js"
 Cohesion: 0.11
@@ -687,23 +519,23 @@ Nodes (43): ae(), be(), Bt(), ce(), D(), de(), ee(), Ft() (+35 more)
 
 ### Community 28 - "contact/views.py"
 Cohesion: 0.06
-Nodes (7): MyInlines1, ContactForm, Meta, Contact, ContactFormFeedbackTests, ContactFormView, tag_suggestions()
+Nodes (7): MyInlines1, ContactForm, Meta, Contact, ContactFormView, ReviewForm, ReviewFormTests
 
 ### Community 29 - "Tooltip"
-Cohesion: 0.08
+Cohesion: 0.09
 Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
 
 ### Community 30 - "farsi_tags.py"
-Cohesion: 0.06
-Nodes (19): 3. Stack (do not invent alternatives), Phase 2 — Polish & trust, persian_currency(), persian_phone(), persian_weekday(), remove_get_param(), rtl_class(), text_align() (+11 more)
+Cohesion: 0.07
+Nodes (14): persian_currency(), persian_phone(), persian_weekday(), remove_get_param(), to_hindi_with_comma(), to_jalali_datetime(), to_jalali_relative(), to_jalali_short() (+6 more)
 
 ### Community 31 - "Tooltip"
 Cohesion: 0.09
 Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
 
-### Community 33 - "Tooltip"
-Cohesion: 0.09
-Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
+### Community 33 - "ni"
+Cohesion: 0.16
+Nodes (3): Ze(), ni, Q
 
 ### Community 35 - "Tooltip"
 Cohesion: 0.09
@@ -713,13 +545,13 @@ Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
 Cohesion: 0.05
 Nodes (18): AttachContainer(), callDep(), ContainerCSS(), countResults(), DropdownCSS(), handler(), hasProp(), InitSelection() (+10 more)
 
-### Community 38 - "select2.full.c2afdeda3058.js"
-Cohesion: 0.05
-Nodes (18): AttachContainer(), callDep(), ContainerCSS(), countResults(), DropdownCSS(), handler(), hasProp(), InitSelection() (+10 more)
+### Community 38 - "detectOverflow"
+Cohesion: 0.22
+Nodes (19): detectOverflow(), expandToHashMap(), getBoundingClientRect(), getClientRectFromMixedType(), getClippingRect(), getCompositeRect(), getDocumentElement(), getDocumentRect() (+11 more)
 
-### Community 41 - "Tooltip"
-Cohesion: 0.09
-Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
+### Community 41 - "getOffsetParent"
+Cohesion: 0.22
+Nodes (18): applyStyles(), contains(), effect$1(), effect$2(), getClippingParents(), getComputedStyle$1(), getContainingBlock(), getNodeName() (+10 more)
 
 ### Community 42 - "Tooltip"
 Cohesion: 0.09
@@ -729,23 +561,31 @@ Nodes (4): findShadowRoot(), getUID(), Popover, Tooltip
 Cohesion: 0.09
 Nodes (29): $a(), aa(), ca(), fa(), ga(), b(), ha(), i() (+21 more)
 
+### Community 46 - "In"
+Cohesion: 0.20
+Nodes (5): B(), bn(), kn(), xn(), In
+
+### Community 48 - "Collapse"
+Cohesion: 0.24
+Nodes (5): Collapse, enableDismissTrigger(), getElementFromSelector(), getSelector(), getSelectorFromElement()
+
 ### Community 49 - "staticfiles/js/jquery.min.js"
 Cohesion: 0.09
 Nodes (29): $a(), aa(), ca(), fa(), ga(), b(), ha(), i() (+21 more)
 
-### Community 50 - "jquery.min.6fc159d00dc3.js"
-Cohesion: 0.09
-Nodes (29): $a(), aa(), ca(), fa(), ga(), b(), ha(), i() (+21 more)
+### Community 50 - "Naming Law"
+Cohesion: 0.12
+Nodes (15): 1. Language rule, 4. Front end, 5. Domain glossary (baseline; the owner may amend once, see section 9), 6. Legacy exceptions register (finite; never copy these into new code), 7. Pre-flight (run before handing off), 8. Review checklist, 9. Amendment procedure, Guidelines (+7 more)
 
 ### Community 51 - "static/js/jquery.js"
 Cohesion: 0.05
 Nodes (9): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr(), done(), finalPropName(), getData(), roundPixelMeasures() (+1 more)
 
-### Community 54 - "staticfiles/js/jquery.js"
-Cohesion: 0.05
-Nodes (9): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr(), done(), finalPropName(), getData(), roundPixelMeasures() (+1 more)
+### Community 52 - "preventOverflow"
+Cohesion: 0.21
+Nodes (17): arrow(), computeAutoPlacement(), computeOffsets(), computeStyles(), flip(), getAltAxis(), getBasePlacement(), getExpandedFallbackPlacements() (+9 more)
 
-### Community 55 - "jquery.2849239b95f5.js"
+### Community 54 - "staticfiles/js/jquery.js"
 Cohesion: 0.05
 Nodes (9): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr(), done(), finalPropName(), getData(), roundPixelMeasures() (+1 more)
 
@@ -753,17 +593,21 @@ Nodes (9): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr()
 Cohesion: 0.06
 Nodes (12): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr(), done(), finalPropName(), getData(), leverageNative() (+4 more)
 
-### Community 57 - "jquery.12e87d2f3a4c.js"
-Cohesion: 0.06
-Nodes (12): ajaxConvert(), ajaxHandleResponses(), computeStyleTests(), dataAttr(), done(), finalPropName(), getData(), leverageNative() (+4 more)
+### Community 57 - "preventOverflow"
+Cohesion: 0.21
+Nodes (17): arrow(), computeAutoPlacement(), computeOffsets(), computeStyles(), flip(), getAltAxis(), getBasePlacement(), getExpandedFallbackPlacements() (+9 more)
 
-### Community 61 - "Website"
-Cohesion: 0.04
-Nodes (28): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Authenticated Submission Identity, User Stories, Website lifecycle (+20 more)
+### Community 61 - "Category"
+Cohesion: 0.10
+Nodes (4): Command, Command, Category, Meta
+
+### Community 64 - "re"
+Cohesion: 0.17
+Nodes (5): blocks_of(), find_template(), rtl_class(), text_align(), TextAlignTestCase
 
 ### Community 65 - "WebsiteSubmitForm"
 Cohesion: 0.07
-Nodes (5): Phase 0 — Foundation (DONE), WebsiteSubmitForm, Meta, WebsiteSubmitFormTests, XSSAndInputValidationTests
+Nodes (6): Phase 0 — Foundation (DONE), WebsiteSubmitForm, Meta, WebsiteSubmitFormTests, XSSAndInputValidationTests, edit_website()
 
 ### Community 66 - "static/js/bootstrap.js"
 Cohesion: 0.09
@@ -777,13 +621,9 @@ Nodes (5): Config, getElement(), isElement(), TemplateFactory, toType()
 Cohesion: 0.09
 Nodes (23): addHandler(), bootstrapDelegationHandler(), bootstrapHandler(), find(), findHandler(), focusableChildren(), getDataAttribute(), getDataAttributes() (+15 more)
 
-### Community 69 - "bootstrap.aac878dd9689.js"
-Cohesion: 0.09
-Nodes (23): addHandler(), bootstrapDelegationHandler(), bootstrapHandler(), find(), findHandler(), focusableChildren(), getDataAttribute(), getDataAttributes() (+15 more)
-
-### Community 70 - "TemplateFactory"
-Cohesion: 0.09
-Nodes (5): Config, getElement(), isElement(), TemplateFactory, toType()
+### Community 69 - "QuickSubmitForm"
+Cohesion: 0.17
+Nodes (3): QuickSubmitForm, Meta, QuickSubmitFormTests
 
 ### Community 71 - "static/js/all.js"
 Cohesion: 0.08
@@ -797,10 +637,6 @@ Nodes (21): _classCallCheck(), convertSVG(), _createClass(), css(), _definePrope
 Cohesion: 0.08
 Nodes (21): _classCallCheck(), convertSVG(), _createClass(), css(), _defineProperties(), _defineProperty(), disableObservation(), enableObservation() (+13 more)
 
-### Community 75 - "all.fcd011feaa2f.js"
-Cohesion: 0.08
-Nodes (21): _classCallCheck(), convertSVG(), _createClass(), css(), _defineProperties(), _defineProperty(), disableObservation(), enableObservation() (+13 more)
-
 ### Community 76 - "TemplateFactory"
 Cohesion: 0.09
 Nodes (5): Config, getElement(), isElement(), TemplateFactory, toType()
@@ -809,99 +645,67 @@ Nodes (5): Config, getElement(), isElement(), TemplateFactory, toType()
 Cohesion: 0.08
 Nodes (21): _classCallCheck(), convertSVG(), _createClass(), css(), _defineProperties(), _defineProperty(), disableObservation(), enableObservation() (+13 more)
 
-### Community 79 - "fontawesome.f98c5f0c8288.js"
-Cohesion: 0.08
-Nodes (21): _classCallCheck(), convertSVG(), _createClass(), css(), _defineProperties(), _defineProperty(), disableObservation(), enableObservation() (+13 more)
-
 ### Community 80 - "utils.py"
 Cohesion: 0.06
-Nodes (13): Migration, Migration, Migration, Migration, Migration, Migration, Migration, format_jalali_date() (+5 more)
+Nodes (14): Migration, Migration, Migration, Migration, Migration, Migration, Migration, Migration (+6 more)
 
 ### Community 81 - "TemplateFactory"
 Cohesion: 0.10
 Nodes (4): Config, getElement(), isElement(), TemplateFactory
 
-### Community 82 - "TemplateFactory"
-Cohesion: 0.10
-Nodes (4): Config, getElement(), isElement(), TemplateFactory
+### Community 90 - "popperGenerator"
+Cohesion: 0.20
+Nodes (9): areValidElements(), debounce(), effect(), mergeByName(), order(), sort(), orderModifiers(), popperGenerator() (+1 more)
 
-### Community 83 - "._queueCallback"
-Cohesion: 0.11
-Nodes (4): Alert, Collapse, reflow(), Toast
-
-### Community 84 - "QuickSubmitForm"
-Cohesion: 0.07
-Nodes (4): QuickSubmitForm, CSRFProtectionTests, QuickSubmitFormTests, SubmitWebsiteViewTests
-
-### Community 95 - "Modal"
-Cohesion: 0.12
-Nodes (3): Modal, reflow(), ScrollBarHelper
+### Community 94 - "Security"
+Cohesion: 0.22
+Nodes (8): Guidelines, Handoff (end every task with this block), In/Out, In scope, Out of scope, Required Input, Role & Scope, Security
 
 ### Community 96 - "staticfiles/js/bootstrap.min.js"
-Cohesion: 0.10
-Nodes (19): B(), D(), getDataAttributes(), H(), I(), j(), M(), N() (+11 more)
+Cohesion: 0.15
+Nodes (18): B(), D(), F(), getDataAttributes(), I(), j(), M(), N() (+10 more)
 
-### Community 98 - "getWindow"
-Cohesion: 0.14
-Nodes (35): applyStyles(), contains(), effect$1(), effect$2(), getBoundingClientRect(), getClientRectFromMixedType(), getClippingParents(), getCompositeRect() (+27 more)
-
-### Community 100 - "Si"
-Cohesion: 0.12
-Nodes (3): fi, Si, ci()
+### Community 98 - "Spec: Public Discovery / Search"
+Cohesion: 0.25
+Nodes (7): Assumptions / Open Questions, In Scope / Out of Scope, Names introduced, Problem Statement, Revision Notes, Spec: Public Discovery / Search, User Stories
 
 ### Community 102 - "BaseComponent"
-Cohesion: 0.09
-Nodes (4): Alert, BaseComponent, Button, Toast
+Cohesion: 0.16
+Nodes (3): Alert, reflow(), Toast
 
 ### Community 104 - "static/js/bootstrap.min.js"
-Cohesion: 0.11
-Nodes (19): B(), D(), F(), getDataAttributes(), I(), j(), M(), N() (+11 more)
+Cohesion: 0.15
+Nodes (18): B(), D(), F(), getDataAttributes(), I(), j(), M(), N() (+10 more)
 
 ### Community 105 - "mt"
-Cohesion: 0.13
-Nodes (4): mt, Ct(), me(), Tt()
+Cohesion: 0.12
+Nodes (5): mt, Ct(), Et(), Nt(), Tt()
 
 ### Community 106 - "BaseComponent"
-Cohesion: 0.09
-Nodes (6): BaseComponent, Button, Config, getElement(), isElement(), toType()
+Cohesion: 0.13
+Nodes (3): Alert, BaseComponent, Button
 
 ### Community 108 - "xregexp.min.js"
 Cohesion: 0.10
 Nodes (13): _arrayLikeToArray(), augment(), cacheInvertedBmp(), charCode(), clipDuplicates(), copyRegex(), _createForOfIteratorHelper(), isType() (+5 more)
 
-### Community 109 - "xregexp.min.f1ae4617847c.js"
-Cohesion: 0.10
-Nodes (13): _arrayLikeToArray(), augment(), cacheInvertedBmp(), charCode(), clipDuplicates(), copyRegex(), _createForOfIteratorHelper(), isType() (+5 more)
+### Community 117 - "invertBmp"
+Cohesion: 0.33
+Nodes (6): cacheInvertedBmp(), charCode(), dec(), hex(), invertBmp(), pad4()
 
 ### Community 126 - "WebJin (dirweb.ir / webjin.ir) Development Roadmap"
-Cohesion: 0.08
-Nodes (26): 1.1 Submission UX, 1.2 Staff / admin dashboard, 1.3 Permissions & lifecycle messaging, 1.4 Public discovery & UX, 1.5 Hygiene & repo, 1A — Core directory and trust foundation (Phase 1), 2A — Discovery and trust expansion (Phase 2), 2B — Monetization and offers (Phase 2, gated by business/analytics specs) (+18 more)
+Cohesion: 0.07
+Nodes (29): 3. Stack (do not invent alternatives), 1.1 Submission UX, 1.2 Staff / admin dashboard, 1.3 Permissions & lifecycle messaging, 1.4 Public discovery & UX, 1.5 Hygiene & repo, 1A — Core directory and trust foundation (Phase 1), 2A — Discovery and trust expansion (Phase 2) (+21 more)
 
 ### Community 127 - "Security"
-Cohesion: 0.10
-Nodes (14): Guidelines, Handoff (end every task with this block), In/Out, In scope, Out of scope, Priority findings to verify and fix, Required Input, Role & Scope (+6 more)
-
-### Community 128 - "bootstrap.min.78ec300a4030.js"
-Cohesion: 0.11
-Nodes (19): B(), D(), F(), getDataAttributes(), I(), j(), M(), N() (+11 more)
-
-### Community 129 - "re"
-Cohesion: 0.10
-Nodes (3): blocks_of(), find_template(), main()
+Cohesion: 0.17
+Nodes (5): default_icon(), get_color_from_domain(), get_initial(), website_icon(), website_icon_url()
 
 ### Community 130 - "Dropdown"
 Cohesion: 0.13
 Nodes (3): distanceAndSkiddingToXY(), Dropdown, offset()
 
 ### Community 131 - "Dropdown"
-Cohesion: 0.13
-Nodes (4): Dropdown, enableDismissTrigger(), isDisabled(), noop()
-
-### Community 134 - "Dropdown"
-Cohesion: 0.13
-Nodes (3): distanceAndSkiddingToXY(), Dropdown, offset()
-
-### Community 136 - "Dropdown"
 Cohesion: 0.13
 Nodes (4): Dropdown, enableDismissTrigger(), isDisabled(), noop()
 
@@ -921,19 +725,7 @@ Nodes (3): li, Oe(), Ue()
 Cohesion: 0.14
 Nodes (4): Dropdown, enableDismissTrigger(), isDisabled(), noop()
 
-### Community 142 - "V"
-Cohesion: 0.11
-Nodes (3): R, V, Y
-
-### Community 143 - "BaseComponent"
-Cohesion: 0.11
-Nodes (3): BaseComponent, Button, Config
-
 ### Community 144 - "BaseComponent"
-Cohesion: 0.11
-Nodes (3): BaseComponent, Button, Config
-
-### Community 145 - "BaseComponent"
 Cohesion: 0.11
 Nodes (3): BaseComponent, Button, Config
 
@@ -941,31 +733,15 @@ Nodes (3): BaseComponent, Button, Config
 Cohesion: 0.11
 Nodes (3): BaseComponent, Button, Config
 
-### Community 147 - "B"
-Cohesion: 0.11
-Nodes (3): B, U, W
-
-### Community 149 - "Dropdown"
-Cohesion: 0.14
-Nodes (4): Dropdown, enableDismissTrigger(), isDisabled(), noop()
-
 ### Community 150 - "Dropdown"
 Cohesion: 0.14
 Nodes (4): Dropdown, enableDismissTrigger(), isDisabled(), noop()
 
 ### Community 151 - "Dropdown"
 Cohesion: 0.14
-Nodes (4): Dropdown, enableDismissTrigger(), isDisabled(), noop()
-
-### Community 152 - "V"
-Cohesion: 0.11
-Nodes (3): R, V, Y
+Nodes (3): Dropdown, isDisabled(), noop()
 
 ### Community 155 - "SelectAdapter"
-Cohesion: 0.13
-Nodes (3): ArrayAdapter(), BaseAdapter(), SelectAdapter()
-
-### Community 156 - "SelectAdapter"
 Cohesion: 0.13
 Nodes (3): ArrayAdapter(), BaseAdapter(), SelectAdapter()
 
@@ -973,13 +749,9 @@ Nodes (3): ArrayAdapter(), BaseAdapter(), SelectAdapter()
 Cohesion: 0.13
 Nodes (3): distanceAndSkiddingToXY(), Dropdown, offset()
 
-### Community 167 - "ti"
-Cohesion: 0.14
-Nodes (4): ni, ei(), ti(), ni
-
-### Community 175 - "pi"
-Cohesion: 0.20
-Nodes (3): je(), si(), pi
+### Community 162 - "WebsiteModelTests"
+Cohesion: 0.05
+Nodes (5): Rating, Meta, DataIntegrityTests, WebsiteLifecycleTests, WebsiteModelTests
 
 ### Community 178 - "Toast"
 Cohesion: 0.16
@@ -989,33 +761,17 @@ Nodes (3): Alert, reflow(), Toast
 Cohesion: 0.15
 Nodes (3): getNextActiveElement(), isVisible(), ScrollSpy
 
-### Community 181 - ".apply"
-Cohesion: 0.12
-Nodes (5): CloseOnSelect(), Defaults(), Dropdown(), EventRelay(), Translation()
-
 ### Community 182 - ".apply"
 Cohesion: 0.12
 Nodes (5): CloseOnSelect(), Defaults(), Dropdown(), EventRelay(), Translation()
 
-### Community 183 - "XRegExp"
-Cohesion: 0.11
-Nodes (20): _arrayLikeToArray(), augment(), cacheInvertedBmp(), charCode(), clipDuplicates(), copyRegex(), _createForOfIteratorHelper(), dec() (+12 more)
-
 ### Community 184 - "XRegExp"
-Cohesion: 0.11
-Nodes (20): _arrayLikeToArray(), augment(), cacheInvertedBmp(), charCode(), clipDuplicates(), copyRegex(), _createForOfIteratorHelper(), dec() (+12 more)
-
-### Community 190 - "Toast"
 Cohesion: 0.16
-Nodes (3): Alert, reflow(), Toast
+Nodes (14): _arrayLikeToArray(), augment(), clipDuplicates(), copyRegex(), _createForOfIteratorHelper(), getNativeFlags(), hasNamedCapture(), isType() (+6 more)
 
-### Community 191 - "ScrollSpy"
-Cohesion: 0.15
-Nodes (3): getNextActiveElement(), isVisible(), ScrollSpy
-
-### Community 195 - "to_hindi"
-Cohesion: 0.15
-Nodes (6): Known defects in the `farsi` app (fix with tests), persian_number_word(), persian_ordinal(), to_hindi(), to_hindi_with_comma(), ToHindiFilterTestCase
+### Community 192 - "TemplateFactory"
+Cohesion: 0.10
+Nodes (4): Config, getElement(), isElement(), TemplateFactory
 
 ### Community 201 - "ScrollSpy"
 Cohesion: 0.16
@@ -1025,41 +781,29 @@ Nodes (3): getNextActiveElement(), isVisible(), ScrollSpy
 Cohesion: 0.15
 Nodes (3): AllowClear(), MaximumInputLength(), MinimumInputLength()
 
-### Community 206 - ".trigger"
-Cohesion: 0.15
-Nodes (3): AllowClear(), MaximumInputLength(), MinimumInputLength()
+### Community 223 - "V"
+Cohesion: 0.11
+Nodes (3): R, V, Y
 
-### Community 210 - "Toast"
-Cohesion: 0.10
-Nodes (3): Alert, Offcanvas, Toast
-
-### Community 215 - "ScrollSpy"
+### Community 231 - "ScrollSpy"
 Cohesion: 0.16
 Nodes (3): getNextActiveElement(), isVisible(), ScrollSpy
 
-### Community 231 - "ScrollSpy"
-Cohesion: 0.17
-Nodes (3): getNextActiveElement(), isVisible(), ScrollSpy
-
 ### Community 232 - "ScrollSpy"
-Cohesion: 0.17
+Cohesion: 0.16
 Nodes (3): getNextActiveElement(), isVisible(), ScrollSpy
 
 ### Community 235 - "AGENTS.md — WebJin (dirweb.ir / webjin.ir)"
 Cohesion: 0.12
-Nodes (17): 10. Files agents edit most often, 11. Known P0/P1 items (see roadmap for full matrix), 12. Deployment notes (Passenger / host), 13. Questions to ask the user if unclear, 1. Project in one paragraph, 2. Canonical sources of truth (read order), 4. Quick start (local), 5. Project layout (what lives where) (+9 more)
+Nodes (16): 10. Files agents edit most often, 11. Known operational follow-up, 12. Deployment notes (Passenger / host), 13. Questions to ask the user if unclear, 1. Project in one paragraph, 2. Canonical sources of truth (read order), 4. Quick start (local), 5. Project layout (what lives where) (+8 more)
 
-### Community 236 - "Naming Law"
-Cohesion: 0.06
-Nodes (26): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Website Submission, User Stories, 1. Language rule (+18 more)
+### Community 236 - "ReportForm"
+Cohesion: 0.11
+Nodes (12): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Website Submission, User Stories, 2. Python (+4 more)
 
 ### Community 238 - "BaseComponent"
 Cohesion: 0.13
 Nodes (3): Alert, BaseComponent, Button
-
-### Community 239 - "matcherFromTokens"
-Cohesion: 0.18
-Nodes (17): addCombinator(), assert(), compile(), condense(), createPositionalPseudo(), elementMatcher(), find(), markFunction() (+9 more)
 
 ### Community 240 - "matcherFromTokens"
 Cohesion: 0.18
@@ -1069,29 +813,13 @@ Nodes (17): addCombinator(), assert(), compile(), condense(), createPositionalPs
 Cohesion: 0.15
 Nodes (5): BaseConstructor(), ctr(), getMethods(), Utils, Options()
 
-### Community 242 - "Utils"
-Cohesion: 0.15
-Nodes (5): BaseConstructor(), ctr(), getMethods(), Utils, Options()
-
 ### Community 243 - "select2.full.min.js"
 Cohesion: 0.21
 Nodes (13): A(), b(), c(), D(), e(), i(), l(), n() (+5 more)
 
-### Community 244 - "select2.full.min.fcd7500d8e13.js"
-Cohesion: 0.21
-Nodes (13): A(), b(), c(), D(), e(), i(), l(), n() (+5 more)
-
-### Community 245 - "preventOverflow"
-Cohesion: 0.21
-Nodes (17): arrow(), computeAutoPlacement(), computeOffsets(), computeStyles(), flip(), getAltAxis(), getBasePlacement(), getExpandedFallbackPlacements() (+9 more)
-
-### Community 248 - "BaseComponent"
-Cohesion: 0.13
-Nodes (3): Alert, BaseComponent, Button
-
 ### Community 249 - "Feature list & bug tracker — WebJin (وب‌جین)"
-Cohesion: 0.14
-Nodes (9): graphify, AJAX conventions, Language & locale, Security, Stack, Static & media, Technical Conventions — WebJin (dirweb.ir), Testing expectations (+1 more)
+Cohesion: 0.13
+Nodes (10): graphify, AJAX conventions, Language & locale, Security, Stack, Static & media, Technical Conventions — WebJin (dirweb.ir), Testing expectations (+2 more)
 
 ### Community 250 - "_toConsumableArray"
 Cohesion: 0.15
@@ -1105,10 +833,6 @@ Nodes (13): _arrayLikeToArray(), _arrayWithoutHoles(), defineIcons(), _definePro
 Cohesion: 0.15
 Nodes (16): _arrayLikeToArray(), _arrayWithHoles(), _arrayWithoutHoles(), bootstrap(), callHooks(), _createForOfIteratorHelper(), domready(), hexValueFromContent() (+8 more)
 
-### Community 256 - "MultipleSelection"
-Cohesion: 0.17
-Nodes (3): HidePlaceholder(), MultipleSelection(), Placeholder()
-
 ### Community 257 - "MultipleSelection"
 Cohesion: 0.17
 Nodes (3): HidePlaceholder(), MultipleSelection(), Placeholder()
@@ -1117,23 +841,11 @@ Nodes (3): HidePlaceholder(), MultipleSelection(), Placeholder()
 Cohesion: 0.15
 Nodes (16): _arrayLikeToArray(), _arrayWithHoles(), _arrayWithoutHoles(), bootstrap(), callHooks(), _createForOfIteratorHelper(), domready(), hexValueFromContent() (+8 more)
 
-### Community 259 - "_toConsumableArray"
-Cohesion: 0.15
-Nodes (16): _arrayLikeToArray(), _arrayWithHoles(), _arrayWithoutHoles(), bootstrap(), callHooks(), _createForOfIteratorHelper(), domready(), hexValueFromContent() (+8 more)
-
 ### Community 262 - "staticfiles/js/brands.js"
 Cohesion: 0.23
 Nodes (13): _arrayLikeToArray(), _arrayWithoutHoles(), defineIcons(), _defineProperty(), _iterableToArray(), _nonIterableSpread(), normalizeIcons(), _objectSpread2() (+5 more)
 
-### Community 263 - "brands.ca7364d19aaa.js"
-Cohesion: 0.23
-Nodes (13): _arrayLikeToArray(), _arrayWithoutHoles(), defineIcons(), _defineProperty(), _iterableToArray(), _nonIterableSpread(), normalizeIcons(), _objectSpread2() (+5 more)
-
 ### Community 264 - "_toConsumableArray"
-Cohesion: 0.15
-Nodes (16): _arrayLikeToArray(), _arrayWithHoles(), _arrayWithoutHoles(), bootstrap(), callHooks(), _createForOfIteratorHelper(), domready(), hexValueFromContent() (+8 more)
-
-### Community 265 - "_toConsumableArray"
 Cohesion: 0.15
 Nodes (16): _arrayLikeToArray(), _arrayWithHoles(), _arrayWithoutHoles(), bootstrap(), callHooks(), _createForOfIteratorHelper(), domready(), hexValueFromContent() (+8 more)
 
@@ -1161,10 +873,6 @@ Nodes (15): applyShimAndAlias(), asFoundIcon(), byAlias(), byOldName(), findIcon
 Cohesion: 0.16
 Nodes (15): applyShimAndAlias(), asFoundIcon(), byAlias(), byOldName(), findIcon(), findIconDefinition(), getCanonicalIcon(), getCanonicalPrefix() (+7 more)
 
-### Community 278 - "getCanonicalIcon"
-Cohesion: 0.16
-Nodes (15): applyShimAndAlias(), asFoundIcon(), byAlias(), byOldName(), findIcon(), findIconDefinition(), getCanonicalIcon(), getCanonicalPrefix() (+7 more)
-
 ### Community 280 - "Feature list & bug tracker — WebJin (وب‌جین)"
 Cohesion: 0.12
 Nodes (16): Agent skills (profitability), Dashboard, Discovery / UX, Display limits, Feature list & bug tracker — WebJin (وب‌جین), Hygiene, Permissions / lifecycle, Phase 0 — closed (+8 more)
@@ -1173,9 +881,9 @@ Nodes (16): Agent skills (profitability), Dashboard, Discovery / UX, Display lim
 Cohesion: 0.16
 Nodes (15): applyShimAndAlias(), asFoundIcon(), byAlias(), byOldName(), findIcon(), findIconDefinition(), getCanonicalIcon(), getCanonicalPrefix() (+7 more)
 
-### Community 291 - "getCanonicalIcon"
+### Community 292 - "persian_list"
 Cohesion: 0.16
-Nodes (15): applyShimAndAlias(), asFoundIcon(), byAlias(), byOldName(), findIcon(), findIconDefinition(), getCanonicalIcon(), getCanonicalPrefix() (+7 more)
+Nodes (6): Rules, Known defects in the `farsi` app (fix with tests), persian_list(), persian_number_word(), persian_ordinal(), PersianListTestCase
 
 ### Community 296 - "Backdrop"
 Cohesion: 0.26
@@ -1189,19 +897,7 @@ Nodes (5): Backdrop, execute(), executeAfterTransition(), getTransitionDurationF
 Cohesion: 0.24
 Nodes (10): addPopupIndex(), dismissAddRelatedObjectPopup(), dismissChangeRelatedObjectPopup(), dismissDeleteRelatedObjectPopup(), dismissRelatedLookupPopup(), removePopupIndex(), showAdminPopup(), showRelatedObjectLookupPopup() (+2 more)
 
-### Community 304 - "RelatedObjectLookups.ed6240809a40.js"
-Cohesion: 0.24
-Nodes (10): addPopupIndex(), dismissAddRelatedObjectPopup(), dismissChangeRelatedObjectPopup(), dismissDeleteRelatedObjectPopup(), dismissRelatedLookupPopup(), removePopupIndex(), showAdminPopup(), showRelatedObjectLookupPopup() (+2 more)
-
-### Community 309 - "Backdrop"
-Cohesion: 0.26
-Nodes (5): Backdrop, execute(), executeAfterTransition(), getTransitionDurationFromElement(), triggerTransitionEnd()
-
 ### Community 312 - "Backdrop"
-Cohesion: 0.26
-Nodes (5): Backdrop, execute(), executeAfterTransition(), getTransitionDurationFromElement(), triggerTransitionEnd()
-
-### Community 315 - "Backdrop"
 Cohesion: 0.26
 Nodes (5): Backdrop, execute(), executeAfterTransition(), getTransitionDurationFromElement(), triggerTransitionEnd()
 
@@ -1212,6 +908,10 @@ Nodes (5): Backdrop, execute(), executeAfterTransition(), getTransitionDurationF
 ### Community 322 - "Product / Requirements"
 Cohesion: 0.15
 Nodes (12): Blockers vs advisory, Guidelines, Handoff (end every task with this block), In/Out, In scope, Output (`.ai_files/specs/<feature>.md`), Procedure, Product / Requirements (+4 more)
+
+### Community 325 - "IndexViewTests"
+Cohesion: 0.08
+Nodes (8): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statement, Spec: Authenticated Submission Identity, User Stories, IndexViewTests
 
 ### Community 326 - "_objectSpread2"
 Cohesion: 0.22
@@ -1225,15 +925,7 @@ Nodes (13): asIcon(), asSymbol(), defineIcons(), isLabeled(), joinStyles(), make
 Cohesion: 0.22
 Nodes (13): asIcon(), asSymbol(), defineIcons(), isLabeled(), joinStyles(), makeInlineSvgAbstract(), makeLayersCounterAbstract(), makeLayersTextAbstract() (+5 more)
 
-### Community 330 - "_objectSpread2"
-Cohesion: 0.22
-Nodes (13): asIcon(), asSymbol(), defineIcons(), isLabeled(), joinStyles(), makeInlineSvgAbstract(), makeLayersCounterAbstract(), makeLayersTextAbstract() (+5 more)
-
 ### Community 334 - "_objectSpread2"
-Cohesion: 0.22
-Nodes (13): asIcon(), asSymbol(), defineIcons(), isLabeled(), joinStyles(), makeInlineSvgAbstract(), makeLayersCounterAbstract(), makeLayersTextAbstract() (+5 more)
-
-### Community 335 - "_objectSpread2"
 Cohesion: 0.22
 Nodes (13): asIcon(), asSymbol(), defineIcons(), isLabeled(), joinStyles(), makeInlineSvgAbstract(), makeLayersCounterAbstract(), makeLayersTextAbstract() (+5 more)
 
@@ -1285,25 +977,9 @@ Nodes (12): addCombinator(), condense(), createPositionalPseudo(), elementMatche
 Cohesion: 0.20
 Nodes (12): attributesParser(), byLigature(), chainHooks(), classArray(), classParser(), hasBeenReplaced(), hasPrefixAndIcon(), isWatched() (+4 more)
 
-### Community 356 - "classParser"
-Cohesion: 0.20
-Nodes (12): attributesParser(), byLigature(), chainHooks(), classArray(), classParser(), hasBeenReplaced(), hasPrefixAndIcon(), isWatched() (+4 more)
-
 ### Community 358 - "classParser"
 Cohesion: 0.20
 Nodes (12): attributesParser(), byLigature(), chainHooks(), classArray(), classParser(), hasBeenReplaced(), hasPrefixAndIcon(), isWatched() (+4 more)
-
-### Community 359 - "classParser"
-Cohesion: 0.20
-Nodes (12): attributesParser(), byLigature(), chainHooks(), classArray(), classParser(), hasBeenReplaced(), hasPrefixAndIcon(), isWatched() (+4 more)
-
-### Community 360 - "matcherFromTokens"
-Cohesion: 0.20
-Nodes (12): addCombinator(), condense(), createPositionalPseudo(), elementMatcher(), markFunction(), matcherFromGroupMatchers(), matcherFromTokens(), multipleContexts() (+4 more)
-
-### Community 361 - "matcherFromTokens"
-Cohesion: 0.20
-Nodes (12): addCombinator(), condense(), createPositionalPseudo(), elementMatcher(), markFunction(), matcherFromGroupMatchers(), matcherFromTokens(), multipleContexts() (+4 more)
 
 ### Community 362 - "matcherFromTokens"
 Cohesion: 0.20
@@ -1345,19 +1021,7 @@ Nodes (11): buildFragment(), buildParams(), disableScript(), DOMEval(), domManip
 Cohesion: 0.38
 Nodes (8): checker(), clearAcross(), hide(), reset(), show(), showClear(), showQuestion(), updateCounter()
 
-### Community 381 - "actions.f1d5653edb59.js"
-Cohesion: 0.38
-Nodes (8): checker(), clearAcross(), hide(), reset(), show(), showClear(), showQuestion(), updateCounter()
-
-### Community 382 - "domManip"
-Cohesion: 0.22
-Nodes (11): buildFragment(), buildParams(), disableScript(), DOMEval(), domManip(), getAll(), isArrayLike(), remove() (+3 more)
-
 ### Community 383 - "domManip"
-Cohesion: 0.22
-Nodes (11): buildFragment(), buildParams(), disableScript(), DOMEval(), domManip(), getAll(), isArrayLike(), remove() (+3 more)
-
-### Community 391 - "domManip"
 Cohesion: 0.22
 Nodes (11): buildFragment(), buildParams(), disableScript(), DOMEval(), domManip(), getAll(), isArrayLike(), remove() (+3 more)
 
@@ -1401,15 +1065,7 @@ Nodes (10): blankMeta(), byOldUnicode(), byUnicode(), domVariants(), getPrefix()
 Cohesion: 0.24
 Nodes (10): blankMeta(), byOldUnicode(), byUnicode(), domVariants(), getPrefix(), htmlEscape(), isSecondaryLayer(), joinAttributes() (+2 more)
 
-### Community 407 - "replaceForPosition"
-Cohesion: 0.24
-Nodes (10): blankMeta(), byOldUnicode(), byUnicode(), domVariants(), getPrefix(), htmlEscape(), isSecondaryLayer(), joinAttributes() (+2 more)
-
 ### Community 408 - "replaceForPosition"
-Cohesion: 0.24
-Nodes (10): blankMeta(), byOldUnicode(), byUnicode(), domVariants(), getPrefix(), htmlEscape(), isSecondaryLayer(), joinAttributes() (+2 more)
-
-### Community 409 - "replaceForPosition"
 Cohesion: 0.24
 Nodes (10): blankMeta(), byOldUnicode(), byUnicode(), domVariants(), getPrefix(), htmlEscape(), isSecondaryLayer(), joinAttributes() (+2 more)
 
@@ -1421,10 +1077,6 @@ Nodes (8): Assumptions, In Scope, Open Questions, Out of Scope, Problem Statemen
 Cohesion: 0.22
 Nodes (8): Django Backend, Done when, Guidelines, Handoff (end every task with this block), In/Out, In scope, Required Input, Role & Scope
 
-### Community 413 - "Me"
-Cohesion: 0.29
-Nodes (3): He(), Ne(), Me
-
 ### Community 416 - "Animation"
 Cohesion: 0.22
 Nodes (9): Animation(), camelCase(), createFxNow(), createTween(), defaultPrefilter(), fcamelCase(), getDefaultDisplay(), propFilter() (+1 more)
@@ -1433,19 +1085,7 @@ Nodes (9): Animation(), camelCase(), createFxNow(), createTween(), defaultPrefil
 Cohesion: 0.22
 Nodes (8): Adding a new icon, Contributing SVG Icons, Example SVG Structure, ⚠️ Important: Changing Font Awesome Version, Information about icons in this directory, License, Modifications, Usage
 
-### Community 418 - "Information about icons in this directory"
-Cohesion: 0.22
-Nodes (8): Adding a new icon, Contributing SVG Icons, Example SVG Structure, ⚠️ Important: Changing Font Awesome Version, Information about icons in this directory, License, Modifications, Usage
-
-### Community 419 - "Animation"
-Cohesion: 0.22
-Nodes (9): Animation(), camelCase(), createFxNow(), createTween(), defaultPrefilter(), fcamelCase(), getDefaultDisplay(), propFilter() (+1 more)
-
 ### Community 420 - "Animation"
-Cohesion: 0.22
-Nodes (9): Animation(), camelCase(), createFxNow(), createTween(), defaultPrefilter(), fcamelCase(), getDefaultDisplay(), propFilter() (+1 more)
-
-### Community 423 - "Animation"
 Cohesion: 0.22
 Nodes (9): Animation(), camelCase(), createFxNow(), createTween(), defaultPrefilter(), fcamelCase(), getDefaultDisplay(), propFilter() (+1 more)
 
@@ -1466,8 +1106,8 @@ Cohesion: 0.25
 Nodes (7): Assumptions / Open Questions, In Scope / Out of Scope, Names introduced, Problem Statement, Revision Notes, Spec: Website Edit Permissions, User Stories
 
 ### Community 430 - "Spec: Website Trash"
-Cohesion: 0.29
-Nodes (6): Assumptions / Open Questions, In Scope / Out of Scope, Problem Statement, Revision Notes, Spec: Website Trash, User Stories
+Cohesion: 0.14
+Nodes (11): Open Questions, Out of Scope, Problem Statement, Spec: Reports / Abuse Handling, User Stories, Assumptions / Open Questions, In Scope / Out of Scope, Problem Statement (+3 more)
 
 ### Community 432 - "static/js/brands.min.js"
 Cohesion: 0.39
@@ -1481,17 +1121,13 @@ Nodes (8): buildFragment(), disableScript(), DOMEval(), domManip(), getAll(), re
 Cohesion: 0.39
 Nodes (6): a(), e(), h(), M(), s(), y()
 
-### Community 437 - "brands.min.ab3eeaf8c702.js"
-Cohesion: 0.39
-Nodes (6): a(), e(), h(), M(), s(), y()
-
-### Community 438 - "domManip"
-Cohesion: 0.32
-Nodes (8): buildFragment(), disableScript(), DOMEval(), domManip(), getAll(), remove(), restoreScript(), setGlobalEval()
-
 ### Community 439 - "domManip"
 Cohesion: 0.32
 Nodes (8): buildFragment(), disableScript(), DOMEval(), domManip(), getAll(), remove(), restoreScript(), setGlobalEval()
+
+### Community 442 - "Report"
+Cohesion: 0.07
+Nodes (12): PostAdmin, CategoryAdmin, RatingAdmin, ReportAdmin, ReviewAdmin, WebsiteAdmin, Report, Meta (+4 more)
 
 ### Community 443 - "Spec: Ratings & Reviews"
 Cohesion: 0.29
@@ -1509,10 +1145,6 @@ Nodes (7): callProvided(), generateMutation(), getKnownPrefixes(), getMutator(),
 Cohesion: 0.29
 Nodes (7): Animation(), createFxNow(), createTween(), defaultPrefilter(), getDefaultDisplay(), propFilter(), showHide()
 
-### Community 448 - "nodeName"
-Cohesion: 0.29
-Nodes (7): boxModelAdjustment(), createButtonPseudo(), createInputPseudo(), curCSS(), getWidthOrHeight(), manipulationTarget(), nodeName()
-
 ### Community 449 - "nodeName"
 Cohesion: 0.29
 Nodes (7): boxModelAdjustment(), createButtonPseudo(), createInputPseudo(), curCSS(), getWidthOrHeight(), manipulationTarget(), nodeName()
@@ -1521,29 +1153,13 @@ Nodes (7): boxModelAdjustment(), createButtonPseudo(), createInputPseudo(), curC
 Cohesion: 0.33
 Nodes (7): callProvided(), generateMutation(), getKnownPrefixes(), getMutator(), onNode(), onTree(), perform()
 
-### Community 453 - "generateMutation"
-Cohesion: 0.33
-Nodes (7): callProvided(), generateMutation(), getKnownPrefixes(), getMutator(), onNode(), onTree(), perform()
-
 ### Community 454 - "generateMutation"
 Cohesion: 0.33
 Nodes (7): callProvided(), generateMutation(), getKnownPrefixes(), getMutator(), onNode(), onTree(), perform()
 
-### Community 455 - "generateMutation"
-Cohesion: 0.33
-Nodes (7): callProvided(), generateMutation(), getKnownPrefixes(), getMutator(), onNode(), onTree(), perform()
-
-### Community 456 - "Animation"
-Cohesion: 0.29
-Nodes (7): Animation(), createFxNow(), createTween(), defaultPrefilter(), getDefaultDisplay(), propFilter(), showHide()
-
 ### Community 457 - "Animation"
 Cohesion: 0.29
 Nodes (7): Animation(), createFxNow(), createTween(), defaultPrefilter(), getDefaultDisplay(), propFilter(), showHide()
-
-### Community 458 - "Spec: Reports / Abuse Handling"
-Cohesion: 0.33
-Nodes (5): Open Questions, Out of Scope, Problem Statement, Spec: Reports / Abuse Handling, User Stories
 
 ### Community 460 - "_setPrototypeOf"
 Cohesion: 0.50
@@ -1557,25 +1173,13 @@ Nodes (4): _inherits(), _setPrototypeOf(), _wrapRegExp(), BabelRegExp()
 Cohesion: 0.40
 Nodes (5): boxModelAdjustment(), curCSS(), getWidthOrHeight(), manipulationTarget(), nodeName()
 
-### Community 465 - "_setPrototypeOf"
-Cohesion: 0.50
-Nodes (4): _inherits(), _setPrototypeOf(), _wrapRegExp(), BabelRegExp()
-
 ### Community 466 - "_setPrototypeOf"
-Cohesion: 0.50
-Nodes (4): _inherits(), _setPrototypeOf(), _wrapRegExp(), BabelRegExp()
-
-### Community 467 - "_setPrototypeOf"
 Cohesion: 0.50
 Nodes (4): _inherits(), _setPrototypeOf(), _wrapRegExp(), BabelRegExp()
 
 ### Community 468 - "_setPrototypeOf"
 Cohesion: 0.50
 Nodes (4): _inherits(), _setPrototypeOf(), _wrapRegExp(), BabelRegExp()
-
-### Community 469 - "getWidthOrHeight"
-Cohesion: 0.40
-Nodes (5): boxModelAdjustment(), curCSS(), getWidthOrHeight(), manipulationTarget(), nodeName()
 
 ### Community 470 - "getWidthOrHeight"
 Cohesion: 0.40
@@ -1592,14 +1196,6 @@ Nodes (4): expectSync(), leverageNative(), returnTrue(), safeActiveElement()
 ### Community 478 - "admin/js/theme.js"
 Cohesion: 0.83
 Nodes (3): cycleTheme(), initTheme(), setTheme()
-
-### Community 479 - "theme.91cf832f559e.js"
-Cohesion: 0.83
-Nodes (3): cycleTheme(), initTheme(), setTheme()
-
-### Community 483 - "expectSync"
-Cohesion: 0.50
-Nodes (4): expectSync(), leverageNative(), returnTrue(), safeActiveElement()
 
 ### Community 484 - "expectSync"
 Cohesion: 0.50
@@ -1621,27 +1217,7 @@ Nodes (3): Identity(), resolve(), Thrower()
 Cohesion: 0.67
 Nodes (3): Identity(), resolve(), Thrower()
 
-### Community 497 - "resolve"
-Cohesion: 0.67
-Nodes (3): Identity(), resolve(), Thrower()
-
 ### Community 498 - "resolve"
-Cohesion: 0.67
-Nodes (3): Identity(), resolve(), Thrower()
-
-### Community 499 - "resolve"
-Cohesion: 0.67
-Nodes (3): Identity(), resolve(), Thrower()
-
-### Community 500 - "done"
-Cohesion: 0.67
-Nodes (3): ajaxConvert(), ajaxHandleResponses(), done()
-
-### Community 501 - "getWidthOrHeight"
-Cohesion: 0.67
-Nodes (3): augmentWidthOrHeight(), curCSS(), getWidthOrHeight()
-
-### Community 502 - "resolve"
 Cohesion: 0.67
 Nodes (3): Identity(), resolve(), Thrower()
 
@@ -1666,22 +1242,22 @@ Cohesion: 0.33
 Nodes (5): Assumptions, Out of Scope, Problem Statement, Spec: User Accounts & Dashboard, User Stories
 
 ## Knowledge Gaps
-- **448 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **282 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ci()` connect `Si` to `Si`, `staticfiles/js/bootstrap.bundle.min.js`, `pi`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `re()` connect `_e` to `je`, `staticfiles/js/bootstrap.bundle.min.js`?**
+  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+- **Are the 54 inferred relationships involving `Website` (e.g. with `Assumptions` and `User Stories`) actually correct?**
+  _`Website` has 54 INFERRED edges - model-reasoned connections that need verification._
 - **Should `htmx.2.0.8.min.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.07690925426774484 - nodes in this community are weakly interconnected._
-- **Why does `fi` connect `Si` to `static/js/bootstrap.bundle.min.js`, `bi`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
-- **Should `htmx.2.0.8.min.d073ff63d1ed.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.07690925426774484 - nodes in this community are weakly interconnected._
-- **Why does `ae()` connect `bootstrap.bundle.min.46f7b49f1198.js` to `htmx.2.0.8.min.js`, `htmx.2.0.8.min.d073ff63d1ed.js`, `._queueCallback`?**
+  _Cohesion score 0.11561561561561562 - nodes in this community are weakly interconnected._
+- **Why does `Ei` connect `Ei` to `staticfiles/js/bootstrap.bundle.min.js`, `ni`, `z`, `Yi`, `Si`, `bi`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Should `Pe` be split into smaller, more focused modules?**
+  _Cohesion score 0.1064102564102564 - nodes in this community are weakly interconnected._
+- **Why does `Ge()` connect `static/js/fontawesome.min.js` to `static/js/bootstrap.bundle.min.js`, `je`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Should `static/js/bootstrap.bundle.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
-- **Should `staticfiles/js/bootstrap.bundle.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.045037292025243834 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08414634146341464 - nodes in this community are weakly interconnected._

@@ -97,9 +97,17 @@
                 <hr>
                 <!-- Owner Info (Hidden if requested) -->
                 {% if not website.hide_owner_info %}
+                {% if website.owner_name or website.owner_email %}
                 <h5>اطلاعات تماس</h5>
+                {% if website.owner_name %}
                 <p><i class="bi bi-person"></i> {{ website.owner_name }}</p>
-                <p><i class="bi bi-envelope"></i> {{ website.owner_email }}</p>
+                {% endif %}
+                {% if website.owner_email %}
+                <p><i class="bi bi-envelope"></i> <a href="mailto:{{ website.owner_email }}">{{ website.owner_email }}</a></p>
+                {% endif %}
+                {% else %}
+                <p class="text-muted">اطلاعات تماس ثبت نشده است.</p>
+                {% endif %}
                 {% else %}
                 <p class="text-muted"><i class="bi bi-eye-slash"></i> اطلاعات صاحب وب‌سایت پنهان شده است.</p>
                 {% endif %}
@@ -112,13 +120,15 @@
                 <!-- Report Section (Accordion) -->
                 <div class="accordion mb-4 card-theme" id="reportAccordion">
                     <div class="accordion-item border-danger">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed bg-danger text-white" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#reportCollapse">
+                        <h2 class="accordion-header" id="reportHeading">
+                            <button class="accordion-button collapsed bg-danger text-white" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#reportCollapse"
+                                aria-expanded="false" aria-controls="reportCollapse">
                                 <i class="bi bi-flag me-2"></i> گزارش مشکل
                             </button>
                         </h2>
-                        <div id="reportCollapse" class="accordion-collapse collapse" data-bs-parent="#reportAccordion">
+                        <div id="reportCollapse" class="accordion-collapse collapse" aria-labelledby="reportHeading"
+                            data-bs-parent="#reportAccordion">
                             <div class="accordion-body">
                                 {% if user.is_authenticated %}
                                 {% if user_report %}
@@ -165,8 +175,9 @@
                     <div class="btn-group" role="group">
                         {% for i in "12345" %}
                         <button type="submit" name="rating" value="{{ forloop.counter }}"
-                            class="btn btn-outline-warning">
-                            {{ forloop.counter }} ⭐
+                            class="btn btn-outline-warning"
+                            aria-label="امتیاز {{ forloop.counter|to_hindi }} از ۵">
+                            {{ forloop.counter|to_hindi }} ⭐
                         </button>
                         {% endfor %}
                     </div>

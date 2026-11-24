@@ -110,7 +110,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0">نظرات من</h5>
+                <h5 class="mb-0">دیدگاه‌های من</h5>
             </div>
             <div class="card-body">
                 {% if my_reviews %}
@@ -120,12 +120,15 @@
                     <p class="mb-1">{{ review.content }}</p>
                     <small class="text-muted">
                         {{ review.created_at|date:"Y/m/d" }}
-                        <a href="{% url 'delete_my_review' review.pk %}" class="text-danger">حذف</a>
+                        <form method="post" action="{% url 'delete_my_review' review.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link btn-sm text-danger p-0">حذف</button>
+                        </form>
                     </small>
                 </div>
                 {% endfor %}
                 {% else %}
-                <p class="text-muted">شما هنوز نظری ثبت نکرده‌اید.</p>
+                <p class="text-muted">شما هنوز دیدگاهی ثبت نکرده‌اید.</p>
                 {% endif %}
             </div>
         </div>

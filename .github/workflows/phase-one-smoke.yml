@@ -1,0 +1,41 @@
+name: Phase 1 smoke
+
+on:
+  pull_request:
+    branches:
+      - main
+      - developement
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DJANGO_SECRET_KEY: github-actions-test-key-not-for-production
+      DEBUG: "True"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Apply migrations
+        run: python manage.py migrate --noinput
+
+      - name: Run directory tests
+        run: python manage.py test directory
+
+      - name: Check Django configuration
+        run: python manage.py check

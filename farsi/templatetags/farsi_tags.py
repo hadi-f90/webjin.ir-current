@@ -277,13 +277,7 @@ def persianize(text):
         ي → ی
         ك → ک
         ة → ه
-        ۀ → ه
-        ؤ → و
-        ئ → ی
-        أ → ا
-        إ → ا
-        آ → ا
-        ة → ه
+        ارقام عربی → فارسی
 
     Args:
         text: متن ورودی
@@ -298,20 +292,10 @@ def persianize(text):
     if not text:
         return ''
 
-    arabic_diacritics = re.compile(r'[\u064B-\u065F\u0670]')
-    text = arabic_diacritics.sub('', text)
-
-    # نقشه تبدیل عربی به فارسی
     conversion_map = {
         'ي': 'ی',
         'ك': 'ک',
         'ة': 'ه',
-        'ۀ': 'ه',
-        'ؤ': 'و',
-        'ئ': 'ی',
-        'أ': 'ا',
-        'إ': 'ا',
-        'آ': 'ا',
         '٠': '۰',
         '١': '۱',
         '٢': '۲',

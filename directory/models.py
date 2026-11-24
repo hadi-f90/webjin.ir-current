@@ -18,7 +18,7 @@ class Category(models.Model):
         return self.name
 
     def get_website_count(self):
-        return self.website_set.filter(
+        return self.websites.filter(
             status=Website.STATUS_APPROVED,
             is_deleted=False,
         ).count()
@@ -37,7 +37,7 @@ class Website(models.Model):
     url = models.URLField()
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='website_set'
+        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='websites'
     )
 
     # Use taggit's TaggableManager

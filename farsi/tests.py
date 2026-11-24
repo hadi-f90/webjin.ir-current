@@ -125,11 +125,13 @@ class PersianizeFilterTestCase(TestCase):
         self.assertEqual(persianize('٠١٢٣'), '۰۱۲۳')
         self.assertEqual(persianize('٩٨٧'), '۹۸۷')
 
-    def test_alef_variants(self):
-        """تست واریانت‌های الف"""
-        self.assertEqual(persianize("أهلاً"), "اهلا")  # اعراب حذف می‌شود ✓
-        self.assertEqual(persianize("إسلام"), "اسلام")
-        self.assertEqual(persianize("آب"), "اب")
+    def test_preserves_alef_variants_and_diacritics(self):
+        self.assertEqual(persianize('آب'), 'آب')
+        self.assertEqual(persianize('أهلاً'), 'أهلاً')
+        self.assertEqual(persianize('إسلام'), 'إسلام')
+
+    def test_preserves_zwnj_while_normalizing_arabic_letters(self):
+        self.assertEqual(persianize('مي‌كند'), 'می‌کند')
 
     def test_persianize_none(self):
         """تست مقادیر خالی"""

@@ -208,13 +208,10 @@ bash scripts/clean_junk.sh                 # remove dump/tmp junk
 
 ---
 
-## 11. Known P0/P1 items (see roadmap for full matrix)
+## 11. Known operational follow-up
 
-1. Move all secrets to env; rotate the previously committed MySQL password
-2. Fix `QuickSubmitForm.Meta`
-3. Add `{% load farsi_tags %}` to `website_card.html`
-4. Remove broken `farsi/templatetags/farsi.py` and junk files
-5. Deduplicate WhiteNoise middleware registration
+- Rotate the previously committed MySQL password in the host environment if
+  that operational action has not already been completed; never add it here.
 
 ---
 

@@ -21,7 +21,7 @@ Templates under `directory/templates/directory/` and `templates/`, `static/css/c
 - Contrast and focus visible in both themes; staff UI dense but scannable.
 
 ## Known issues to fix first
-`edit_website.html` undefined `safeTagName` and escaped quote bug; admin dashboard missing hidden inputs (`currentDeleteCatActionUrl`, `currentDeleteTagActionUrl`) and `bootstrap.Modal` created before the elements are guaranteed; reading `bootstrap.Modal.getInstance(...)` that can be null; counts for categories/tags/users not passed; `website_card.html` unused duplicate of the index card; dashboard stat cards use `.count` on querysets repeatedly (extra queries).
+`edit_website.html` undefined `safeTagName` and escaped quote bug; admin dashboard missing hidden inputs (`currentDeleteCatActionUrl`, `currentDeleteTagActionUrl`) and `bootstrap.Modal` created before the elements are guaranteed; reading `bootstrap.Modal.getInstance(...)` that can be null; counts for categories/tags/users not passed; the unused `website_card.html` duplicate of the index card was removed in Phase 1.5; dashboard stat cards use `.count` on querysets repeatedly (extra queries).
 
 ## Done when
 Page works with JS off (where applicable), console clean in both themes, `python .claude/skills/naming-law/scripts/naming_check.py .` has no ERROR, screenshots or manual smoke list attached.

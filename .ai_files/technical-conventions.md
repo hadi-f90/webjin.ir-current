@@ -69,7 +69,9 @@ For day-to-day coding style, see `.ai_files/coding-conventions.md` when it exist
 ## Security
 
 - Secrets only in environment / `.env` (never commit real keys or DB passwords)
-- CSP: allow only needed script origins (e.g. Yektanet CDN if ads enabled)
+- CSP: allow only needed script origins; the existing Yektanet integration uses
+  `cdn.yektanet.com` for scripts/frames and `audience.yektanet.com` plus
+  `ua.yektanet.com` for connections. Do not allow local ad-daemon origins.
 - Inline scripts must use the per-response `django-csp` nonce; never enable
   `'unsafe-inline'` to make scripts work.
 - Captcha on anonymous submit; rate-limit submit/rate/review/report

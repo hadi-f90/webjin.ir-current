@@ -87,17 +87,17 @@ template, route, database or API surface.
 ## 6. Legacy exceptions register (finite; never copy these into new code)
 | ID | Where | Violation | Target |
 |---|---|---|---|
-| L-01 | `Category.website_set` related_name | `_set` | `websites` (migration + templates + tests) |
+| L-01 | Historical migrations 0001/0003/0004 retain `website_set` | `_set` in migration history only; current model uses `websites` via migration 0006 |
 | L-02 | url name `approve_website`; paths `approve/<pk>/`, `resolve-report/<pk>/`, `add-tag/` | missing `_ajax`, missing `/ajax/`, alias `add_tag` | `approve_website_ajax`, `/ajax/approve/<pk>/` etc., drop alias |
-| L-03 | `website_card.html`, `paginator.html` | partial without `_` | `_website_card.html`, `_paginator.html`; index inlines the card, so `website_card.html` is dead or must be adopted |
+| L-03 | Resolved in Phase 1.5: `paginator.html` renamed `_paginator.html`; unused `website_card.html` removed | Keep the paginator partial prefixed with `_`; do not recreate the dead card partial |
 | L-04 | `directory/base.html` and `templates/_base.html` | two base templates with different theme systems | one base (owner picks) |
-| L-05 | `contact.html` block `extrajs`; error pages `meta_title`/`meta_description` | block not defined by parent | `extra_js`; add or drop blocks |
+| L-05 | Resolved: `contact.html` and error templates use only supported blocks | Block names must exist in the parent | `extra_js`; error templates now define no unsupported metadata blocks |
 | L-06 | admin_dashboard context `pending/approved/rejected/reports/tags` | counts and `users`, `recent_reviews`, `pending_count`, `report_count` used by template but not passed | `pending_websites`, ... plus the missing keys |
 | L-07 | `farsi/templatetags/utils.py` | duplicates `truncate_persian`, `to_persian_num` of `farsi_tags`; not a tag library | single implementation |
 | L-08 | `tag_suggestions` in `forms.py` | view outside `views.py` | move |
 | L-09 | ids `tagInput` (form widget and manual input), `confirmModal` unused | id collisions / dangling | unique, defined ids |
 | L-10 | «نظر» vs «دیدگاه», «ایمیل» vs «رایانامه», «سایت» vs «وب‌سایت» | mixed vocabulary | glossary terms |
-| L-11 | `custome.css` (if present) | typo duplicate | delete |
+| L-11 | Resolved in Phase 1.5: stale `custome.css` source and collected output removed | typo duplicate | Keep `custom.css` only |
 
 Retiring an entry needs a patch that changes the name everywhere (code, templates, tests, docs) in one change.
 

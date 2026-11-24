@@ -1,6 +1,9 @@
 import os
 import re
 import json
+import subprocess
+import sys
+from datetime import timedelta
 from decimal import Decimal
 from django.contrib import admin
 from django.test import TestCase, Client, RequestFactory, override_settings
@@ -12,6 +15,7 @@ from django.core.management import call_command
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from django.utils import timezone
 from unittest.mock import patch, MagicMock
 from .models import Website, Category, Rating, Review, Report
 from .forms import WebsiteSubmitForm, QuickSubmitForm, RatingForm, ReviewForm, ReportForm
@@ -36,9 +40,36 @@ class SecuritySettingsTests(TestCase):
         self.assertGreater(len(settings.SECRET_KEY), 20)  # env key must exist; prod uses long key
 
     def test_debug_is_false_in_production(self):
-        """Ensure DEBUG is False when running in production-like environment."""
-        # This test assumes you use environment variables.
-        self.assertFalse(settings.DEBUG, "DEBUG should be False in production.")
+        """Production settings disable DEBUG and select the MySQL backend."""
+        env = os.environ.copy()
+        env.update({
+            'DJANGO_SECRET_KEY': 'production-settings-test-key',
+            'DEBUG': 'False',
+            'DJANGO_ALLOWED_HOSTS': 'example.com',
+            'MYSQL_DATABASE': 'test_database',
+            'MYSQL_USER': 'test_user',
+            'MYSQL_PASSWORD': 'test_password',
+            'MYSQL_HOST': '127.0.0.1',
+        })
+        result = subprocess.run(
+            [
+                sys.executable,
+                '-c',
+                "import config.settings as settings; "
+                "print(settings.DEBUG); "
+                "print(settings.DATABASES['default']['ENGINE'])",
+            ],
+            cwd=settings.BASE_DIR,
+            env=env,
+            capture_output=True,
+            check=True,
+            text=True,
+        )
+
+        self.assertEqual(
+            result.stdout.strip().splitlines(),
+            ['False', 'django.db.backends.mysql'],
+        )
 
     @override_settings(
         DEBUG=False,
@@ -886,6 +917,33 @@ class IndexViewTests(TestCase):
         response = self.client.get(reverse('index') + '?search=python')
         self.assertContains(response, 'Python Tutorial')
 
+    def test_index_combines_category_tag_and_search_filters(self):
+        matching_website = Website.objects.create(
+            title='Combined Discovery Match',
+            url='https://combined-match.example',
+            status=Website.STATUS_APPROVED,
+            category=self.category,
+        )
+        matching_website.tags.add('combined-filter')
+        Website.objects.create(
+            title='Combined Discovery Excluded',
+            url='https://combined-excluded.example',
+            status=Website.STATUS_APPROVED,
+            category=self.category,
+        )
+
+        response = self.client.get(
+            reverse('index'),
+            {
+                'category': self.category.slug,
+                'tag': 'combined-filter',
+                'search': 'Combined Discovery',
+            },
+        )
+
+        self.assertContains(response, 'Combined Discovery Match')
+        self.assertNotContains(response, 'Combined Discovery Excluded')
+
     def test_index_pagination(self):
         """Test pagination works."""
         for i in range(15):
@@ -898,6 +956,94 @@ class IndexViewTests(TestCase):
         response = self.client.get(reverse('index'))
         self.assertEqual(response.status_code, 200)
         self.assertIn('page_obj', response.context)
+
+    def test_featured_websites_blend_recent_random_and_highest_rated(self):
+        created_at = timezone.now()
+        websites = [
+            Website.objects.create(
+                title=f'Featured Site {index}',
+                slug=f'featured-site-{index}',
+                url=f'https://featured{index}.example',
+                status=Website.STATUS_APPROVED,
+            )
+            for index in range(26)
+        ]
+        for index, website in enumerate(websites):
+            Website.objects.filter(pk=website.pk).update(
+                created_at=created_at - timedelta(days=index),
+            )
+        Website.objects.filter(pk=websites[-1].pk).update(
+            average_rating=Decimal('5.00'),
+            total_ratings=20,
+        )
+        Website.objects.filter(pk=websites[-2].pk).update(
+            average_rating=Decimal('4.90'),
+            total_ratings=100,
+        )
+
+        with patch('directory.views.random.shuffle', side_effect=lambda items: items.reverse()):
+            response = self.client.get(reverse('index'))
+
+        featured = response.context['featured_websites']
+        featured_ids = [website.pk for website in featured]
+        self.assertEqual(len(featured), 6)
+        self.assertEqual(len(featured_ids), len(set(featured_ids)))
+        self.assertEqual(
+            featured,
+            [websites[23], websites[22], websites[0], websites[1], websites[-1], websites[-2]],
+        )
+
+    def test_featured_websites_are_hidden_when_any_filter_is_active(self):
+        for filters in (
+            {'search': 'missing'},
+            {'category': self.category.slug},
+            {'tag': 'missing'},
+        ):
+            with self.subTest(filters=filters):
+                response = self.client.get(reverse('index'), filters)
+                self.assertNotContains(response, 'وب‌سایت‌های پیشنهادی')
+
+    def test_empty_filter_states_link_back_to_all_websites(self):
+        empty_filters = (
+            ({'search': 'no-match'}, 'برای این جستجو وب‌سایتی پیدا نشد.'),
+            ({'category': self.category.slug}, 'در این دسته‌بندی وب‌سایتی برای نمایش وجود ندارد.'),
+            ({'tag': 'missing'}, 'برای این برچسب وب‌سایتی پیدا نشد.'),
+        )
+        for filters, empty_message in empty_filters:
+            with self.subTest(filters=filters):
+                response = self.client.get(reverse('index'), filters)
+
+                self.assertContains(response, empty_message)
+                self.assertContains(response, 'نمایش همه وب‌سایت‌ها')
+                self.assertContains(response, reverse('index'))
+
+    def test_elided_pagination_preserves_active_filters(self):
+        Website.objects.bulk_create([
+            Website(
+                title=f'Pagination Site {index}',
+                slug=f'pagination-site-{index}',
+                url=f'https://pagination{index}.example',
+                status=Website.STATUS_APPROVED,
+                category=self.category,
+            )
+            for index in range(301)
+        ])
+
+        response = self.client.get(
+            reverse('index'),
+            {'search': 'Pagination Site', 'category': self.category.slug, 'page': 13},
+        )
+
+        self.assertEqual(response.context['page_obj'].paginator.num_pages, 26)
+        self.assertContains(response, '…')
+        self.assertContains(response, 'aria-current="page"')
+        self.assertContains(response, 'رفتن به صفحه نخست')
+        self.assertContains(response, 'رفتن به صفحه قبلی')
+        self.assertContains(response, 'رفتن به صفحه بعدی')
+        self.assertContains(response, 'رفتن به صفحه آخر')
+        self.assertContains(response, 'page=12')
+        self.assertContains(response, 'search=Pagination')
+        self.assertContains(response, 'category=tech')
 
 
 class WebsiteDetailViewTests(TestCase):
@@ -955,6 +1101,48 @@ class WebsiteDetailViewTests(TestCase):
 
         response = self.client.get(reverse('website_detail', kwargs={'slug': 'test-site'}))
         self.assertContains(response, 'Related Site')
+
+    def test_detail_prefers_shared_tag_related_websites(self):
+        category = Category.objects.create(name='Related', slug='related')
+        self.website.category = category
+        self.website.save()
+        shared_tag = Tag.objects.create(name='Shared', slug='shared')
+        self.website.tags.add(shared_tag)
+        shared_website = Website.objects.create(
+            title='Shared Tag Site',
+            url='https://shared.example',
+            status=Website.STATUS_APPROVED,
+        )
+        shared_website.tags.add(shared_tag)
+        Website.objects.create(
+            title='Same Category Site',
+            url='https://category.example',
+            status=Website.STATUS_APPROVED,
+            category=category,
+        )
+
+        response = self.client.get(reverse('website_detail', kwargs={'slug': 'test-site'}))
+
+        self.assertEqual(response.context['related_websites'][0], shared_website)
+
+    def test_detail_handles_missing_owner_contact_values(self):
+        self.website.owner_name = ''
+        self.website.owner_email = ''
+        self.website.save()
+
+        response = self.client.get(reverse('website_detail', kwargs={'slug': 'test-site'}))
+
+        self.assertContains(response, 'اطلاعات تماس ثبت نشده است.')
+        self.assertNotContains(response, 'mailto:')
+
+    def test_detail_honors_hidden_owner_contact_values(self):
+        self.website.hide_owner_info = True
+        self.website.save()
+
+        response = self.client.get(reverse('website_detail', kwargs={'slug': 'test-site'}))
+
+        self.assertContains(response, 'اطلاعات صاحب وب‌سایت پنهان شده است.')
+        self.assertNotContains(response, 'owner@test.com')
 
 
 class SubmitWebsiteViewTests(TestCase):
@@ -1206,6 +1394,23 @@ class CspNonceTests(CspNonceAssertionsMixin, TestCase):
 
         self.assert_csp_nonce_matches_header(response)
 
+    def test_index_page_csp_nonce_matches_header_and_uses_safe_text_rendering(self):
+        response = self.client.get(reverse('index'))
+
+        self.assert_csp_nonce_matches_header(response)
+        csp = response.headers['Content-Security-Policy']
+        self.assertIn(
+            'frame-src \'self\' https://cdn.ampproject.org https://cdn.yektanet.com',
+            csp,
+        )
+        self.assertIn(
+            'connect-src \'self\' https://audience.yektanet.com https://ua.yektanet.com',
+            csp,
+        )
+        self.assertNotIn('127.0.0.1:8888', csp)
+        self.assertContains(response, 'textContent', html=False)
+        self.assertNotContains(response, 'innerHTML', html=False)
+
 
 class AuthenticationViewTests(TestCase):
     """Tests for authentication views."""
@@ -1253,7 +1458,12 @@ class AuthenticationViewTests(TestCase):
         self.client.login(username='testuser', password='pass123')
 
         response = self.client.get(reverse('logout'))
+        self.assertEqual(response.status_code, 405)
+        self.assertIn('_auth_user_id', self.client.session)
+
+        response = self.client.post(reverse('logout'))
         self.assertRedirects(response, reverse('index'))
+        self.assertNotIn('_auth_user_id', self.client.session)
 
 
 class AuthenticationAjaxFeedbackTests(TestCase):
@@ -1412,6 +1622,54 @@ class UserDashboardViewTests(TestCase):
         )
         self.assertRedirects(response, reverse('user_dashboard'))
 
+    def test_delete_review_requires_post_and_owner_authentication(self):
+        review = Review.objects.create(
+            website=self.website,
+            user=self.user,
+            content='Temporary review',
+        )
+
+        response = self.client.get(
+            reverse('delete_my_review', kwargs={'pk': review.pk})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Review.objects.filter(pk=review.pk).exists())
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse('delete_my_review', kwargs={'pk': review.pk})
+        )
+
+        self.assertEqual(response.status_code, 405)
+        self.assertTrue(Review.objects.filter(pk=review.pk).exists())
+
+        response = self.client.post(
+            reverse('delete_my_review', kwargs={'pk': review.pk})
+        )
+
+        self.assertFalse(Review.objects.filter(pk=review.pk).exists())
+        self.assertEqual(
+            [str(message) for message in get_messages(response.wsgi_request)],
+            ['دیدگاه حذف شد.'],
+        )
+        self.assertRedirects(response, reverse('user_dashboard'))
+
+    def test_user_cannot_delete_another_users_review(self):
+        other_user = User.objects.create_user('other', 'other@test.com', 'pass123')
+        review = Review.objects.create(
+            website=self.website,
+            user=other_user,
+            content='Another user review',
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse('delete_my_review', kwargs={'pk': review.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Review.objects.filter(pk=review.pk).exists())
+
     def test_owner_can_restore_website_they_deleted(self):
         self.website.is_deleted = True
         self.website.deleted_by = self.user
@@ -1473,6 +1731,15 @@ class RatingViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
 
+    def test_rate_requires_post(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse('rate_website', kwargs={'slug': self.website.slug})
+        )
+
+        self.assertEqual(response.status_code, 405)
+
     def test_rate_creates_rating(self):
         """Test authenticated user can rate."""
         self.client.login(username='testuser', password='pass123')
@@ -1503,6 +1770,34 @@ class RatingViewTests(TestCase):
         ratings = Rating.objects.filter(user=self.user, website=self.website)
         self.assertEqual(ratings.count(), 1)
         self.assertEqual(ratings.first().rating, 5)
+
+    def test_invalid_rating_shows_feedback(self):
+        self.client.force_login(self.user)
+
+        for rating, error_message in (
+            ('0', 'امتیاز باید بین ۱ تا ۵ باشد.'),
+            ('invalid', 'امتیاز نامعتبر است.'),
+        ):
+            with self.subTest(rating=rating):
+                response = self.client.post(
+                    reverse('rate_website', kwargs={'slug': self.website.slug}),
+                    {'rating': rating},
+                )
+
+                self.assertFalse(
+                    Rating.objects.filter(user=self.user, website=self.website).exists()
+                )
+                self.assertIn(
+                    error_message,
+                    [str(message) for message in get_messages(response.wsgi_request)],
+                )
+
+    def test_rating_buttons_have_persian_accessible_labels(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('website_detail', kwargs={'slug': self.website.slug}))
+
+        self.assertContains(response, 'aria-label="امتیاز ۱ از ۵"')
 
 
 class ReviewViewTests(TestCase):
@@ -1535,6 +1830,27 @@ class ReviewViewTests(TestCase):
         )
 
         self.assertTrue(Review.objects.filter(user=self.user, website=self.website).exists())
+
+    def test_review_requires_post(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('review_website', kwargs={'slug': self.website.slug}))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_invalid_review_shows_feedback(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse('review_website', kwargs={'slug': self.website.slug}),
+            {'content': ''},
+        )
+
+        self.assertFalse(Review.objects.filter(user=self.user, website=self.website).exists())
+        self.assertIn(
+            'دیدگاه شما ثبت نشد. لطفاً متن را بررسی کنید.',
+            [str(message) for message in get_messages(response.wsgi_request)],
+        )
 
 
 class ReportViewTests(TestCase):
@@ -1586,6 +1902,26 @@ class ReportViewTests(TestCase):
 
         self.assertEqual(Report.objects.filter(user=self.user, website=self.website).count(), 1)
 
+    def test_report_requires_post(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse('report_website', kwargs={'slug': self.website.slug}))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_invalid_report_shows_feedback(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse('report_website', kwargs={'slug': self.website.slug}),
+            {'report_type': ''},
+        )
+
+        self.assertFalse(Report.objects.filter(user=self.user, website=self.website).exists())
+        self.assertIn(
+            'گزارش شما ثبت نشد. لطفاً اطلاعات را بررسی کنید.',
+            [str(message) for message in get_messages(response.wsgi_request)],
+        )
 
 class AdminDashboardViewTests(TestCase):
     """Tests for admin dashboard."""
@@ -2524,7 +2860,7 @@ class PerformanceTests(TestCase):
                 category=self.category
             )
 
-        with self.assertNumQueries(5):  # featured, count, categories, tags, page
+        with self.assertNumQueries(6):  # featured buckets, count, categories, tags, page
             response = self.client.get(reverse('index'))
 
         self.assertEqual(response.status_code, 200)

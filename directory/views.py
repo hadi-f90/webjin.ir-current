@@ -65,10 +65,10 @@ def index(request):
     ).select_related('category')
     categories = Category.objects.annotate(
         website_count=Count(
-            'website_set',
+            'websites',
             filter=Q(
-                website_set__status=Website.STATUS_APPROVED,
-                website_set__is_deleted=False,
+                websites__status=Website.STATUS_APPROVED,
+                websites__is_deleted=False,
             ),
         )
     )
@@ -109,14 +109,43 @@ def index(request):
             | Q(tags__name__icontains=search)
         ).distinct()
 
-    # Limit before shuffle — avoid loading the full approved table
-    featured_qs = list(
-        Website.objects.filter(status=Website.STATUS_APPROVED, is_deleted=False)
-        .select_related('category')
-        .order_by('-created_at')[:24]
-    )
-    random.shuffle(featured_qs)
-    featured_websites = featured_qs[:6]
+    featured_websites = []
+    if not (category_slug or tag_slug or search):
+        eligible_websites = Website.objects.filter(
+            status=Website.STATUS_APPROVED,
+            is_deleted=False,
+        ).select_related('category')
+        recent_candidates = list(eligible_websites.order_by('-created_at')[:24])
+        random.shuffle(recent_candidates)
+        random_websites = recent_candidates[:2]
+        recent_websites = sorted(
+            recent_candidates,
+            key=lambda website: website.created_at,
+            reverse=True,
+        )[:2]
+        rated_websites = list(
+            eligible_websites.filter(total_ratings__gt=0).order_by(
+                '-average_rating',
+                '-total_ratings',
+                '-created_at',
+            )[:2]
+        )
+
+        selected_ids = set()
+        for website_pool in (
+            random_websites,
+            recent_websites,
+            rated_websites,
+            recent_candidates,
+        ):
+            for website in website_pool:
+                if website.pk not in selected_ids:
+                    featured_websites.append(website)
+                    selected_ids.add(website.pk)
+                    if len(featured_websites) == 6:
+                        break
+            if len(featured_websites) == 6:
+                break
 
     paginator = Paginator(websites, 12)
     page_number = request.GET.get('page')
@@ -127,6 +156,7 @@ def index(request):
         'categories': categories,
         'all_tags': all_tags,
         'featured_websites': featured_websites,
+        'page_range': paginator.get_elided_page_range(page_obj.number),
         'category_slug': category_slug,
         'selected_category': selected_category,
         'tag_slug': tag_slug,
@@ -272,6 +302,7 @@ def rate_website(request, slug):
     return redirect('website_detail', slug=slug)
 
 @login_required
+@require_POST
 def review_website(request, slug):
     website = get_object_or_404(
         Website, slug=slug, status=Website.STATUS_APPROVED, is_deleted=False
@@ -279,19 +310,19 @@ def review_website(request, slug):
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
-            # taggit doesn't affect reviews directly, but ensure unique review per user if needed
-            # Currently, the model allows multiple reviews per user.
-            # If you want one review per user, add unique_together in Review model.
             Review.objects.create(
                 website=website,
                 user=request.user,
                 content=form.cleaned_data['content'],
                 is_approved=True
             )
-            messages.success(request, 'نظر شما ثبت شد!')
+            messages.success(request, 'دیدگاه شما ثبت شد.')
+        else:
+            messages.error(request, 'دیدگاه شما ثبت نشد. لطفاً متن را بررسی کنید.')
     return redirect('website_detail', slug=slug)
 
 @login_required
+@require_POST
 def report_website(request, slug):
     website = get_object_or_404(
         Website, slug=slug, status=Website.STATUS_APPROVED, is_deleted=False
@@ -311,6 +342,8 @@ def report_website(request, slug):
                 description=form.cleaned_data.get('description', '')
             )
             messages.success(request, 'گزارش شما ثبت شد. متشکریم!')
+        else:
+            messages.error(request, 'گزارش شما ثبت نشد. لطفاً اطلاعات را بررسی کنید.')
     return redirect('website_detail', slug=slug)
 
 def _wants_json(request):
@@ -513,6 +546,7 @@ def user_login(request):
         form = AuthenticationForm()
     return render(request, 'directory/login.html', {'form': form})
 
+@require_POST
 def user_logout(request):
     logout(request)
     messages.info(request, 'از حساب خود خارج شدید.')
@@ -569,10 +603,11 @@ def restore_my_website(request, pk):
 
 
 @login_required
+@require_POST
 def delete_my_review(request, pk):
     review = get_object_or_404(Review, pk=pk, user=request.user)
     review.delete()
-    messages.success(request, 'نظر حذف شد.')
+    messages.success(request, 'دیدگاه حذف شد.')
     return redirect('user_dashboard')
 
 # ==================== Static Pages ====================
@@ -604,7 +639,7 @@ def admin_dashboard(request):
         'deleted_by',
     )
     categories = Category.objects.annotate(
-        website_count=Count('website_set', filter=Q(website_set__is_deleted=False))
+        website_count=Count('websites', filter=Q(websites__is_deleted=False))
     )
     tags = Tag.objects.annotate(
         website_count=Count(
@@ -796,10 +831,10 @@ def edit_category_ajax(request, pk):
 @staff_ajax_required
 def delete_category_ajax(request, pk):
     category = get_object_or_404(Category, pk=pk)
-    if category.website_set.exists():
+    if category.websites.exists():
         return JsonResponse({
             'status': 'error',
-            'message': f"این دسته‌بندی شامل {category.website_set.count()} وب‌سایت است.",
+            'message': f"این دسته‌بندی شامل {category.websites.count()} وب‌سایت است.",
         }, status=400)
     category.delete()
     return JsonResponse({'status': 'success', 'message': "دسته‌بندی حذف شد."})

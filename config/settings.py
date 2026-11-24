@@ -190,10 +190,14 @@ CONTENT_SECURITY_POLICY = {
             NONCE,
         ),
         'style-src': ("'self'", "'unsafe-inline'"),  # inline styles used in templates
-        'frame-src': ("'self'", 'https://cdn.ampproject.org'),
+        'frame-src': ("'self'", 'https://cdn.ampproject.org', 'https://cdn.yektanet.com'),
         'img-src': ("'self'", 'data:', 'https:', 'https://cdn.ampproject.org'),
         'font-src': ("'self'", 'data:'),
-        'connect-src': ("'self'",),
+        'connect-src': (
+            "'self'",
+            'https://audience.yektanet.com',
+            'https://ua.yektanet.com',
+        ),
     },
 }
 
